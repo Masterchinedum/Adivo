@@ -49,10 +49,11 @@ export default withAuth(
 )
 
 export const config = {
-  matcher: [
-    '/dashboard/:path*',
-    '/admin/:path*',
-    '/mod/:path*',
-    '/auth/:path*'
-  ]
-}
+    matcher: [
+      '/dashboard/:path*',
+      '/admin/:path*',
+      '/mod/:path*',
+      '/auth/signin',
+      '/auth/signup',
+    ]
+  }
