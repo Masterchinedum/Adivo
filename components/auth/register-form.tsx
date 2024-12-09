@@ -1,6 +1,6 @@
 'use client'
 
-import { z } from "zod";
+// import { z } from "zod";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useForm } from "react-hook-form";
@@ -18,7 +18,6 @@ import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CardWrapper } from "@/components/auth/card-wrapper";
-import { login } from "@/actions/login";
 import { useState, useTransition } from "react";
 import { register } from "@/actions/register";
 

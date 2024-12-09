@@ -1,11 +1,11 @@
 'use server'
 
-import { hash } from 'bcryptjs'
-import { db } from "@/lib/prisma"
-import { getUserByEmail } from "@/data/user"
-import { sendVerificationEmail } from "@/lib/mail"
-import { generateVerificationToken } from "@/data/tokens"
-import { registerSchema, RegisterSchema } from "@/schemas"
+import { hash } from 'bcryptjs';
+import { db } from "@/lib/prisma";
+import { getUserByEmail } from "@/data/user";
+import { sendVerificationEmail } from "@/lib/mail";
+import { generateVerificationToken } from "@/data/tokens";
+import { registerSchema, RegisterSchema } from "@/schemas";
 
 export async function register(values: RegisterSchema) {
   const validatedFields = registerSchema.safeParse(values)
