@@ -3,7 +3,7 @@ import type { NextAuthConfig } from "next-auth"
 import { loginSchema } from "./schemas"
 import { getUserByEmail } from "./data/user"
 import { compare } from "bcryptjs"
-import Github from "next-auth/providers/github"
+import Github from "next-auth/providers/facebook"
 import Google from "next-auth/providers/google"
  
 export default {
