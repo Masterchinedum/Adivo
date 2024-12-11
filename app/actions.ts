@@ -5,6 +5,9 @@ import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { rateLimit } from '@/lib/rate-limit'
+import { signInSchema, signUpSchema } from '@/lib/validations/auth'
+
 export const signUpAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
@@ -39,22 +42,28 @@ export const signUpAction = async (formData: FormData) => {
   }
 };
 
-export const signInAction = async (formData: FormData) => {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-  const supabase = await createClient();
-
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (error) {
-    return encodedRedirect("error", "/sign-in", error.message);
+export async function signInAction(formData: FormData) {
+  const rateLimitResult = await rateLimit.check(5, '10 m')
+  if (!rateLimitResult.success) {
+    return { error: 'Too many attempts. Please try again later.' }
   }
 
-  return redirect("/protected");
-};
+  try {
+    const values = Object.fromEntries(formData)
+    const validatedFields = signInSchema.parse(values)
+    
+    const { data: { session }, error } = await supabase.auth.signInWithPassword({
+      email: validatedFields.email,
+      password: validatedFields.password,
+    })
+
+    if (error) throw error
+    
+    return { success: true }
+  } catch (error) {
+    return { error: 'Invalid credentials' }
+  }
+}
 
 export const forgotPasswordAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
