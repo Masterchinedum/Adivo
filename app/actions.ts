@@ -43,7 +43,7 @@ export const signUpAction = async (formData: FormData) => {
 };
 
 export async function signInAction(formData: FormData) {
-  const supabase = createClient()  // Add this line
+  const supabase = await createClient() 
   
   try {
     const values = Object.fromEntries(formData)
