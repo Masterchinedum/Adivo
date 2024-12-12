@@ -21,3 +21,13 @@ export interface AuthUser {
   export interface AuthError {
     message: string;
   }
+
+export type UserRole = 'ADMIN' | 'EDITOR' | 'USER';
+
+export interface UserProfile {
+  id: string;
+  role: UserRole;
+  email: string;
+  full_name?: string;
+  permissions?: string[];
+}

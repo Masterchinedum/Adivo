@@ -1,79 +1,76 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { rateLimit } from '@/lib/rate-limit';
-import { signInSchema, signUpSchema, resetPasswordSchema } from '@/lib/validations/auth';
-import { type AuthResponse } from '@supabase/supabase-js';
+import { signInSchema, signUpSchema } from '@/lib/validations/auth';
 import { createAuditLog } from '@/lib/audit';
+import { UserRole } from '@/types/auth';
+import { z } from 'zod';
 
-// Define type-safe response structure
-interface AuthActionResponse {
+interface AuthResponse {
   success: boolean;
   message: string;
   redirectTo?: string;
-  error?: string;
 }
 
-// Rate limit configuration
-const RATE_LIMIT_ATTEMPTS = 5;
-const RATE_LIMIT_WINDOW = '300 s'; // 5 minutes
+const DEFAULT_ROLE: UserRole = 'USER';
 
-export async function signUpAction(formData: FormData): Promise<AuthActionResponse> {
+async function getOriginHeader(): Promise<string> {
+  const headersList = await headers();
+  return headersList.get("origin") || "";
+}
+
+export async function signUpAction(formData: FormData): Promise<AuthResponse> {
   try {
     // Rate limiting
-    const identifier = formData.get("email")?.toString() || '';
-    const { success } = await rateLimit(`signup_${identifier}`, RATE_LIMIT_ATTEMPTS, RATE_LIMIT_WINDOW);
-    if (!success) {
-      return {
-        success: false,
-        message: "Too many attempts. Please try again later.",
-        error: "RATE_LIMIT_EXCEEDED"
-      };
-    }
+    const ip = (await headers()).get("x-forwarded-for") || "anonymous";
+    await rateLimit(ip);
 
-    // Validate input
+    // Validate form data
     const values = Object.fromEntries(formData);
     const validatedFields = signUpSchema.parse(values);
     
     const supabase = await createClient();
-    const origin = headers().get("origin");
+    const origin = await getOriginHeader() || "";
 
     // Create user with default role
-    const { data: { user }, error: signUpError } = await supabase.auth.signUp({
+    const { data: { user }, error } = await supabase.auth.signUp({
       email: validatedFields.email,
       password: validatedFields.password,
       options: {
         emailRedirectTo: `${origin}/auth/callback`,
         data: {
-          role: 'user', // Default role
-          full_name: validatedFields.full_name || '',
+          role: DEFAULT_ROLE,
+          full_name: validatedFields.full_name || "",
         }
       }
     });
 
-    if (signUpError) throw signUpError;
+    if (error) throw error;
 
-    // Create user profile in profiles table with default role
+    // Create user profile in profiles table with role
     if (user) {
       const { error: profileError } = await supabase
         .from('profiles')
-        .insert({
-          id: user.id,
-          role: 'user',
-          email: validatedFields.email,
-          full_name: validatedFields.full_name || '',
-        });
+        .insert([
+          {
+            id: user.id,
+            role: DEFAULT_ROLE,
+            email: validatedFields.email,
+            full_name: validatedFields.full_name || "",
+          }
+        ]);
 
       if (profileError) throw profileError;
     }
 
-    // Create audit log
+    // Audit log
     await createAuditLog({
-      action: 'SIGNUP',
-      userId: user?.id,
-      details: 'User registration successful'
+      action: 'SIGN_UP',
+      userId: user?.id || 'anonymous',
+      details: `New user registration: ${validatedFields.email}`
     });
 
     return {
@@ -81,29 +78,22 @@ export async function signUpAction(formData: FormData): Promise<AuthActionRespon
       message: "Please check your email to confirm your account.",
       redirectTo: "/sign-in"
     };
-
   } catch (error) {
     console.error('SignUp error:', error);
     return {
       success: false,
-      message: "Registration failed. Please try again.",
-      error: error instanceof Error ? error.message : "Unknown error"
+      message: error instanceof z.ZodError 
+        ? "Invalid input data" 
+        : "Registration failed. Please try again.",
     };
   }
 }
 
-export async function signInAction(formData: FormData): Promise<AuthActionResponse> {
+export async function signInAction(formData: FormData): Promise<AuthResponse> {
   try {
     // Rate limiting
-    const identifier = formData.get("email")?.toString() || '';
-    const { success } = await rateLimit(`signin_${identifier}`, RATE_LIMIT_ATTEMPTS, RATE_LIMIT_WINDOW);
-    if (!success) {
-      return {
-        success: false,
-        message: "Too many attempts. Please try again later.",
-        error: "RATE_LIMIT_EXCEEDED"
-      };
-    }
+    const ip = (await headers()).get("x-forwarded-for") || "anonymous";
+    await rateLimit(ip);
 
     const values = Object.fromEntries(formData);
     const validatedFields = signInSchema.parse(values);
@@ -117,95 +107,58 @@ export async function signInAction(formData: FormData): Promise<AuthActionRespon
 
     if (error) throw error;
 
-    // Get user's role and permissions
+    // Fetch user's role and permissions
     const { data: profile } = await supabase
       .from('profiles')
       .select('role, permissions')
       .eq('id', user?.id)
       .single();
 
-    // Create audit log
+    // Audit log
     await createAuditLog({
-      action: 'SIGNIN',
-      userId: user?.id,
-      details: 'User login successful'
+      action: 'SIGN_IN',
+      userId: user?.id || 'anonymous',
+      details: `User login: ${validatedFields.email}`
     });
 
     return {
       success: true,
-      message: "Login successful",
-      redirectTo: profile?.role === 'admin' ? '/admin/dashboard' : '/dashboard'
+      message: "Successfully signed in",
+      redirectTo: profile?.role === 'ADMIN' ? '/admin/dashboard' : '/dashboard'
     };
-
   } catch (error) {
     console.error('SignIn error:', error);
     return {
       success: false,
       message: "Invalid credentials",
-      error: error instanceof Error ? error.message : "Unknown error"
     };
   }
 }
 
-export async function forgotPasswordAction(formData: FormData): Promise<AuthActionResponse> {
+export async function resetPasswordAction(formData: FormData): Promise<AuthResponse> {
   try {
-    const email = formData.get("email")?.toString();
-    if (!email) {
+    const supabase = await createClient();
+    const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
+
+    if (password !== confirmPassword) {
       return {
         success: false,
-        message: "Email is required",
-        error: "INVALID_INPUT"
+        message: "Passwords do not match"
       };
     }
 
-    const supabase = await createClient();
-    const origin = headers().get("origin");
-
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${origin}/auth/callback?redirect_to=/protected/reset-password`,
-    });
-
-    if (error) throw error;
-
-    // Create audit log
-    await createAuditLog({
-      action: 'PASSWORD_RESET_REQUEST',
-      details: `Password reset requested for ${email}`
-    });
-
-    return {
-      success: true,
-      message: "Password reset instructions sent to your email",
-    };
-
-  } catch (error) {
-    console.error('Password reset request error:', error);
-    return {
-      success: false,
-      message: "Could not process password reset",
-      error: error instanceof Error ? error.message : "Unknown error"
-    };
-  }
-}
-
-export async function resetPasswordAction(formData: FormData): Promise<AuthActionResponse> {
-  try {
-    const values = Object.fromEntries(formData);
-    const validatedFields = resetPasswordSchema.parse(values);
-    
-    const supabase = await createClient();
-
     const { data: { user }, error } = await supabase.auth.updateUser({
-      password: validatedFields.password
+      password: password
     });
 
     if (error) throw error;
 
-    // Create audit log
+    // Audit log
     await createAuditLog({
-      action: 'PASSWORD_RESET_COMPLETE',
-      userId: user?.id,
-      details: 'Password reset successful'
+      action: 'PASSWORD_RESET',
+      userId: user?.id || 'anonymous',
+      details: 'Password reset completed'
     });
 
     return {
@@ -213,44 +166,33 @@ export async function resetPasswordAction(formData: FormData): Promise<AuthActio
       message: "Password updated successfully",
       redirectTo: "/sign-in"
     };
-
   } catch (error) {
     console.error('Password reset error:', error);
     return {
       success: false,
-      message: "Password update failed",
-      error: error instanceof Error ? error.message : "Unknown error"
+      message: "Password update failed"
     };
   }
 }
 
-export async function signOutAction(): Promise<AuthActionResponse> {
+export async function signOutAction(): Promise<void> {
+  const supabase = await createClient();
+  
   try {
-    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-
-    // Create audit log
+    await supabase.auth.signOut();
+    
+    // Audit log
     await createAuditLog({
-      action: 'SIGNOUT',
-      userId: user?.id,
+      action: 'SIGN_OUT',
+      userId: user?.id || 'anonymous',
       details: 'User signed out'
     });
-
-    return {
-      success: true,
-      message: "Signed out successfully",
-      redirectTo: "/sign-in"
-    };
-
+    
+    redirect('/sign-in');
   } catch (error) {
     console.error('SignOut error:', error);
-    return {
-      success: false,
-      message: "Sign out failed",
-      error: error instanceof Error ? error.message : "Unknown error"
-    };
+    redirect('/sign-in');
   }
 }
