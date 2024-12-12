@@ -43,11 +43,8 @@ export const signUpAction = async (formData: FormData) => {
 };
 
 export async function signInAction(formData: FormData) {
-  const rateLimitResult = await rateLimit.check(5, '10 m')
-  if (!rateLimitResult.success) {
-    return { error: 'Too many attempts. Please try again later.' }
-  }
-
+  const supabase = createClient()  // Add this line
+  
   try {
     const values = Object.fromEntries(formData)
     const validatedFields = signInSchema.parse(values)
@@ -64,7 +61,6 @@ export async function signInAction(formData: FormData) {
     return { error: 'Invalid credentials' }
   }
 }
-
 export const forgotPasswordAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
   const supabase = await createClient();
