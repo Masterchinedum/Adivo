@@ -1,3 +1,5 @@
+//app/(dashboards)/admindash/page.tsx
+
 import { Button } from "@/components/ui/button"
 
 const page = () => {

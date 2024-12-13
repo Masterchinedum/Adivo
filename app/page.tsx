@@ -1,3 +1,5 @@
+//@/app/page.tsx
+
 export default function HomePage() {
   return (
     <section className="text-center py-16">

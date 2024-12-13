@@ -1,3 +1,5 @@
+//@/(auth)/sign-up/[[...sign-up]]/page.tsx
+
 import { SignUp } from "@clerk/nextjs";
 
 import React from 'react'

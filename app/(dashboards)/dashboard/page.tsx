@@ -1,3 +1,5 @@
+//app/(dashboards)/dashboard/page.tsx
+
 import React from 'react'
 
 const page = () => {
