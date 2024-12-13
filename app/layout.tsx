@@ -1,3 +1,4 @@
+import { ClerkProvider} from '@clerk/nextjs'
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -17,21 +18,23 @@ export default function RootLayout({
   children: React.ReactNode; 
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} min-h-screen flex flex-col`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Navbar />
-          <main className="flex-grow container mx-auto px-4 py-8"> 
-            {children} 
-          </main>
-          <Footer /> 
-        </ThemeProvider>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" suppressHydrationWarning>
+        <body className={`${inter.className} min-h-screen flex flex-col`}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Navbar />
+            <main className="flex-grow container mx-auto px-4 py-8"> 
+              {children} 
+            </main>
+            <Footer /> 
+          </ThemeProvider>
+        </body>
+      </html>
+    </ClerkProvider>  
   );
 }

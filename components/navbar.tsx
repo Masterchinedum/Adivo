@@ -1,5 +1,6 @@
 "use client"
 
+import {SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
 import Link from "next/link"
 import { ModeToggle } from "./mode-toggle"
 
@@ -23,6 +24,12 @@ export default function Navbar() {
           >
             About
           </Link>
+            <SignedOut>
+              <SignInButton />
+            </SignedOut>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
           <ModeToggle />
         </div>
       </div>
