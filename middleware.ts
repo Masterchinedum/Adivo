@@ -11,7 +11,9 @@ const isPublicRoute = createRouteMatcher([
 
 // Define admin-only routes
 const isAdminRoute = createRouteMatcher([
-  '/admindash(.*)',
+  '/admin(.*)',
+  '/dashboard/settings(.*)',
+  '/dashboard/users(.*)'
 ])
 
 export default clerkMiddleware(async (auth, req) => {
@@ -23,11 +25,11 @@ export default clerkMiddleware(async (auth, req) => {
   // Get the user's authentication status
   const { userId, has, redirectToSignIn } = await auth()
 
-  // Check if the route is an admin route
+  // Special handling for admin routes
   if (isAdminRoute(req)) {
-    // Ensure user is logged in
+    // If not logged in, redirect to 404 for admin routes
     if (!userId) {
-      return redirectToSignIn()
+      return NextResponse.redirect(new URL('/404', req.url))
     }
 
     // Check if user has admin role
@@ -37,8 +39,8 @@ export default clerkMiddleware(async (auth, req) => {
     }
   }
 
-  // For all other routes, require login
-  if (!userId) {
+  // For other protected routes, redirect to sign-in if not logged in
+  if (!userId && !isAdminRoute(req)) {
     return redirectToSignIn()
   }
 
