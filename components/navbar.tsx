@@ -24,6 +24,18 @@ export default function Navbar() {
           >
             About
           </Link>
+          <Link 
+            href="/dashboard" 
+            className="hover:text-blue-600 dark:hover:text-blue-400 dark:text-gray-200"
+          >
+            Dashboard
+          </Link>
+          <Link 
+            href="/admindash" 
+            className="hover:text-blue-600 dark:hover:text-blue-400 dark:text-gray-200"
+          >
+            Admin
+          </Link>
             <SignedOut>
               <SignInButton />
             </SignedOut>
