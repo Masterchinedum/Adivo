@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 
-import { register } from "@/actions/register"
+// import { register } from "@/actions/register"
 import { CardWrapper } from "@/components/auth/card-wrapper"
 import { FormError } from "@/components/form-error"
 import { FormSuccess } from "@/components/form-success"
