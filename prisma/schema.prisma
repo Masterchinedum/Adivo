@@ -9,105 +9,13 @@ generator client {
 }
 
 model User {
-  id            String         @id @default(uuid())
-  clerkId       String         @unique
-  email         String         @unique
-  firstName     String?
-  lastName      String?
-  profileImage  String?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  testResults   TestResult[]
-  preferences   UserPreferences?
-  role          Role           @default(USER)
-  lastActive    DateTime       @updatedAt
-}
-
-model UserPreferences {
-  id              String   @id @default(uuid())
-  userId          String   @unique
-  user            User     @relation(fields: [userId], references: [id])
-  theme           String   @default("light")
-  emailNotifications Boolean @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-}
-
-model Test {
-  id          String       @id @default(uuid())
-  title       String
-  description String       @db.String
-  category    TestCategory
-  duration    Int          // Duration in minutes
-  questions   Question[]
-  results     TestResult[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-}
-
-model Question {
-  id          String       @id @default(uuid())
-  testId      String
-  text        String       @db.String
-  type        QuestionType
-  options     String[]     // Array of possible answers
-  weight      Float        // Question weight in final score
-  order       Int          // Question order in test
-  test        Test         @relation(fields: [testId], references: [id])
-  answers     Answer[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-}
-
-model Answer {
-  id          String    @id @default(uuid())
-  questionId  String
-  resultId    String
-  value       String    // The selected answer
-  question    Question  @relation(fields: [questionId], references: [id])
-  result      TestResult @relation(fields: [resultId], references: [id])
-  createdAt   DateTime  @default(now())
-}
-
-model TestResult {
-  id          String    @id @default(uuid())
-  userId      String
-  testId      String
-  score       Float     // Percentage score
-  answers     Answer[]
-  insights    String[]  // Array of generated insights
-  user        User      @relation(fields: [userId], references: [id])
-  test        Test      @relation(fields: [testId], references: [id])
+  id          String    @id @default(uuid()) @map("_id")
+  email       String    @unique
+  firstName   String?   @default("")
+  lastName    String?   @default("")
+  imageUrl    String?   @default("")
+  clerkUserId String    @unique
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  completedAt DateTime  // To track when test was completed
-  duration    Int       // Time taken in minutes
-  status      TestStatus // COMPLETED, IN_PROGRESS, ABANDONED
 }
 
-enum TestCategory {
-  RELATIONSHIP_HEALTH
-  TRUST_INDEX
-  CONFLICT_RESOLUTION
-  COMMUNICATION
-  COMPATIBILITY
-}
-
-enum QuestionType {
-  MULTIPLE_CHOICE
-  CHECKBOX
-  DROPDOWN
-  SCALE
-  TEXT
-}
-
-enum TestStatus {
-  IN_PROGRESS
-  COMPLETED 
-  ABANDONED
-}
-
-enum Role {
-  USER
-  ADMIN
-}
