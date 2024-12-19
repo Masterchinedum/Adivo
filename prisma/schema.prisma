@@ -19,6 +19,8 @@ model User {
   updatedAt     DateTime       @updatedAt
   testResults   TestResult[]
   preferences   UserPreferences?
+  role          Role           @default(USER)
+  lastActive    DateTime       @updatedAt
 }
 
 model UserPreferences {
@@ -78,6 +80,9 @@ model TestResult {
   test        Test      @relation(fields: [testId], references: [id])
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  completedAt DateTime  // To track when test was completed
+  duration    Int       // Time taken in minutes
+  status      TestStatus // COMPLETED, IN_PROGRESS, ABANDONED
 }
 
 enum TestCategory {
@@ -94,4 +99,15 @@ enum QuestionType {
   DROPDOWN
   SCALE
   TEXT
+}
+
+enum TestStatus {
+  IN_PROGRESS
+  COMPLETED 
+  ABANDONED
+}
+
+enum Role {
+  USER
+  ADMIN
 }
