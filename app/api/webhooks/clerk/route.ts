@@ -61,18 +61,18 @@ export async function POST(req: Request) {
       })
     }
 
-    const user: User = {
+    const userData: User = {
       id: crypto.randomUUID(),
       email: email_addresses[0].email_address,
-      clerkUserId: id,                    // Kept as clerkUserId
+      clerkUserId: id,
       firstName: first_name || null,
       lastName: last_name || null,
-      imageUrl: image_url || null,         // Kept as imageUrl
+      imageUrl: image_url || null,
       createdAt: new Date(),
       updatedAt: new Date()
     }
-
-    await createUser(user)
+    
+    await createUser(userData)
   }
 
   return new Response('', { status: 200 })
