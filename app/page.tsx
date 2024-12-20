@@ -12,7 +12,7 @@ export default function HomePage() {
           href="/tests"
           className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700"
         >
-          Take a Test
+          Try a Test
         </a>
         <a
           href="/about"
