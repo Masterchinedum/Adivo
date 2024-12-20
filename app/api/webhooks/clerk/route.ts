@@ -61,14 +61,17 @@ export async function POST(req: Request) {
     }
 
     const user = {
-      clerkUserId: id,
+      id: crypto.randomUUID(), // Generate unique ID
       email: email_addresses[0].email_address,
-      ...(first_name ? { firstName: first_name } : {}),
-      ...(last_name ? { lastName: last_name } : {}),
-      ...(image_url ? { imageUrl: image_url } : {})
-    }
+      clerkUserId: id,
+      firstName: first_name || null,
+      lastName: last_name || null,
+      imageUrl: image_url || null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
 
-    await createUser(user as User)
+    await createUser(user)
   }
 
   return new Response('', { status: 200 })
