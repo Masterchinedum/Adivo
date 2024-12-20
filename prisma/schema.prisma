@@ -14,7 +14,7 @@ model User {
   firstName   String?   @default("")
   lastName    String?   @default("")
   imageUrl    String?   @default("")
-  clerkUserId String    @unique
+  clerkUserId String    @unique // Changed from clerkId to clerkUserId
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
