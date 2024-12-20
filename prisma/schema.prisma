@@ -1,4 +1,4 @@
-// This is your Prisma schema file
+// schema.prisma
 datasource db {
   provider = "cockroachdb"
   url      = env("DATABASE_URL")

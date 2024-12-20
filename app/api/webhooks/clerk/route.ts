@@ -1,3 +1,4 @@
+// route.ts
 import { Webhook } from 'svix'
 import { headers } from 'next/headers'
 import { WebhookEvent } from '@clerk/nextjs/server'
@@ -63,10 +64,10 @@ export async function POST(req: Request) {
     const user: User = {
       id: crypto.randomUUID(),
       email: email_addresses[0].email_address,
-      clerkUserId: id,
-      firstName: first_name || "",
-      lastName: last_name || "",
-      imageUrl: image_url || "",
+      clerkUserId: id,                    // Kept as clerkUserId
+      firstName: first_name || null,
+      lastName: last_name || null,
+      imageUrl: image_url || null,         // Kept as imageUrl
       createdAt: new Date(),
       updatedAt: new Date()
     }
