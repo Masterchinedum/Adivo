@@ -64,9 +64,9 @@ export async function POST(req: Request) {
       id: crypto.randomUUID(), // Generate unique ID
       email: email_addresses[0].email_address,
       clerkUserId: id,                    // Changed from clerkId
-      firstName: first_name || null,
-      lastName: last_name || null,
-      imageUrl: image_url || null, // Changed from profileImage
+      firstName: first_name || "",
+      lastName: last_name || "",
+      imageUrl: image_url || "", // Changed from profileImage
       createdAt: new Date(),
       updatedAt: new Date()
     };
