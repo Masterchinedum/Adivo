@@ -61,12 +61,12 @@ export async function POST(req: Request) {
     }
 
     const user = {
-      id: crypto.randomUUID(), // Generate unique ID
+      id: crypto.randomUUID(),
       email: email_addresses[0].email_address,
-      clerkUserId: id,                    // Changed from clerkId
-      firstName: first_name || "",
-      lastName: last_name || "",
-      imageUrl: image_url || "", // Changed from profileImage
+      clerkUserId: id,                    // Matches schema
+      firstName: first_name || "",         // Default to "" not null
+      lastName: last_name || "",           // Default to "" not null
+      imageUrl: image_url || "",           // Matches schema
       createdAt: new Date(),
       updatedAt: new Date()
     };
