@@ -18,3 +18,39 @@ model User {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
+
+model Test {
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  isPublished Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  categories  Category[]
+}
+
+model Category {
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  parentId    String?    // For nested categories
+  parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children    Category[] @relation("CategoryHierarchy")
+  test        Test       @relation(fields: [testId], references: [id], onDelete: Cascade)
+  testId      String
+  questions   Question[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Question {
+  id          String   @id @default(cuid())
+  text        String
+  type        String   // Can be 'multiple_choice', 'checkbox', 'dropdown', etc.
+  options     Json?    // For questions with predefined options
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId  String
+  order       Int      // To maintain question order
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
