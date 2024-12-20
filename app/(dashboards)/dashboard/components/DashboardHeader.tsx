@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { 
   CalendarDays, 
   Settings, 
-  PlusCircle,
+  // PlusCircle,
   BookOpen
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
