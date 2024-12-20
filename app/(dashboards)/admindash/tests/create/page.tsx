@@ -1,5 +1,5 @@
 // app/(dashboards)/admindash/tests/create/page.tsx
-import { TestForm } from '../_components/test-form';
+import { TestForm } from '../_components/test-form/test-form';
 
 export default function CreateTestPage() {
   return (
