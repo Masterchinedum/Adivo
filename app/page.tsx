@@ -5,7 +5,7 @@ export default function HomePage() {
     <section className="text-center py-16">
       <h1 className="text-4xl font-bold mb-4">Welcome to the Relationship Matrix</h1>
       <p className="text-lg text-gray-600 mb-8">
-        Take insightful tests to explore your relationships and self-reflection.
+        Take insightful tests to explore your relationships and self-reflection times.
       </p>
       <div className="flex justify-center gap-4">
         <a
