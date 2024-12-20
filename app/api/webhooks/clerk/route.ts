@@ -2,7 +2,7 @@ import { Webhook } from 'svix'
 import { headers } from 'next/headers'
 import { WebhookEvent } from '@clerk/nextjs/server'
 import { createUser } from '@/lib/users'
-// import { User } from '@prisma/client'
+import { User } from '@prisma/client'
 
 export async function POST(req: Request) {
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET
@@ -60,16 +60,16 @@ export async function POST(req: Request) {
       })
     }
 
-    const user = {
+    const user: User = {
       id: crypto.randomUUID(),
       email: email_addresses[0].email_address,
-      clerkUserId: id,                    // Matches schema
-      firstName: first_name || "",         // Default to "" not null
-      lastName: last_name || "",           // Default to "" not null
-      imageUrl: image_url || "",           // Matches schema
+      clerkUserId: id,
+      firstName: first_name || "",
+      lastName: last_name || "",
+      imageUrl: image_url || "",
       createdAt: new Date(),
       updatedAt: new Date()
-    };
+    }
 
     await createUser(user)
   }

@@ -1,3 +1,4 @@
+// users.ts
 import prisma from '@/lib/prisma'
 import { User } from '@prisma/client'
 
