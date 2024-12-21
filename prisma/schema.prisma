@@ -19,18 +19,22 @@ model User {
   updatedAt   DateTime  @updatedAt
 }
 
+// prisma/schema.prisma
 model Test {
   id          String     @id @default(cuid())
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
   title       String
   description String?
   isPublished Boolean    @default(false)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  createdById String     // Foreign key for Clerk user ID
   categories  Category[]
 }
 
 model Category {
   id          String     @id @default(cuid())
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
   title       String
   description String?
   parentId    String?    // For nested categories
@@ -39,18 +43,16 @@ model Category {
   test        Test       @relation(fields: [testId], references: [id], onDelete: Cascade)
   testId      String
   questions   Question[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
 }
 
 model Question {
-  id          String   @id @default(cuid())
-  text        String
-  type        String   // Can be 'multiple_choice', 'checkbox', 'dropdown', etc.
-  options     Json?    // For questions with predefined options
-  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  categoryId  String
-  order       Int      // To maintain question order
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  text       String
+  type       String
+  options    Json?
+  order      Int
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId String
 }
