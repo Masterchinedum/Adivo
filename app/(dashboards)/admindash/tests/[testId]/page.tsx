@@ -1,25 +1,50 @@
 // app/(dashboards)/admindash/tests/[testId]/page.tsx
-import { TestActions } from "./_components/test-actions"
+import { notFound } from "next/navigation"
+import { auth } from "@clerk/nextjs"
+import prisma from "@/lib/prisma"
 import { TestEditor } from "./_components/test-editor"
 
 interface TestPageProps {
   params: {
-    testId: string;
+    testId: string
   }
 }
 
-const TestPage = async ({ params }: TestPageProps) => {
-  // TODO: Fetch test data
+async function getTest(testId: string, userId: string) {
+  const test = await prisma.test.findUnique({
+    where: {
+      id: testId,
+      createdById: userId
+    },
+    include: {
+      categories: {
+        include: {
+          questions: {
+            orderBy: {
+              order: 'asc'
+            }
+          }
+        }
+      }
+    }
+  })
+
+  if (!test) notFound()
+  return test
+}
+
+export default async function TestPage({ params }: TestPageProps) {
+  const { userId } = await auth()
+  
+  if (!userId) {
+    return notFound()
+  }
+
+  const test = await getTest(params.testId, userId)
   
   return (
     <div className="max-w-5xl mx-auto p-6">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold">Edit Test</h1>
-        <TestActions testId={params.testId} />
-      </div>
-      <TestEditor testId={params.testId} />
+      <TestEditor initialData={test} />
     </div>
   )
 }
-
-export default TestPage
