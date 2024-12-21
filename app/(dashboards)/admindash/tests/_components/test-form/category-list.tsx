@@ -1,16 +1,48 @@
-// app/(dashboards)/admindash/tests/_components/test-form/category-list.tsx
 "use client"
 
 import { useState } from "react"
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { CategoryItem } from "./category-item"
+import { QuestionTypeEnum } from "@/types/test"
 
-export const CategoryList = () => {
-  const [categories, setCategories] = useState<string[]>([])
+interface Category {
+  id: string
+  title: string
+  description?: string
+  questions: Array<{
+    id: string
+    text: string
+    type: QuestionTypeEnum
+  }>
+}
 
+interface CategoryListProps {
+  categories: Category[]
+  onChange: (categories: Category[]) => void
+}
+
+export const CategoryList = ({ categories, onChange }: CategoryListProps) => {
   const addCategory = () => {
-    setCategories(prev => [...prev, `category-${prev.length}`])
+    const newCategory: Category = {
+      id: `temp-${Date.now()}`,
+      title: "",
+      description: "",
+      questions: []
+    }
+    onChange([...categories, newCategory])
+  }
+
+  const updateCategory = (id: string, data: Partial<Category>) => {
+    onChange(
+      categories.map(cat => 
+        cat.id === id ? { ...cat, ...data } : cat
+      )
+    )
+  }
+
+  const removeCategory = (id: string) => {
+    onChange(categories.filter(cat => cat.id !== id))
   }
 
   return (
@@ -28,8 +60,13 @@ export const CategoryList = () => {
       </div>
 
       <div className="space-y-4">
-        {categories.map((id) => (
-          <CategoryItem key={id} id={id} />
+        {categories.map((category) => (
+          <CategoryItem 
+            key={category.id}
+            category={category}
+            onUpdate={(data) => updateCategory(category.id, data)}
+            onRemove={() => removeCategory(category.id)}
+          />
         ))}
       </div>
     </div>
