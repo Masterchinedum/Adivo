@@ -26,7 +26,7 @@ export async function GET(
     const test = await prisma.test.findUnique({
       where: {
         id: params.testId,
-        userId,
+        createdById: userId,
       },
       include: {
         categories: {
@@ -64,7 +64,7 @@ export async function PATCH(
     const test = await prisma.test.update({
       where: {
         id: params.testId,
-        userId,
+        createdById: userId,
       },
       data: {
         ...body
@@ -95,7 +95,7 @@ export async function DELETE(
     const test = await prisma.test.delete({
       where: {
         id: params.testId,
-        userId,
+        createdById: userId,
       }
     })
 

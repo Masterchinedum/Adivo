@@ -34,7 +34,7 @@ export async function POST(
     const test = await prisma.test.findUnique({
       where: {
         id: params.testId,
-        userId,
+        createdById: userId
       }
     })
 
