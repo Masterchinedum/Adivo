@@ -31,7 +31,14 @@ export async function GET(
       include: {
         categories: {
           include: {
-            questions: true
+            questions: {
+              orderBy: {
+                order: 'asc'
+              }
+            }
+          },
+          orderBy: {
+            createdAt: 'asc'
           }
         }
       }
@@ -61,17 +68,38 @@ export async function PATCH(
     const json = await req.json()
     const body = updateTestSchema.parse(json)
 
-    const test = await prisma.test.update({
+    const test = await prisma.test.findUnique({
       where: {
         id: params.testId,
         createdById: userId,
-      },
-      data: {
-        ...body
       }
     })
 
-    return NextResponse.json(test)
+    if (!test) {
+      return new NextResponse("Not found", { status: 404 })
+    }
+
+    const updatedTest = await prisma.test.update({
+      where: {
+        id: params.testId
+      },
+      data: {
+        ...body
+      },
+      include: {
+        categories: {
+          include: {
+            questions: {
+              orderBy: {
+                order: 'asc'
+              }
+            }
+          }
+        }
+      }
+    })
+
+    return NextResponse.json(updatedTest)
   } catch (error) {
     if (error instanceof z.ZodError) {
       return new NextResponse("Invalid request data", { status: 422 })
@@ -92,14 +120,24 @@ export async function DELETE(
       return new NextResponse("Unauthorized", { status: 401 })
     }
 
-    const test = await prisma.test.delete({
+    const test = await prisma.test.findUnique({
       where: {
         id: params.testId,
         createdById: userId,
       }
     })
 
-    return NextResponse.json(test)
+    if (!test) {
+      return new NextResponse("Not found", { status: 404 })
+    }
+
+    await prisma.test.delete({
+      where: {
+        id: params.testId
+      }
+    })
+
+    return new NextResponse(null, { status: 204 })
   } catch (error) {
     return new NextResponse("Internal error", { status: 500 })
   }
