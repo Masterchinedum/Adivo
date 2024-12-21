@@ -2,22 +2,36 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 interface TestTitleFormProps {
-  testId: string
+  initialData: {
+    title: string;
+    id: string;
+  }
 }
 
-export const TestTitleForm = ({ testId }: TestTitleFormProps) => {
+export const TestTitleForm = ({ initialData }: TestTitleFormProps) => {
+  const router = useRouter()
   const [isEditing, setIsEditing] = useState(false)
-  const [title, setTitle] = useState("Untitled Test")
+  const [title, setTitle] = useState(initialData.title)
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    // TODO: Implement title update
-    setIsEditing(false)
+    try {
+      await fetch(`/api/admindash/tests/${initialData.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title })
+      })
+      router.refresh()
+      setIsEditing(false)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return isEditing ? (

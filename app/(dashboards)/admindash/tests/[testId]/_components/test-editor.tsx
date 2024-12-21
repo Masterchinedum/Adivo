@@ -7,19 +7,26 @@ import { Button } from "@/components/ui/button"
 import { TestTitleForm } from "./test-title-form"
 import { TestDescription } from "./test-description"
 import { CategoryEditor } from "./category-editor"
+import { TestActions } from "./test-actions"
+import { Test } from "@/types/test"
 
 interface TestEditorProps {
-  testId: string
+  initialData: Test
 }
 
-export const TestEditor = ({ testId }: TestEditorProps) => {
+export const TestEditor = ({ initialData }: TestEditorProps) => {
   const router = useRouter()
   const [isPublishing, setIsPublishing] = useState(false)
 
   const onPublish = async () => {
     try {
       setIsPublishing(true)
-      // TODO: Implement publish functionality
+      await fetch(`/api/admindash/tests/${initialData.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isPublished: true })
+      })
+      router.refresh()
     } catch (error) {
       console.error(error)
     } finally {
@@ -28,23 +35,31 @@ export const TestEditor = ({ testId }: TestEditorProps) => {
   }
 
   return (
-    <div className="grid gap-8">
-      <div>
-        <TestTitleForm testId={testId} />
-        <TestDescription testId={testId} />
-      </div>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Test Structure</h2>
-          <Button
-            onClick={onPublish}
-            disabled={isPublishing}
-          >
-            Publish Test
-          </Button>
+    <div className="grid gap-6">
+      <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-2">
+          <TestTitleForm 
+            initialData={{
+              title: initialData.title,
+              id: initialData.id
+            }}
+          />
+          <TestDescription 
+            initialData={{
+              description: initialData.description || "",
+              id: initialData.id
+            }}
+          />
         </div>
-        <CategoryEditor testId={testId} />
+        <TestActions 
+          testId={initialData.id} 
+          isPublished={initialData.isPublished}
+        />
       </div>
+      <CategoryEditor 
+        testId={initialData.id}
+        initialCategories={initialData.categories}
+      />
     </div>
   )
 }
