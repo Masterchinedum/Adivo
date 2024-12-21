@@ -60,3 +60,38 @@ export async function POST(
     return new NextResponse("Internal error", { status: 500 })
   }
 }
+
+export async function GET(
+  req: Request,
+  { params }: RouteContextProps
+) {
+  try {
+    const { userId } = await auth()
+
+    if (!userId) {
+      return new NextResponse("Unauthorized", { status: 401 })
+    }
+
+    // Verify the test belongs to the user and get its categories
+    const categories = await prisma.category.findMany({
+      where: {
+        testId: params.testId,
+        test: {
+          createdById: userId
+        }
+      },
+      include: {
+        questions: {
+          orderBy: {
+            order: 'asc'
+          }
+        }
+      }
+    })
+
+    return NextResponse.json(categories)
+  } catch (error) {
+    console.error("[CATEGORIES_GET]", error)
+    return new NextResponse("Internal error", { status: 500 })
+  }
+}
