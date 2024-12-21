@@ -9,7 +9,7 @@ const createQuestionSchema = z.object({
   type: z.enum(["multiple_choice", "checkbox", "scale", "text"]),
   options: z.array(z.object({
     text: z.string(),
-    value: z.union([z.string(), z.number()]),
+    value: z.union([z.string(), z.number()])
   })).optional(),
   categoryId: z.string(),
   order: z.number().min(0),
@@ -18,6 +18,43 @@ const createQuestionSchema = z.object({
 interface RouteContextProps {
   params: {
     testId: string
+  }
+}
+
+export async function GET(
+  req: Request,
+  { params }: RouteContextProps
+) {
+  try {
+    const { userId } = await auth()
+
+    if (!userId) {
+      return new NextResponse("Unauthorized", { status: 401 })
+    }
+
+    const { searchParams } = new URL(req.url)
+    const categoryId = searchParams.get("categoryId")
+
+    // Verify test ownership and get questions
+    const questions = await prisma.question.findMany({
+      where: {
+        category: {
+          id: categoryId || undefined,
+          test: {
+            id: params.testId,
+            createdById: userId
+          }
+        }
+      },
+      orderBy: {
+        order: 'asc'
+      }
+    })
+
+    return NextResponse.json(questions)
+  } catch (error) {
+    console.error("[QUESTIONS_GET]", error)
+    return new NextResponse("Internal error", { status: 500 })
   }
 }
 
@@ -35,7 +72,7 @@ export async function POST(
     const json = await req.json()
     const body = createQuestionSchema.parse(json)
 
-    // First verify if the category exists and belongs to the test
+    // Verify if the category exists and belongs to the test
     const category = await prisma.category.findFirst({
       where: {
         id: body.categoryId,
