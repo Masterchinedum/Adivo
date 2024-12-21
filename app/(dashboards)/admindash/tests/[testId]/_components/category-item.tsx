@@ -2,155 +2,125 @@
 "use client"
 
 import { useState } from "react"
-import { Pencil, GripVertical, ChevronDown, ChevronRight, Trash2, Plus } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
+import { useRouter } from "next/navigation"
+import { Pencil, ChevronDown, ChevronRight, Trash2, Plus } from "lucide-react"
+import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { CategoryType } from "@/types/test"
+import { QuestionList } from "./question-list"
 
 interface CategoryItemProps {
   testId: string
-  categoryId: string
+  category: CategoryType
+  onUpdate: (category: CategoryType) => void
+  onDelete: (id: string) => void
 }
 
-export const CategoryItem = ({ testId, categoryId }: CategoryItemProps) => {
+export const CategoryItem = ({ testId, category, onUpdate, onDelete }: CategoryItemProps) => {
+  const router = useRouter()
   const [isExpanded, setIsExpanded] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [showDeleteAlert, setShowDeleteAlert] = useState(false)
-  const [title, setTitle] = useState("Untitled Category")
-  const [description, setDescription] = useState("")
-  const [questions, setQuestions] = useState<string[]>([])
+  const [title, setTitle] = useState(category.title)
+  const [description, setDescription] = useState(category.description || "")
 
-  const onDelete = async () => {
+  const handleUpdate = async () => {
     try {
-      // TODO: Implement delete functionality
-      setShowDeleteAlert(false)
-    } catch (error) {
-      console.error(error)
-    }
-  }
+      const response = await fetch(`/api/admindash/tests/${testId}/categories/${category.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, description })
+      })
 
-  const onSave = async () => {
-    try {
-      // TODO: Implement save functionality
+      if (!response.ok) throw new Error("Failed to update category")
+
+      const updatedCategory = await response.json()
+      onUpdate(updatedCategory)
       setIsEditing(false)
+      router.refresh()
     } catch (error) {
       console.error(error)
     }
   }
 
-  const addQuestion = () => {
-    setQuestions(prev => [...prev, `question-${prev.length}`])
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`/api/admindash/tests/${testId}/categories/${category.id}`, {
+        method: "DELETE"
+      })
+
+      if (!response.ok) throw new Error("Failed to delete category")
+
+      onDelete(category.id)
+      setShowDeleteAlert(false)
+      router.refresh()
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return (
-    <Card>
-      <div className="p-4">
-        <div className="flex items-center gap-x-2">
-          <GripVertical className="h-5 w-5 text-slate-400" />
-          <div
-            className="flex-1 flex items-center gap-x-2 cursor-pointer"
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            {isExpanded ? (
-              <ChevronDown className="h-5 w-5" />
-            ) : (
-              <ChevronRight className="h-5 w-5" />
-            )}
-            <span className="font-semibold">{title}</span>
+    <Card className="p-4">
+      <div className="flex items-center gap-x-2">
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="p-1"
+        >
+          {isExpanded ? (
+            <ChevronDown className="h-4 w-4" />
+          ) : (
+            <ChevronRight className="h-4 w-4" />
+          )}
+        </button>
+
+        {isEditing ? (
+          <div className="flex-1 space-y-2">
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Category title"
+            />
+            <Textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Category description"
+            />
+            <div className="flex items-center gap-x-2">
+              <Button onClick={handleUpdate} size="sm">Save</Button>
+              <Button onClick={() => setIsEditing(false)} variant="ghost" size="sm">
+                Cancel
+              </Button>
+            </div>
           </div>
-          <div className="flex items-center gap-x-2">
-            <Button
-              onClick={() => setIsEditing(true)}
-              variant="ghost"
-              size="sm"
-            >
+        ) : (
+          <>
+            <div className="flex-1">
+              <h4 className="font-semibold">{category.title}</h4>
+              {category.description && (
+                <p className="text-sm text-muted-foreground">{category.description}</p>
+              )}
+            </div>
+            <Button onClick={() => setIsEditing(true)} variant="ghost" size="sm">
               <Pencil className="h-4 w-4" />
             </Button>
-            <Button
-              onClick={() => setShowDeleteAlert(true)}
-              variant="ghost"
-              size="sm"
-            >
-              <Trash2 className="h-4 w-4 text-red-500" />
+            <Button onClick={() => setShowDeleteAlert(true)} variant="ghost" size="sm">
+              <Trash2 className="h-4 w-4 text-destructive" />
             </Button>
-          </div>
-        </div>
+          </>
+        )}
       </div>
 
       {isExpanded && (
-        <CardContent className="border-t pt-4">
-          {isEditing ? (
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">Title</label>
-                <Input
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Category title"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Description</label>
-                <Textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Category description"
-                />
-              </div>
-              <div className="flex items-center gap-x-2">
-                <Button onClick={onSave}>
-                  Save Changes
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={() => setIsEditing(false)}
-                >
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {description && (
-                <p className="text-sm text-muted-foreground">{description}</p>
-              )}
-              
-              {/* Questions Section */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-medium">Questions</h3>
-                  <Button
-                    onClick={addQuestion}
-                    variant="outline"
-                    size="sm"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Question
-                  </Button>
-                </div>
-                {questions.map((questionId) => (
-                  <QuestionItem
-                    key={questionId}
-                    questionId={questionId}
-                    categoryId={categoryId}
-                    testId={testId}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-        </CardContent>
+        <div className="mt-4 pl-6">
+          <QuestionList 
+            testId={testId}
+            categoryId={category.id}
+            questions={category.questions}
+          />
+        </div>
       )}
 
       <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
@@ -158,96 +128,17 @@ export const CategoryItem = ({ testId, categoryId }: CategoryItemProps) => {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will delete this category and all its questions. This action cannot be undone.
+              This will permanently delete this category and all its questions.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={onDelete}
-              className="bg-red-600 hover:bg-red-700"
-            >
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive">
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </Card>
-  )
-}
-
-interface QuestionItemProps {
-  questionId: string
-  categoryId: string
-  testId: string
-}
-
-const QuestionItem = ({ questionId, categoryId, testId }: QuestionItemProps) => {
-  const [isEditing, setIsEditing] = useState(false)
-  const [text, setText] = useState("Untitled Question")
-  const [type, setType] = useState("multiple_choice")
-
-  const onSave = async () => {
-    try {
-      // TODO: Implement save functionality
-      setIsEditing(false)
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  return (
-    <Card>
-      <CardContent className="p-4">
-        <div className="flex items-center gap-x-2">
-          <GripVertical className="h-5 w-5 text-slate-400" />
-          {isEditing ? (
-            <div className="flex-1 space-y-4">
-              <Input
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder="Question text"
-              />
-              <select
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-                className="w-full p-2 border rounded-md"
-              >
-                <option value="multiple_choice">Multiple Choice</option>
-                <option value="checkbox">Checkbox</option>
-                <option value="scale">Scale</option>
-                <option value="text">Text</option>
-              </select>
-              <div className="flex items-center gap-x-2">
-                <Button onClick={onSave} size="sm">
-                  Save
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={() => setIsEditing(false)}
-                  size="sm"
-                >
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <>
-              <div className="flex-1">
-                <p>{text}</p>
-                <p className="text-sm text-muted-foreground">Type: {type}</p>
-              </div>
-              <Button
-                onClick={() => setIsEditing(true)}
-                variant="ghost"
-                size="sm"
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
-            </>
-          )}
-        </div>
-      </CardContent>
     </Card>
   )
 }
