@@ -5,11 +5,14 @@ import { Button } from "@/components/ui/button"
 import { QuestionType } from "@/types/test"
 import { QuestionForm } from "./question-form"
 
-export function QuestionEditor() {
-  const [questions, setQuestions] = useState<Partial<QuestionType>[]>([])
+interface QuestionEditorProps {
+  questions: Partial<QuestionType>[]
+  onChange: (questions: Partial<QuestionType>[]) => void
+}
 
+export function QuestionEditor({ questions, onChange }: QuestionEditorProps) {
   const addQuestion = () => {
-    setQuestions([
+    onChange([
       ...questions,
       {
         text: "",
@@ -23,7 +26,7 @@ export function QuestionEditor() {
   const handleQuestionChange = (index: number, updatedQuestion: Partial<QuestionType>) => {
     const newQuestions = [...questions]
     newQuestions[index] = updatedQuestion
-    setQuestions(newQuestions)
+    onChange(newQuestions)
   }
 
   return (

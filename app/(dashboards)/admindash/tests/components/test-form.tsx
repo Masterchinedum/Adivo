@@ -1,5 +1,3 @@
-// app/(dashboards)/admindash/tests/components/test-form.tsx
-
 "use client"
 
 import { useState } from "react"
@@ -17,11 +15,15 @@ import { AlertDialog,
 } from "@/components/ui/alert-dialog"
 import { QuestionType } from "@/types/test"
 
-export default function TestForm() {
+interface TestFormProps {
+  test?: TestType
+}
+
+export default function TestForm({ test }: TestFormProps) {
   const router = useRouter()
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
-  const [questions, setQuestions] = useState<Partial<QuestionType>[]>([])
+  const [title, setTitle] = useState(test?.title ?? "")
+  const [description, setDescription] = useState(test?.description ?? "")
+  const [questions, setQuestions] = useState<Partial<QuestionType>[]>(test?.questions ?? [])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState("")
   
@@ -31,12 +33,14 @@ export default function TestForm() {
     setError("")
 
     try {
-      // Validate form
       if (!title) throw new Error("Title is required")
       if (questions.length === 0) throw new Error("At least one question is required")
       
-      const response = await fetch('/api/admin/tests', {
-        method: 'POST',
+      const url = test ? `/api/admin/tests/${test.id}` : '/api/admin/tests'
+      const method = test ? 'PATCH' : 'POST'
+
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -52,13 +56,11 @@ export default function TestForm() {
       })
 
       if (!response.ok) {
-        throw new Error('Failed to create test')
+        throw new Error('Failed to save test')
       }
 
-      const data = await response.json()
       router.push('/admindash/tests')
       router.refresh()
-      
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Something went wrong')
     } finally {
