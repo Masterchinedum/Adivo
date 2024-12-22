@@ -3,7 +3,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Pencil, ChevronDown, ChevronRight, Trash2, Plus } from "lucide-react"
+import { Pencil, ChevronDown, ChevronRight, Trash2, Loader2 } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { CategoryType } from "@/types/test"
 import { QuestionList } from "./question-list"
+import { toast } from "react-hot-toast"
 
 interface CategoryItemProps {
   testId: string
@@ -23,12 +24,14 @@ export const CategoryItem = ({ testId, category, onUpdate, onDelete }: CategoryI
   const router = useRouter()
   const [isExpanded, setIsExpanded] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [showDeleteAlert, setShowDeleteAlert] = useState(false)
   const [title, setTitle] = useState(category.title)
   const [description, setDescription] = useState(category.description || "")
 
   const handleUpdate = async () => {
     try {
+      setIsLoading(true)
       const response = await fetch(`/api/admindash/tests/${testId}/categories/${category.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -40,14 +43,19 @@ export const CategoryItem = ({ testId, category, onUpdate, onDelete }: CategoryI
       const updatedCategory = await response.json()
       onUpdate(updatedCategory)
       setIsEditing(false)
+      toast.success("Category updated")
       router.refresh()
     } catch (error) {
       console.error(error)
+      toast.error("Failed to update category")
+    } finally {
+      setIsLoading(false)
     }
   }
 
   const handleDelete = async () => {
     try {
+      setIsLoading(true)
       const response = await fetch(`/api/admindash/tests/${testId}/categories/${category.id}`, {
         method: "DELETE"
       })
@@ -55,10 +63,14 @@ export const CategoryItem = ({ testId, category, onUpdate, onDelete }: CategoryI
       if (!response.ok) throw new Error("Failed to delete category")
 
       onDelete(category.id)
-      setShowDeleteAlert(false)
+      toast.success("Category deleted")
       router.refresh()
     } catch (error) {
       console.error(error)
+      toast.error("Failed to delete category")
+    } finally {
+      setIsLoading(false)
+      setShowDeleteAlert(false)
     }
   }
 
@@ -68,6 +80,7 @@ export const CategoryItem = ({ testId, category, onUpdate, onDelete }: CategoryI
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="p-1"
+          disabled={isLoading}
         >
           {isExpanded ? (
             <ChevronDown className="h-4 w-4" />
@@ -82,15 +95,27 @@ export const CategoryItem = ({ testId, category, onUpdate, onDelete }: CategoryI
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Category title"
+              disabled={isLoading}
             />
             <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Category description"
+              disabled={isLoading}
             />
             <div className="flex items-center gap-x-2">
-              <Button onClick={handleUpdate} size="sm">Save</Button>
-              <Button onClick={() => setIsEditing(false)} variant="ghost" size="sm">
+              <Button 
+                onClick={handleUpdate} 
+                disabled={isLoading}
+              >
+                {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                Save
+              </Button>
+              <Button
+                onClick={() => setIsEditing(false)}
+                variant="ghost"
+                disabled={isLoading}
+              >
                 Cancel
               </Button>
             </div>
@@ -103,10 +128,20 @@ export const CategoryItem = ({ testId, category, onUpdate, onDelete }: CategoryI
                 <p className="text-sm text-muted-foreground">{category.description}</p>
               )}
             </div>
-            <Button onClick={() => setIsEditing(true)} variant="ghost" size="sm">
+            <Button 
+              onClick={() => setIsEditing(true)} 
+              variant="ghost" 
+              size="sm"
+              disabled={isLoading}
+            >
               <Pencil className="h-4 w-4" />
             </Button>
-            <Button onClick={() => setShowDeleteAlert(true)} variant="ghost" size="sm">
+            <Button 
+              onClick={() => setShowDeleteAlert(true)} 
+              variant="ghost" 
+              size="sm"
+              disabled={isLoading}
+            >
               <Trash2 className="h-4 w-4 text-destructive" />
             </Button>
           </>
@@ -133,7 +168,12 @@ export const CategoryItem = ({ testId, category, onUpdate, onDelete }: CategoryI
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive">
+            <AlertDialogAction 
+              onClick={handleDelete}
+              className="bg-destructive"
+              disabled={isLoading}
+            >
+              {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
