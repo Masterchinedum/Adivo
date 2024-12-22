@@ -1,21 +1,24 @@
-This is a next.js app router project. I have already done the basic setup of setting up the following:
-a database using prisma, 
-shadcn ui, for components,
-tailwind css, 
-clerk for authentication
-etc.
+This is the plan base on our last conversation. 
 
-Now lets plan out the admin dasboard section. first we will be adding this feature.
+we have done step 1, 2, and 5, which leaves step 3 and 4 . You can confirm this on the work space to see the files we currently have.
 
-ability of an admin to publish a test to the database. This means writting a model for test on our schema.prisma file, writing a types/test.ts file for our types.
-create our api routes for post, get and delete requests to and from the database. 
-work on other technical aspects like the design etc. 
+Based on your workspace, I'll help plan the admin dashboard's test creation feature. Let's break it down into steps:
 
-Ok lets talk about how it would look.
+1. Update Schema (prisma/schema.prisma):
 
-I don't know yet you can advice on the best approach and design, however I do have a rough idea. The admin can create multiple test
+2. Create API Routes:
 
-lets take for example if one of the test is . Relationship Health Assessment
+3. Admin Dashboard UI (app/(dashboards)/admindash/tests/page.tsx/admindash/tests/page.tsx)):
 
-we will discus other aspects later, for now lets concentrate on the test Questions
-please write out a plan for me if you have any question feel free to ask.
+- List of tests with status (published/draft)
+- Create/Edit test button
+- Test management actions (publish, unpublish, delete)
+
+4. Test Creation Form (app/(dashboards)/admindash/tests/new/page.tsx/admindash/tests/new/page.tsx)):
+
+5. Components Needed:
+TestList - Table showing all tests
+TestForm - Form for test details
+QuestionEditor - Component for managing questions
+QuestionForm - Form for individual questions
+OptionsEditor - Component for managing question options
