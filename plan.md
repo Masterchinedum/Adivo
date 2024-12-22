@@ -1,6 +1,6 @@
 This is the plan base on our last conversation. 
 
-we have done step 1, 2, and 5, which leaves step 3 and 4 . You can confirm this on the work space to see the files we currently have.
+we have done step 1, 2, 4 and 5, which leaves step 3. You can confirm this on the work space to see the files we currently have.
 
 Based on your workspace, I'll help plan the admin dashboard's test creation feature. Let's break it down into steps:
 
