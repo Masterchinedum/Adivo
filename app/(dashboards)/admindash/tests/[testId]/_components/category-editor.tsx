@@ -1,11 +1,12 @@
 // app/(dashboards)/admindash/tests/[testId]/_components/category-editor.tsx
 "use client"
 
-import { useState, useEffect } from "react"
-import { Plus } from "lucide-react"
+import { useState } from "react"
+import { Plus, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { CategoryItem } from "./category-item"
 import { CategoryType } from "@/types/test"
+import { toast } from "react-hot-toast" // Add toast for notifications
 
 interface CategoryEditorProps {
   testId: string
@@ -14,9 +15,11 @@ interface CategoryEditorProps {
 
 export const CategoryEditor = ({ testId, initialCategories }: CategoryEditorProps) => {
   const [categories, setCategories] = useState<CategoryType[]>(initialCategories)
+  const [isLoading, setIsLoading] = useState(false)
 
   const addCategory = async () => {
     try {
+      setIsLoading(true)
       const response = await fetch(`/api/admindash/tests/${testId}/categories`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -26,12 +29,18 @@ export const CategoryEditor = ({ testId, initialCategories }: CategoryEditorProp
         })
       })
 
-      if (!response.ok) throw new Error("Failed to create category")
+      if (!response.ok) {
+        throw new Error("Failed to create category")
+      }
       
       const newCategory = await response.json()
-      setCategories([...categories, newCategory])
+      setCategories(prev => [...prev, newCategory])
+      toast.success("Category created")
     } catch (error) {
       console.error(error)
+      toast.error("Failed to create category")
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -43,8 +52,13 @@ export const CategoryEditor = ({ testId, initialCategories }: CategoryEditorProp
           onClick={addCategory}
           variant="outline"
           size="sm"
+          disabled={isLoading}
         >
-          <Plus className="h-4 w-4 mr-2" />
+          {isLoading ? (
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          ) : (
+            <Plus className="h-4 w-4 mr-2" />
+          )}
           Add Category
         </Button>
       </div>
@@ -65,6 +79,11 @@ export const CategoryEditor = ({ testId, initialCategories }: CategoryEditorProp
             }}
           />
         ))}
+        {categories.length === 0 && (
+          <div className="text-center text-sm text-muted-foreground p-4">
+            No categories yet. Click "Add Category" to create one.
+          </div>
+        )}
       </div>
     </div>
   )
