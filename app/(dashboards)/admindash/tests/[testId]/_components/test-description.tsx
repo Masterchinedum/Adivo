@@ -2,22 +2,36 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 
 interface TestDescriptionProps {
-  testId: string
+  initialData: {
+    description: string;
+    id: string;
+  }
 }
 
-export const TestDescription = ({ testId }: TestDescriptionProps) => {
+export const TestDescription = ({ initialData }: TestDescriptionProps) => {
+  const router = useRouter()
   const [isEditing, setIsEditing] = useState(false)
-  const [description, setDescription] = useState("No description")
+  const [description, setDescription] = useState(initialData.description)
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    // TODO: Implement description update
-    setIsEditing(false)
+    try {
+      await fetch(`/api/admindash/tests/${initialData.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description })
+      })
+      router.refresh()
+      setIsEditing(false)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return isEditing ? (
@@ -42,7 +56,7 @@ export const TestDescription = ({ testId }: TestDescriptionProps) => {
     </form>
   ) : (
     <div className="flex items-center gap-x-2 text-sm text-muted-foreground">
-      <p>{description}</p>
+      <p>{description || "No description"}</p>
       <Button
         onClick={() => setIsEditing(true)}
         variant="ghost"

@@ -23,17 +23,21 @@ import {
 
 interface TestActionsProps {
   testId: string
+  isPublished: boolean
 }
 
-export const TestActions = ({ testId }: TestActionsProps) => {
+export const TestActions = ({ testId, isPublished }: TestActionsProps) => {
   const [showDeleteAlert, setShowDeleteAlert] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   const onDelete = async () => {
     try {
       setIsLoading(true)
-      // TODO: Implement delete functionality
-      // await deleteTest(testId)
+      await fetch(`/api/admindash/tests/${testId}`, {
+        method: "DELETE"
+      })
+      router.push("/admindash/tests")
+      router.refresh()
     } catch (error) {
       console.error(error)
     } finally {
