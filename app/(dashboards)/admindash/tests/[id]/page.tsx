@@ -2,18 +2,33 @@
 
 import { Metadata } from "next"
 import TestForm from "../components/test-form"
+import prisma from "@/lib/prisma"
+import { notFound } from "next/navigation"
 
 export const metadata: Metadata = {
   title: "Edit Test",
   description: "Modify an existing assessment test",
 }
 
-async function getTest(id: string) {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/admin/tests/${id}`, {
-    cache: 'no-store'
-  })
-  if (!response.ok) throw new Error('Failed to fetch test')
-  return response.json()
+const getTest = async (id: string) => {
+  const test = await prisma.test.findUnique({
+    where: {
+      id: id
+    },
+    include: {
+      questions: {
+        orderBy: {
+          order: 'asc'
+        }
+      }
+    }
+  });
+
+  if (!test) {
+    notFound()
+  }
+
+  return test
 }
 
 export default async function EditTestPage({ params }: { params: { id: string } }) {
