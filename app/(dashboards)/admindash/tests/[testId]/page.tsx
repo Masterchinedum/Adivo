@@ -1,6 +1,6 @@
 // app/(dashboards)/admindash/tests/[testId]/page.tsx
 import { notFound } from "next/navigation"
-import { auth } from "@clerk/nextjs"
+import { auth } from "@clerk/nextjs/server"
 import prisma from "@/lib/prisma"
 import { TestEditor } from "./_components/test-editor"
 

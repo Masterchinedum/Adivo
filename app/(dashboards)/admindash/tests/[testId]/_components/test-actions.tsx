@@ -2,6 +2,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation" // Add this import
 import { MoreHorizontal, Settings, Trash2, Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -27,6 +28,7 @@ interface TestActionsProps {
 }
 
 export const TestActions = ({ testId, isPublished }: TestActionsProps) => {
+  const router = useRouter() // Add this line
   const [showDeleteAlert, setShowDeleteAlert] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
