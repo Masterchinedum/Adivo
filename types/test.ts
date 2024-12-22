@@ -1,48 +1,57 @@
 // types/test.ts
 
 export type TestType = {
-    questions: any;
-    id: string;
-    title: string;
-    description?: string;
-    isPublished: boolean;
-    categories: CategoryType[];
-    createdAt: Date;
-    updatedAt: Date;
-  };
-  
-  export type CategoryType = {
-    id: string;
-    title: string;
-    description?: string;
-    parentId?: string;
-    children?: CategoryType[];
-    questions: QuestionType[];
-    createdAt: Date;
-    updatedAt: Date;
-  };
-  
-  export type QuestionType = {
-    id: string;
-    text: string;
-    type: QuestionTypeEnum;
-    options?: QuestionOption[];
-    categoryId: string;
-    order: number;
-    createdAt: Date;
-    updatedAt: Date;
-  };
-  
-  export enum QuestionTypeEnum {
-    MULTIPLE_CHOICE = 'multiple_choice',
-    CHECKBOX = 'checkbox',
-    DROPDOWN = 'dropdown',
-    SCALE = 'scale',
-    TEXT = 'text'
-  }
-  
-  export type QuestionOption = {
-    id: string;
-    text: string;
-    value: number | string;
-  };
+  id: string;
+  title: string;
+  description?: string;
+  questions: QuestionType[];
+  isPublished: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type CategoryType = {
+  id: string;
+  title: string;
+  description?: string;
+  parentId?: string;
+  children?: CategoryType[];
+  questions: QuestionType[];
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type QuestionType = {
+  id?: string;
+  text: string;
+  type: QuestionTypeEnum;
+  options?: QuestionOption[];
+  order: number;
+  testId?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
+
+export enum QuestionTypeEnum {
+  MULTIPLE_CHOICE = 'MULTIPLE_CHOICE',
+  CHECKBOX = 'CHECKBOX',
+  SCALE = 'SCALE',
+  TEXT = 'TEXT'
+}
+
+export type QuestionOption = {
+  id: string;
+  text: string;
+  value: string | number;
+};
+
+// For form handling
+export type CreateTestInput = {
+  title: string;
+  description?: string;
+  questions: Omit<QuestionType, 'id' | 'testId' | 'createdAt' | 'updatedAt'>[];
+};
+
+export type UpdateTestInput = Partial<CreateTestInput> & {
+  isPublished?: boolean;
+};
