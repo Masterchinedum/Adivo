@@ -1,6 +1,7 @@
 // types/test.ts
 
 export type TestType = {
+    questions: any;
     id: string;
     title: string;
     description?: string;
