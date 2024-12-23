@@ -1,3 +1,5 @@
+//app/api/admin/tests/[id]/questions/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
@@ -6,7 +8,7 @@ import { Question } from "@prisma/client";
 // POST /api/admin/tests/[id]/questions - Add questions to a test
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } } // Fixed context parameter destructuring
+  context: { params: { id: string } }  // Fixed: Using correct context type
 ) {
   try {
     const { sessionClaims } = await auth();
@@ -24,7 +26,7 @@ export async function POST(
         type,
         options,
         order,
-        testId: params.id // Access id through params
+        testId: context.params.id  // Fixed: Access id through context
       }
     });
 

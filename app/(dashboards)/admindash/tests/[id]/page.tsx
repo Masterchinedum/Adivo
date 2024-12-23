@@ -1,3 +1,5 @@
+//app/(dashboards)/admindash/tests/[id]/page.tsx
+
 import { Metadata } from "next"
 import TestForm from "../components/test-form"
 import prisma from "@/lib/prisma"
