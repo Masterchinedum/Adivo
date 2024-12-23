@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { updateTestSchema } from "@/lib/validations/test";
+import { Question } from "@prisma/client";
 
 
 // GET /api/admin/tests/[id] - Get a specific test
@@ -153,5 +154,32 @@ export async function PUT(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  // ... rest of the PUT handler
+  try {
+    const { sessionClaims } = await auth();
+    
+    if (sessionClaims?.metadata?.role !== 'admin') {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    const json = await request.json();
+    const { questions } = json;
+
+    // Verify questions belong to the correct test
+    const updates = questions.map((question: Question) =>
+      prisma.question.update({
+        where: { 
+          id: question.id,
+          testId: params.id
+        },
+        data: { order: question.order }
+      })
+    );
+
+    await prisma.$transaction(updates);
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error("Error updating questions:", err);
+    return new NextResponse("Internal Error", { status: 500 });
+  }
 }
