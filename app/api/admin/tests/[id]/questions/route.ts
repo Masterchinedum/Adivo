@@ -8,7 +8,7 @@ import { Question } from "@prisma/client";
 // POST /api/admin/tests/[id]/questions - Add questions to a test
 export async function POST(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
     const { sessionClaims } = await auth();
@@ -26,12 +26,12 @@ export async function POST(
         type,
         options,
         order,
-        testId: params.id
+        testId: context.params.id
       }
     });
 
     return NextResponse.json(question);
-  } catch (err) { // Changed from error to err
+  } catch (err) {
     console.error('Error creating question:', err)
     return new NextResponse("Internal Error", { status: 500 })
   }
@@ -40,11 +40,11 @@ export async function POST(
 // PUT /api/admin/tests/[id]/questions - Update question order
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
     const { sessionClaims } = await auth();
-    const testId = params.id; // Use the id parameter
+    const testId = context.params.id;
     
     if (sessionClaims?.metadata?.role !== 'admin') {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -58,7 +58,7 @@ export async function PUT(
       prisma.question.update({
         where: { 
           id: question.id,
-          testId: testId // Ensure question belongs to this test
+          testId: testId
         },
         data: { order: question.order }
       })
