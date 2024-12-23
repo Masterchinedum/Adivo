@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { updateTestSchema } from "@/lib/validations/test";
+import { Question } from "@prisma/client";
 
 // GET /api/admin/tests/[id] - Get a specific test
 export async function GET(
@@ -113,4 +114,44 @@ export async function DELETE(
     console.error("Error:", err);
     return new NextResponse("Internal Error", { status: 500 });
   }
+}
+
+// POST /api/admin/tests/[id]/questions
+export async function POST(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { sessionClaims } = await auth();
+    
+    if (sessionClaims?.metadata?.role !== 'admin') {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    const json = await request.json();
+    const { text, type, options, order } = json;
+
+    const question = await prisma.question.create({
+      data: {
+        text,
+        type,
+        options,
+        order,
+        testId: params.id
+      }
+    });
+
+    return NextResponse.json(question);
+  } catch (err) {
+    console.error('Error creating question:', err)
+    return new NextResponse("Internal Error", { status: 500 })
+  }
+}
+
+// PUT /api/admin/tests/[id]/questions 
+export async function PUT(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  // ... rest of the PUT handler
 }
