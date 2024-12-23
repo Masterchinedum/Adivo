@@ -4,16 +4,16 @@ import { auth } from "@clerk/nextjs/server";
 import { Question } from "@prisma/client";
 
 // POST /api/admin/tests/[id]/questions - Add questions to a test
-export async function POST(
-  request: NextRequest,
-  { id }: { id: string }  // Fixed: Direct destructuring of id
-) {
+export async function POST(request: NextRequest) {
   try {
     const { sessionClaims } = await auth();
     
     if (sessionClaims?.metadata?.role !== 'admin') {
       return new NextResponse("Unauthorized", { status: 401 });
     }
+
+    // Get the ID from the URL
+    const id = request.nextUrl.pathname.split('/')[4];  // /api/admin/tests/[id]/questions
 
     const json = await request.json();
     const { text, type, options, order } = json;
@@ -36,12 +36,12 @@ export async function POST(
 }
 
 // PUT /api/admin/tests/[id]/questions - Update question order
-export async function PUT(
-  request: NextRequest,
-  { id }: { id: string }  // Fixed: Direct destructuring of id
-) {
+export async function PUT(request: NextRequest) {
   try {
     const { sessionClaims } = await auth();
+    
+    // Get the ID from the URL
+    const id = request.nextUrl.pathname.split('/')[4];  // /api/admin/tests/[id]/questions
     
     if (sessionClaims?.metadata?.role !== 'admin') {
       return new NextResponse("Unauthorized", { status: 401 });
