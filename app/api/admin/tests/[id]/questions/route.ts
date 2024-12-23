@@ -8,7 +8,7 @@ import { Question } from "@prisma/client";
 // POST /api/admin/tests/[id]/questions - Add questions to a test
 export async function POST(
   req: NextRequest,
-  context: { params: { id: string } }  // Fixed: Using correct context type
+  { params }: { params: { id: string } }
 ) {
   try {
     const { sessionClaims } = await auth();
@@ -26,7 +26,7 @@ export async function POST(
         type,
         options,
         order,
-        testId: context.params.id  // Fixed: Access id through context
+        testId: params.id
       }
     });
 
@@ -40,11 +40,11 @@ export async function POST(
 // PUT /api/admin/tests/[id]/questions - Update question order
 export async function PUT(
   req: Request,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     const { sessionClaims } = await auth();
-    const testId = context.params.id;
+    const testId = params.id;
     
     if (sessionClaims?.metadata?.role !== 'admin') {
       return new NextResponse("Unauthorized", { status: 401 });
