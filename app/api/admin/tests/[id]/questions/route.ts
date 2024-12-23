@@ -1,5 +1,3 @@
-//app/api/admin/tests/[id]/questions/route.ts
-
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
@@ -7,8 +5,8 @@ import { Question } from "@prisma/client";
 
 // POST /api/admin/tests/[id]/questions - Add questions to a test
 export async function POST(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: { id: string } }
 ) {
   try {
     const { sessionClaims } = await auth();
@@ -17,7 +15,7 @@ export async function POST(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const json = await req.json();
+    const json = await request.json();
     const { text, type, options, order } = json;
 
     const question = await prisma.question.create({
@@ -26,7 +24,7 @@ export async function POST(
         type,
         options,
         order,
-        testId: params.id
+        testId: context.params.id
       }
     });
 
@@ -39,24 +37,26 @@ export async function POST(
 
 // PUT /api/admin/tests/[id]/questions - Update question order
 export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: { id: string } }
 ) {
   try {
     const { sessionClaims } = await auth();
-    const testId = params.id;
+    const testId = context.params.id;
     
     if (sessionClaims?.metadata?.role !== 'admin') {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { questions } = await req.json();
+    const json = await request.json();
+    const { questions } = json;
 
+    // Verify questions belong to the correct test
     const updates = questions.map((question: Question) =>
       prisma.question.update({
         where: { 
           id: question.id,
-          testId 
+          testId: testId
         },
         data: { order: question.order }
       })
