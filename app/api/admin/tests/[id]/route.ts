@@ -48,7 +48,6 @@ export async function PATCH(
 ) {
   try {
     const { sessionClaims } = await auth();
-    // @ts-expect-error - Ignore Next.js params validation
     const id = params.id;
     
     if (sessionClaims?.metadata?.role !== 'admin') {
