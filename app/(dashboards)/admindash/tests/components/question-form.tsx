@@ -5,12 +5,12 @@
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { QuestionTypeEnum, QuestionOption } from "@/types/test"
+import { QuestionTypeEnum, QuestionOption, QuestionType } from "@/types/test"
 import { OptionsEditor } from "./options-editor"
 
 interface QuestionFormProps {
-  question: Partial<QuestionTypeEnum>
-  onChange: (question: Partial<QuestionTypeEnum>) => void
+  question: Partial<QuestionType>
+  onChange: (question: Partial<QuestionType>) => void
 }
 
 export function QuestionForm({ question, onChange }: QuestionFormProps) {

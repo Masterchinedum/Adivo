@@ -13,7 +13,7 @@ import { AlertDialog,
   AlertDialogHeader, 
   AlertDialogTitle 
 } from "@/components/ui/alert-dialog"
-import { QuestionType } from "@/types/test"
+import { QuestionType, TestType } from "@/types/test"
 
 interface TestFormProps {
   test?: TestType

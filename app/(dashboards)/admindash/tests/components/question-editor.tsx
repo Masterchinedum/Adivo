@@ -1,8 +1,7 @@
 "use client"
 
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { QuestionType } from "@/types/test"
+import { QuestionType, QuestionTypeEnum } from "@/types/test"
 import { QuestionForm } from "./question-form"
 
 interface QuestionEditorProps {
@@ -12,15 +11,13 @@ interface QuestionEditorProps {
 
 export function QuestionEditor({ questions, onChange }: QuestionEditorProps) {
   const addQuestion = () => {
-    onChange([
-      ...questions,
-      {
-        text: "",
-        type: "MULTIPLE_CHOICE",
-        order: questions.length,
-        options: []
-      }
-    ])
+    const newQuestion: Partial<QuestionType> = {
+      text: "",
+      type: QuestionTypeEnum.MULTIPLE_CHOICE,
+      order: questions.length,
+      options: []
+    }
+    onChange([...questions, newQuestion])
   }
 
   const handleQuestionChange = (index: number, updatedQuestion: Partial<QuestionType>) => {

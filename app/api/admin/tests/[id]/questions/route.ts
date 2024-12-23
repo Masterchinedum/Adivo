@@ -44,6 +44,7 @@ export async function PUT(
 ) {
   try {
     const { sessionClaims } = await auth();
+    const testId = params.id; // Use the id parameter
     
     if (sessionClaims?.metadata?.role !== 'admin') {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -52,9 +53,13 @@ export async function PUT(
     const json = await req.json();
     const { questions } = json;
 
+    // Verify questions belong to the correct test
     const updates = questions.map((question: Question) =>
       prisma.question.update({
-        where: { id: question.id },
+        where: { 
+          id: question.id,
+          testId: testId // Ensure question belongs to this test
+        },
         data: { order: question.order }
       })
     );
@@ -62,7 +67,7 @@ export async function PUT(
     await prisma.$transaction(updates);
 
     return NextResponse.json({ success: true });
-  } catch (err) { // Changed error to err for consistency
+  } catch (err) {
     console.error("Error updating questions:", err);
     return new NextResponse("Internal Error", { status: 500 });
   }

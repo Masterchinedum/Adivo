@@ -30,7 +30,7 @@ export default function TestList() {
   const [tests, setTests] = useState<TestType[]>([])
   const [loading, setLoading] = useState(true)
   const [deleteId, setDeleteId] = useState<string | null>(null)
-  const [errorMessage, setErrorMessage] = useState("")
+  const [error, setError] = useState("")
 
   useEffect(() => {
     fetchTests()
@@ -42,8 +42,9 @@ export default function TestList() {
       const response = await fetch('/api/admin/tests')
       const data = await response.json()
       setTests(data)
-    } catch (error) {
-      console.error('Error fetching tests:', error)
+      setError("") // Clear any previous errors
+    } catch (err) {
+      console.error('Error fetching tests:', err)
       setError('Failed to load tests')
     } finally {
       setLoading(false)
@@ -61,8 +62,10 @@ export default function TestList() {
       
       await fetchTests() // Refresh the list
       setDeleteId(null)
+      setError("") // Clear any previous errors
     } catch (err) {
-      setErrorMessage('Failed to delete test')
+      console.error('Error deleting test:', err)
+      setError('Failed to delete test')
     }
   }
 
@@ -82,7 +85,9 @@ export default function TestList() {
       if (!response.ok) throw new Error('Failed to update test')
       
       await fetchTests() // Refresh the list
-    } catch (error) {
+      setError("") // Clear any previous errors
+    } catch (err) {
+      console.error('Error updating test status:', err)
       setError('Failed to update test status')
     }
   }

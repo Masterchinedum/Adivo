@@ -12,6 +12,8 @@ interface OptionsEditorProps {
   onChange: (options: QuestionOption[]) => void
 }
 
+// Remove the QuestionFormProps interface as it's not used in this file
+
 export function OptionsEditor({ options, onChange }: OptionsEditorProps) {
   const [newOption, setNewOption] = useState("")
 
