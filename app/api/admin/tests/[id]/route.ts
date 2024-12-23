@@ -116,7 +116,7 @@ export async function DELETE(
   }
 }
 
-// POST /api/admin/tests/[id]/questions
+// POST /api/admin/tests/[id]/questions - Add questions to a test
 export async function POST(
   request: Request,
   { params }: { params: { id: string } }
@@ -143,12 +143,12 @@ export async function POST(
 
     return NextResponse.json(question);
   } catch (err) {
-    console.error('Error creating question:', err)
-    return new NextResponse("Internal Error", { status: 500 })
+    console.error('Error creating question:', err);
+    return new NextResponse("Internal Error", { status: 500 });
   }
 }
 
-// PUT /api/admin/tests/[id]/questions 
+// PUT /api/admin/tests/[id]/questions - Update question order
 export async function PUT(
   request: Request,
   { params }: { params: { id: string } }
