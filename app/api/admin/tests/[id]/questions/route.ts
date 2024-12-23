@@ -6,10 +6,16 @@ import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { Question } from "@prisma/client";
 
+interface Params {
+  params: {
+    id: string;
+  };
+}
+
 // POST /api/admin/tests/[id]/questions - Add questions to a test
 export async function POST(
-  request: NextRequest,
-  context: { params: { id: string } }
+  req: NextRequest,
+  { params }: Params
 ) {
   try {
     const { sessionClaims } = await auth();
@@ -18,7 +24,7 @@ export async function POST(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const json = await request.json();
+    const json = await req.json();
     const { text, type, options, order } = json;
 
     const question = await prisma.question.create({
@@ -27,7 +33,7 @@ export async function POST(
         type,
         options,
         order,
-        testId: context.params.id
+        testId: params.id
       }
     });
 
@@ -40,18 +46,18 @@ export async function POST(
 
 // PUT /api/admin/tests/[id]/questions - Update question order
 export async function PUT(
-  request: NextRequest,
-  context: { params: { id: string } }
+  req: NextRequest,
+  { params }: Params
 ) {
   try {
     const { sessionClaims } = await auth();
-    const testId = context.params.id;
+    const testId = params.id;
     
     if (sessionClaims?.metadata?.role !== 'admin') {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const json = await request.json();
+    const json = await req.json();
     const { questions } = json;
 
     // Verify questions belong to the correct test
