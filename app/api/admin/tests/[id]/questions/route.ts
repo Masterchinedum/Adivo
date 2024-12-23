@@ -6,7 +6,7 @@ import { Question } from "@prisma/client";
 // POST /api/admin/tests/[id]/questions - Add questions to a test
 export async function POST(
   request: NextRequest,
-  context: { params: { id: string } }
+  { id }: { id: string }  // Fixed: Direct destructuring of id
 ) {
   try {
     const { sessionClaims } = await auth();
@@ -24,7 +24,7 @@ export async function POST(
         type,
         options,
         order,
-        testId: context.params.id
+        testId: id
       }
     });
 
@@ -38,11 +38,10 @@ export async function POST(
 // PUT /api/admin/tests/[id]/questions - Update question order
 export async function PUT(
   request: NextRequest,
-  context: { params: { id: string } }
+  { id }: { id: string }  // Fixed: Direct destructuring of id
 ) {
   try {
     const { sessionClaims } = await auth();
-    const testId = context.params.id;
     
     if (sessionClaims?.metadata?.role !== 'admin') {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -56,7 +55,7 @@ export async function PUT(
       prisma.question.update({
         where: { 
           id: question.id,
-          testId: testId
+          testId: id
         },
         data: { order: question.order }
       })
