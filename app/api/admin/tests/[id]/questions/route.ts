@@ -1,13 +1,11 @@
-// app/api/admin/tests/[id]/questions/route.ts
-
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { Question } from "@prisma/client";
 
 // POST /api/admin/tests/[id]/questions - Add questions to a test
 export async function POST(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } } // Fixed context parameter destructuring
 ) {
   try {
