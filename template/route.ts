@@ -70,7 +70,7 @@ export async function PATCH (
         }
 
         if (!price) {
-            return new NextResponse("Price is required", { status: 400});
+            return new NextResponse("Prices is required", { status: 400});
         }
 
         if (!categoryId) {
