@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { updateTestSchema } from "@/lib/validations/test";
-import { Question } from "@prisma/client";
+
 
 // GET /api/admin/tests/[id] - Get a specific test
 export async function GET(
