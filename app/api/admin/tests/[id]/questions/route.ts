@@ -52,8 +52,7 @@ export async function PUT(
     const json = await req.json();
     const { questions } = json;
 
-    // Update multiple questions in a transaction
-    const updates = questions.map((question: Question) => // Use Question type instead of any
+    const updates = questions.map((question: Question) =>
       prisma.question.update({
         where: { id: question.id },
         data: { order: question.order }
@@ -63,7 +62,8 @@ export async function PUT(
     await prisma.$transaction(updates);
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (err) { // Changed error to err for consistency
+    console.error("Error updating questions:", err);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

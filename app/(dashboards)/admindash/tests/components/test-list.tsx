@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
 import {
   Table,
   TableBody,
@@ -30,7 +30,7 @@ export default function TestList() {
   const [tests, setTests] = useState<TestType[]>([])
   const [loading, setLoading] = useState(true)
   const [deleteId, setDeleteId] = useState<string | null>(null)
-  const [error, setError] = useState("")
+  const [errorMessage, setErrorMessage] = useState("")
 
   useEffect(() => {
     fetchTests()
@@ -61,8 +61,8 @@ export default function TestList() {
       
       await fetchTests() // Refresh the list
       setDeleteId(null)
-    } catch (error) {
-      setError('Failed to delete test')
+    } catch (err) {
+      setErrorMessage('Failed to delete test')
     }
   }
 
@@ -174,4 +174,8 @@ export default function TestList() {
       </AlertDialog>
     </>
   )
+}
+
+function setError(arg0: string) {
+  throw new Error("Function not implemented.")
 }
