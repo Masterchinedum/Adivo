@@ -48,7 +48,7 @@ export async function PATCH(
 ) {
   try {
     const { sessionClaims } = await auth();
-    const id = await params.id; // Await params.id
+    const id = params.id;
     
     if (sessionClaims?.metadata?.role !== 'admin') {
       return new NextResponse("Unauthorized", { status: 401 });
