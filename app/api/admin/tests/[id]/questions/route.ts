@@ -8,7 +8,7 @@ import { Question } from "@prisma/client";
 // POST /api/admin/tests/[id]/questions - Add questions to a test
 export async function POST(
   req: Request,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } } // Fixed context parameter destructuring
 ) {
   try {
     const { sessionClaims } = await auth();
@@ -26,7 +26,7 @@ export async function POST(
         type,
         options,
         order,
-        testId: context.params.id
+        testId: params.id // Access id through params
       }
     });
 
