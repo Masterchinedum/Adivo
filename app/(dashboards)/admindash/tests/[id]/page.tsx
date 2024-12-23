@@ -4,6 +4,7 @@ import { Metadata } from "next"
 import TestForm from "../components/test-form"
 import prisma from "@/lib/prisma"
 import { notFound } from "next/navigation"
+import { TestType } from "@/types/test"
 
 export const metadata: Metadata = {
   title: "Edit Test",
@@ -22,7 +23,7 @@ const getTest = async (id: string) => {
         }
       }
     }
-  });
+  }) as TestType;
 
   if (!test) {
     notFound()
