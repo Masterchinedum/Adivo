@@ -47,6 +47,7 @@ export async function PATCH(
 ) {
   try {
     const { sessionClaims } = await auth();
+    const id = await params.id; // Await params.id
     
     if (sessionClaims?.metadata?.role !== 'admin') {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -55,11 +56,30 @@ export async function PATCH(
     const json = await req.json();
     const body = updateTestSchema.parse(json);
 
+    // Delete existing questions
+    await prisma.question.deleteMany({
+      where: { testId: id }
+    });
+
+    // Update test with new questions
     const test = await prisma.test.update({
-      where: {
-        id: params.id
+      where: { id },
+      data: {
+        title: body.title,
+        description: body.description,
+        isPublished: body.isPublished,
+        questions: {
+          create: body.questions?.map((q) => ({
+            text: q.text,
+            type: q.type,
+            options: q.options,
+            order: q.order
+          }))
+        }
       },
-      data: body
+      include: {
+        questions: true
+      }
     });
 
     return NextResponse.json(test);

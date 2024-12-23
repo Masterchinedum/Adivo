@@ -32,7 +32,8 @@ const getTest = async (id: string) => {
 }
 
 export default async function EditTestPage({ params }: { params: { id: string } }) {
-  const test = await getTest(params.id)
+  const id = await params.id // Await params.id
+  const test = await getTest(id)
 
   return (
     <div className="container mx-auto py-10">
