@@ -1,5 +1,3 @@
-// app/(dashboards)/admindash/tests/[id]/page.tsx
-
 import { Metadata } from "next"
 import TestForm from "../components/test-form"
 import prisma from "@/lib/prisma"
@@ -32,8 +30,12 @@ const getTest = async (id: string) => {
   return test
 }
 
-export default async function EditTestPage({ params }: { params: { id: string } }) {
-  const id = await params.id;
+export default async function EditTestPage({ 
+  params 
+}: { 
+  params: Promise<{ id: string }> 
+}) {
+  const { id } = await params;
   const test = await getTest(id);
 
   return (
