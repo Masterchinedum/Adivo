@@ -25,7 +25,8 @@ export async function GET() {
     });
 
     return NextResponse.json(tests);
-  } catch (error) {
+  } catch (err) {
+    console.error('Error fetching tests:', err)
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
@@ -63,7 +64,8 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json(test);
-  } catch (error) {
+  } catch (err) {
+    console.error('Error creating test:', err)
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

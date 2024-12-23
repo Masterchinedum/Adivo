@@ -35,7 +35,8 @@ export async function GET(
     }
 
     return NextResponse.json(test);
-  } catch (error) {
+  } catch (err) {
+    console.error('Error fetching test:', err)
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
@@ -83,7 +84,8 @@ export async function PATCH(
     });
 
     return NextResponse.json(test);
-  } catch (error) {
+  } catch (err) {
+    console.error('Error updating test:', err)
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
