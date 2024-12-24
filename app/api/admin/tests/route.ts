@@ -1,67 +1,44 @@
 // app/api/admin/tests/route.ts
+import { NextRequest, NextResponse } from 'next/server'
+import prisma from '@/lib/prisma'
+import { createTestSchema } from '@/lib/validations/test'
 
-import { NextResponse } from "next/server";
-import { createTestSchema } from "@/lib/validations/test";
-import prisma from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json()
+    const parsedBody = createTestSchema.parse(body)
 
-// GET /api/admin/tests - Get all tests
+    const newTest = await prisma.test.create({
+      data: {
+        title: parsedBody.title,
+        description: parsedBody.description,
+        isPublished: parsedBody.isPublished,
+      },
+    })
+
+    return NextResponse.json(newTest)
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 400 })
+  }
+}
+
 export async function GET() {
   try {
-    const { sessionClaims } = await auth();
-    
-    // Check if user is admin
-    if (sessionClaims?.metadata?.role !== 'admin') {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
-
     const tests = await prisma.test.findMany({
       include: {
         questions: {
           orderBy: {
-            order: 'asc'
-          }
-        }
+            order: 'asc',
+          },
+          include: {
+            options: true,
+          },
+        },
       },
-      orderBy: {
-        createdAt: 'desc'
-      }
-    });
+    })
 
-    return NextResponse.json(tests);
-  } catch (err) {
-    console.error("Error:", err);
-    return new NextResponse("Internal Error", { status: 500 });
-  }
-}
-
-// POST /api/admin/tests - Create a new test
-export async function POST(req: Request) {
-  try {
-    const { sessionClaims } = await auth();
-    
-    // Check if user is admin
-    if (sessionClaims?.metadata?.role !== 'admin') {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
-
-    const json = await req.json();
-    const body = createTestSchema.parse(json);
-
-    const test = await prisma.test.create({
-      data: {
-        title: body.title,
-        description: body.description,
-        isPublished: body.isPublished
-      },
-      include: {
-        questions: true
-      }
-    });
-
-    return NextResponse.json(test);
-  } catch (err) {
-    console.error("Error:", err);
-    return new NextResponse("Internal Error", { status: 500 });
+    return NextResponse.json(tests)
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 400 })
   }
 }
