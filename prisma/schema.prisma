@@ -23,27 +23,7 @@ model Test {
   id          String      @id @default(uuid())
   title       String
   description String?
-  questions   Question[]
   isPublished Boolean     @default(false)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
-}
-
-model Question {
-  id         String       @id @default(uuid())
-  text       String
-  type       QuestionType
-  options    Json?        // For storing multiple choice options
-  order      Int
-  testId     String
-  test       Test        @relation(fields: [testId], references: [id])
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-}
-
-enum QuestionType {
-  MULTIPLE_CHOICE
-  CHECKBOX
-  SCALE
-  TEXT
 }
