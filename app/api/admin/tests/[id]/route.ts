@@ -57,29 +57,20 @@ export async function PATCH(
     const json = await req.json();
     const body = updateTestSchema.parse(json);
 
-    // Delete existing questions
-    await prisma.question.deleteMany({
-      where: { testId: id }
-    });
-
-    // Update test with new questions
+    // Update test without modifying questions
     const test = await prisma.test.update({
       where: { id },
       data: {
         title: body.title,
         description: body.description,
-        isPublished: body.isPublished,
-        questions: {
-          create: body.questions?.map((q) => ({
-            text: q.text,
-            type: q.type,
-            options: q.options,
-            order: q.order
-          }))
-        }
+        isPublished: body.isPublished
       },
       include: {
-        questions: true
+        questions: {
+          orderBy: {
+            order: 'asc'
+          }
+        }
       }
     });
 
@@ -102,6 +93,7 @@ export async function DELETE(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
+    // Delete the test (this will cascade delete associated questions due to the database relationship)
     await prisma.test.delete({
       where: {
         id: params.id

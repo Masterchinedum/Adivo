@@ -1,7 +1,7 @@
 // app/api/admin/tests/route.ts
 
 import { NextResponse } from "next/server";
-import { createTestSchema, updateTestSchema } from "@/lib/validations/test";
+import { createTestSchema } from "@/lib/validations/test";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 
@@ -17,7 +17,11 @@ export async function GET() {
 
     const tests = await prisma.test.findMany({
       include: {
-        questions: true
+        questions: {
+          orderBy: {
+            order: 'asc'
+          }
+        }
       },
       orderBy: {
         createdAt: 'desc'
@@ -48,54 +52,7 @@ export async function POST(req: Request) {
       data: {
         title: body.title,
         description: body.description,
-        isPublished: body.isPublished,
-        questions: {
-          create: body.questions?.map((q) => ({
-            text: q.text,
-            type: q.type,
-            options: q.options,
-            order: q.order
-          })) || [] // Add fallback empty array if questions is undefined
-        }
-      },
-      include: {
-        questions: true
-      }
-    });
-
-    return NextResponse.json(test);
-  } catch (err) {
-    console.error("Error:", err);
-    return new NextResponse("Internal Error", { status: 500 });
-  }
-}
-
-// PATCH /api/admin/tests/[id] - Update a test
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
-  try {
-    const json = await req.json();
-    const body = updateTestSchema.parse(json);
-
-    // Delete existing questions
-    await prisma.question.deleteMany({
-      where: { testId: params.id }
-    });
-
-    // Update test with new questions
-    const test = await prisma.test.update({
-      where: { id: params.id },
-      data: {
-        title: body.title,
-        description: body.description,
-        isPublished: body.isPublished,
-        questions: {
-          create: body.questions?.map((q) => ({
-            text: q.text,
-            type: q.type,
-            options: q.options,
-            order: q.order
-          }))
-        }
+        isPublished: body.isPublished
       },
       include: {
         questions: true
