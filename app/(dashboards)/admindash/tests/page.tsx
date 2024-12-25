@@ -1,3 +1,4 @@
+// app/(dashboards)/admindash/tests/page.tsx
 "use client"
 
 import React from "react"
@@ -8,31 +9,35 @@ import { TestsDataTable } from "./components/TestsDataTable"
 import type { Test } from "@/types/tests/test"
 
 export default function TestsPage() {
-  // Router to navigate or refresh page if needed
   const router = useRouter()
-
-  // State for data, loading, and error
   const [tests, setTests] = React.useState<Test[]>([])
   const [totalTests, setTotalTests] = React.useState<number>(0)
   const [loading, setLoading] = React.useState<boolean>(false)
   const [error, setError] = React.useState<string | null>(null)
 
-  // Table filter & sort states
+  // Pagination state
+  const [currentPage, setCurrentPage] = React.useState<number>(1)
+  const [itemsPerPage] = React.useState<number>(10)
+
+  // Filter states
   const [searchValue, setSearchValue] = React.useState<string>("")
   const [publishedValue, setPublishedValue] = React.useState<"all" | "true" | "false">("all")
   const [sortValue, setSortValue] = React.useState<"asc" | "desc">("desc")
 
-  // Memoized fetch function to prevent unnecessary re-renders
   const fetchTests = React.useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
 
-      // Build query parameters
+      // Build query parameters with pagination
       const query = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: itemsPerPage.toString(),
         search: searchValue || "",
         sort: sortValue,
       })
+      
+      // Only add isPublished if it's not "all"
       if (publishedValue !== "all") {
         query.set("isPublished", publishedValue)
       }
@@ -43,7 +48,6 @@ export default function TestsPage() {
       }
 
       const data = await response.json()
-      // Expecting shape: { tests: Test[], totalTests: number, currentPage: number, totalPages: number }
       setTests(data.tests ?? [])
       setTotalTests(data.totalTests ?? 0)
     } catch (err: unknown) {
@@ -55,42 +59,34 @@ export default function TestsPage() {
     } finally {
       setLoading(false)
     }
-  }, [searchValue, publishedValue, sortValue])
+  }, [currentPage, itemsPerPage, searchValue, publishedValue, sortValue])
 
-  // Fetch tests on initial load and whenever filters change:
   React.useEffect(() => {
     void fetchTests()
   }, [fetchTests])
 
-  // Handlers for your toolbar
   function handleCreateNewTest() {
-    // Navigate to the new test form, or open a modal, etc.
     router.push("/admindash/tests/new")
   }
 
   function handleApplyFilters() {
-    // If you want to fetch again on an explicit "Apply" click
+    setCurrentPage(1) // Reset to first page when filters change
     void fetchTests()
   }
 
-  // Example bulk-delete handler (if using row selection)
-  function handleDeleteSelected() {
-    // In a real scenario, gather selected IDs and make a DELETE request
-    // ...
-    alert("Delete selected tests (not implemented)")
+  function handlePageChange(page: number) {
+    setCurrentPage(page)
   }
 
   return (
     <div className="p-4 space-y-6">
-      {/* Page header with optional stats */}
       <TestsHeader
         title="Tests"
         description="Manage your tests from this dashboard."
-        showCreateButton={false} // We're showing a button in the toolbar instead
+        showCreateButton={false}
         totalTests={totalTests}
       />
 
-      {/* Toolbar for Create + Filters + Bulk Actions */}
       <TestsTableToolbar
         onCreateNewTest={handleCreateNewTest}
         searchValue={searchValue}
@@ -100,17 +96,18 @@ export default function TestsPage() {
         sortValue={sortValue}
         onSortChange={setSortValue}
         onApplyFilters={handleApplyFilters}
-        // Include these if you're using row selection:
         selectedRowCount={0}
-        onDeleteSelected={handleDeleteSelected}
       />
 
-      {/* Show loading/error states */}
       {loading && <p>Loading tests...</p>}
       {error && <p className="text-red-500">Error: {error}</p>}
 
-      {/* Table of tests */}
-      <TestsDataTable data={tests} />
+      <TestsDataTable 
+        data={tests}
+        currentPage={currentPage}
+        totalPages={Math.ceil(totalTests / itemsPerPage)}
+        onPageChange={handlePageChange}
+      />
     </div>
   )
 }

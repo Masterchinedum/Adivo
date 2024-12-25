@@ -9,7 +9,6 @@ export const testsTableColumns: ColumnDef<Test>[] = [
     accessorKey: "title",
     header: "Title",
     cell: ({ row }) => {
-      // Safely retrieve the title as a string
       const title = row.getValue("title") as string
       return <span>{title}</span>
     },
@@ -18,7 +17,6 @@ export const testsTableColumns: ColumnDef<Test>[] = [
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => {
-      // Safely retrieve the description as a string or empty if undefined
       const desc = (row.getValue("description") as string) || ""
       const truncated = desc.length > 50 ? `${desc.slice(0, 50)}...` : desc
       return <span>{truncated}</span>
@@ -40,9 +38,17 @@ export const testsTableColumns: ColumnDef<Test>[] = [
     accessorKey: "createdAt",
     header: "Created",
     cell: ({ row }) => {
-      // Retrieve createdAt which is a Date in the Test interface
-      const dateValue = row.getValue("createdAt") as Date
-      return <span>{dateValue.toLocaleDateString()}</span>
+      // Parse the date string to a Date object
+      const dateStr = row.getValue("createdAt") as string
+      const dateValue = new Date(dateStr)
+      
+      // Format the date, with error handling
+      try {
+        return <span>{dateValue.toLocaleDateString()}</span>
+      } catch (error) {
+        console.error("Error formatting date:", error)
+        return <span>Invalid date</span>
+      }
     },
   },
   {

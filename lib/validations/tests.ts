@@ -21,12 +21,18 @@ export const updateTestSchema = testSchema.partial().extend({
 
 // For query parameters
 export const testQuerySchema = z.object({
-  page: z.string().optional(),
-  limit: z.string().optional(),
-  search: z.string().optional(),
-  sort: z.enum(['asc', 'desc']).optional(),
+  page: z.string().regex(/^\d+$/).optional().default('1'),
+  limit: z.string().regex(/^\d+$/).optional().default('10'),
+  search: z.string().optional().default(''),
+  sort: z.enum(['asc', 'desc']).optional().default('desc'),
   isPublished: z.enum(['true', 'false']).optional()
-})
+}).transform(data => ({
+  ...data,
+  page: data.page ?? '1',
+  limit: data.limit ?? '10',
+  search: data.search ?? '',
+  sort: data.sort ?? 'desc'
+}))
 
 export type TestFormValues = z.infer<typeof testSchema>
 export type UpdateTestFormValues = z.infer<typeof updateTestSchema>
