@@ -6,11 +6,11 @@ import { TestFormHeader } from "../components/TestFormHeader"
 import { TestContent } from "./components/TestContent"
 import type { Test } from "@/types/tests/test"
 
-interface TestEditPageProps {
-  params: {
-    id: string
-  }
-}
+// interface TestEditPageProps {
+//   params: {
+//     id: string
+//   }
+// }
 
 async function getTest(id: string): Promise<Test | null> {
   try {
@@ -23,11 +23,10 @@ async function getTest(id: string): Promise<Test | null> {
     }
 
     // Transform the Prisma response to match the Test type
-    // by converting null to undefined for the description
     return {
       ...test,
-      description: test.description || undefined,
-      user: undefined // Add this if the user field is optional in your Test type
+      description: test.description ?? undefined,
+      user: undefined 
     } as Test
   } catch (error) {
     console.error("Failed to fetch test:", error)
@@ -35,7 +34,15 @@ async function getTest(id: string): Promise<Test | null> {
   }
 }
 
-export default async function TestEditPage({ params }: TestEditPageProps) {
+export default async function TestEditPage({
+  params,
+}: {
+  params: { id: string }
+}) {
+  if (!params?.id) {
+    notFound()
+  }
+
   const test = await getTest(params.id)
 
   if (!test) {

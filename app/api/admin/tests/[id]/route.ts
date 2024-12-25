@@ -2,27 +2,36 @@
 
 import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
+import { Prisma } from '@prisma/client'
 import prisma from '@/lib/prisma'
 import { updateTestSchema } from '@/lib/validations/tests'
 import type { TestError } from '@/types/tests/test'
 
 // GET - Retrieve a specific test by ID
-export async function GET(req: Request) {
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
   try {
     const { userId } = await auth()
     if (!userId) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
-    const { searchParams } = new URL(req.url)
-    const id = searchParams.get('id')
+    const { id } = params
     if (!id) {
       return new NextResponse('Bad Request: Missing test ID', { status: 400 })
     }
 
-    const test = await prisma.test.findUnique({ where: { id } })
+    const test = await prisma.test.findUnique({ 
+      where: { id },
+      include: {
+        user: true
+      }
+    })
+
     if (!test) {
-      return new NextResponse('Not Found', { status: 404 })
+      return new NextResponse('Test not found', { status: 404 })
     }
 
     return NextResponse.json(test)
@@ -36,15 +45,23 @@ export async function GET(req: Request) {
 }
 
 // PATCH - Update a specific test by ID
-export async function PATCH(req: Request) {
+export async function PATCH(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
   try {
     const { userId } = await auth()
     if (!userId) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
-    const json = await req.json()
-    const validationResult = updateTestSchema.safeParse(json)
+    const { id } = params
+    const body = await request.json()
+
+    const validationResult = updateTestSchema.safeParse({
+      ...body,
+      id
+    })
 
     if (!validationResult.success) {
       const errorResponse: TestError = {
@@ -55,13 +72,25 @@ export async function PATCH(req: Request) {
     }
 
     const test = await prisma.test.update({
-      where: { id: validationResult.data.id },
-      data: validationResult.data
+      where: { id },
+      data: {
+        title: validationResult.data.title,
+        description: validationResult.data.description,
+        isPublished: validationResult.data.isPublished
+      }
     })
 
     return NextResponse.json(test)
   } catch (error) {
     console.error('[TEST_PATCH]', error)
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === 'P2025') {
+        return NextResponse.json(
+          { message: 'Test not found' },
+          { status: 404 }
+        )
+      }
+    }
     return NextResponse.json(
       { message: 'Internal Server Error' },
       { status: 500 }
@@ -70,24 +99,38 @@ export async function PATCH(req: Request) {
 }
 
 // DELETE - Delete a specific test by ID
-export async function DELETE(req: Request) {
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
   try {
     const { userId } = await auth()
     if (!userId) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
-    const { searchParams } = new URL(req.url)
-    const id = searchParams.get('id')
+    const { id } = params
     if (!id) {
       return new NextResponse('Bad Request: Missing test ID', { status: 400 })
     }
 
-    await prisma.test.delete({ where: { id } })
+    await prisma.test.delete({
+      where: { id }
+    })
 
-    return new NextResponse('No Content', { status: 204 })
+    return new NextResponse(null, { status: 204 })
   } catch (error) {
     console.error('[TEST_DELETE]', error)
+    
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === 'P2025') {
+        return NextResponse.json(
+          { message: 'Test not found' },
+          { status: 404 }
+        )
+      }
+    }
+
     return NextResponse.json(
       { message: 'Internal Server Error' },
       { status: 500 }

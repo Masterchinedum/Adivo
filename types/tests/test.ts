@@ -39,4 +39,4 @@ export interface TestError {
   errors?: Record<string, string[]>
 }
 
-export { User }
+export type { User }
