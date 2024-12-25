@@ -1,17 +1,9 @@
-// app/(dashboard)/admin/tests/page.tsx
-import { Heading } from "@/components/ui/heading"
-import { TestClient } from "./_components/client"
+import React from 'react'
 
-const TestsPage = () => {
+const Test = () => {
   return (
-    <div className="flex-1 p-8 pt-6">
-      <Heading
-        title="Tests Management"
-        description="Create and manage tests for your courses"
-      />
-      <TestClient />
-    </div>
+    <div>Test </div>
   )
 }
 
-export default TestsPage
+export default Test
