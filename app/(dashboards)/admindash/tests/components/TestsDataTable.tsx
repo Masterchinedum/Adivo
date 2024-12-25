@@ -1,78 +1,76 @@
-// app/(dashboards)/admindash/tests/components/TestsTableColumns.tsx
-
-import { ColumnDef } from "@tanstack/react-table"
+import React from "react"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table"
+import { testsTableColumns } from "./TestsTableColumns"
 import type { Test } from "@/types/tests/test"
-import { Badge } from "@/components/ui/badge"
 
-export const testsTableColumns: ColumnDef<Test>[] = [
-  {
-    accessorKey: "title",
-    header: "Title",
-    cell: ({ row }) => {
-      // Safely cast to string or handle undefined
-      const titleValue = row.getValue("title") as string | undefined
-      return titleValue ?? ""
-    },
-  },
-  {
-    accessorKey: "description",
-    header: "Description",
-    cell: ({ row }) => {
-      // Safely cast to string or handle undefined
-      const descriptionValue = row.getValue("description") as string | undefined
-      if (!descriptionValue) {
-        return ""
-      }
-      // Truncate if description is longer than 50 characters
-      return descriptionValue.length > 50
-        ? `${descriptionValue.slice(0, 50)}...`
-        : descriptionValue
-    },
-  },
-  {
-    accessorKey: "isPublished",
-    header: "Status",
-    cell: ({ row }) => {
-      // Handle boolean for published status
-      const published = row.getValue("isPublished") as boolean
-      return published ? (
-        <Badge variant="default">Published</Badge>
-      ) : (
-        <Badge variant="secondary">Draft</Badge>
-      )
-    },
-  },
-  {
-    accessorKey: "createdAt",
-    header: "Created",
-    cell: ({ row }) => {
-      // createdAt can be string or Date - handle accordingly
-      const rawDate = row.getValue("createdAt") as string | Date | null | undefined
-      if (!rawDate) {
-        return "N/A"
-      }
+interface TestsDataTableProps {
+  data: Test[]
+}
 
-      // Convert string into Date if necessary
-      const dateObj = typeof rawDate === "string" ? new Date(rawDate) : rawDate
-      return dateObj.toLocaleDateString()
-    },
-  },
-  {
-    id: "actions",
-    header: "Actions",
-    cell: ({ row }) => {
-      // Access the entire row via row.original
-      const testItem = row.original
-      return (
-        <div className="flex gap-2">
-          <a 
-            href={`/admindash/tests/${testItem.id}`} 
-            className="underline text-sm"
-          >
-            Edit
-          </a>
-        </div>
-      )
-    },
-  },
-]
+export function TestsDataTable({ data }: TestsDataTableProps) {
+  const table = useReactTable({
+    data,
+    columns: testsTableColumns,
+    getCoreRowModel: getCoreRowModel(),
+  })
+
+  return (
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <TableHead key={header.id}>
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                </TableHead>
+              ))}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell
+                colSpan={testsTableColumns.length}
+                className="h-24 text-center"
+              >
+                No tests found.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </div>
+  )
+}
