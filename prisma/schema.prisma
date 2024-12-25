@@ -17,6 +17,8 @@ model User {
   clerkUserId String    @unique
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+
+  Test Test[]
 }
 
 model Test {
@@ -26,4 +28,6 @@ model Test {
   isPublished Boolean     @default(false)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+  createdBy   String      // Add this field
+  user        User        @relation(fields: [createdBy], references: [id])
 }

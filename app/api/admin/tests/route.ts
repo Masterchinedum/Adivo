@@ -4,7 +4,9 @@ import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import { Prisma } from '@prisma/client'
 import prisma from '@/lib/prisma'
-import { testQuerySchema } from '@/lib/validations/tests'
+import { testQuerySchema, testSchema } from '@/lib/validations/tests'
+import type { TestError } from '@/types/tests/test'
+import { getUserById } from '@/lib/users'
 
 // GET - List all tests with pagination and filtering
 export async function GET(req: Request) {
@@ -99,6 +101,51 @@ export async function GET(req: Request) {
     })
   } catch (error) {
     console.error('[TESTS_GET]', error)
+    return NextResponse.json(
+      { message: 'Internal Server Error' },
+      { status: 500 }
+    )
+  }
+}
+
+// Add POST handler for creating tests
+export async function POST(req: Request) {
+  try {
+    const { userId } = await auth()
+    if (!userId) {
+      return new NextResponse('Unauthorized', { status: 401 })
+    }
+
+    const json = await req.json()
+    const validationResult = testSchema.safeParse(json)
+
+    if (!validationResult.success) {
+      const errorResponse: TestError = {
+        message: 'Invalid request data',
+        errors: validationResult.error.flatten().fieldErrors
+      }
+      return NextResponse.json(errorResponse, { status: 400 })
+    }
+
+    // Get the user's ID from the database using their Clerk ID
+    const { user } = await getUserById({ clerkUserId: userId })
+    if (!user) {
+      return NextResponse.json(
+        { message: 'User not found' },
+        { status: 404 }
+      )
+    }
+
+    const test = await prisma.test.create({
+      data: {
+        ...validationResult.data,
+        createdBy: user.id // Use the database user ID
+      }
+    })
+
+    return NextResponse.json(test, { status: 201 })
+  } catch (error) {
+    console.error('[TEST_POST]', error)
     return NextResponse.json(
       { message: 'Internal Server Error' },
       { status: 500 }
