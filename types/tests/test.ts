@@ -38,3 +38,5 @@ export interface TestError {
   message: string
   errors?: Record<string, string[]>
 }
+
+export { User }
