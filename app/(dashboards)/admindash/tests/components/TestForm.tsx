@@ -4,7 +4,8 @@
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRouter } from "next/navigation"
+import { Test, CreateTestInput } from "@/types/tests/test"
+import { testSchema } from "@/lib/validations/tests"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -18,19 +19,16 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
-import { TestFormValues, testSchema } from "@/lib/validations/tests"
-import { Test } from "@/types/tests/test"
 
-interface TestFormProps {
+export interface TestFormProps {
+  onSubmit: (data: CreateTestInput) => Promise<void>
   initialData?: Test
-  onSubmit: (data: TestFormValues) => Promise<void>
 }
 
-export function TestForm({ initialData, onSubmit }: TestFormProps) {
+export function TestForm({ onSubmit, initialData }: TestFormProps) {
   const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
 
-  const form = useForm<TestFormValues>({
+  const form = useForm<CreateTestInput>({
     resolver: zodResolver(testSchema),
     defaultValues: {
       title: initialData?.title || "",
@@ -39,14 +37,10 @@ export function TestForm({ initialData, onSubmit }: TestFormProps) {
     },
   })
 
-  const handleSubmit = async (data: TestFormValues) => {
+  const handleSubmit = async (data: CreateTestInput) => {
     try {
       setIsLoading(true)
       await onSubmit(data)
-      router.push("/admindash/tests")
-      router.refresh()
-    } catch (error) {
-      console.error("Failed to submit test:", error)
     } finally {
       setIsLoading(false)
     }
@@ -62,13 +56,15 @@ export function TestForm({ initialData, onSubmit }: TestFormProps) {
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input placeholder="Enter test title" {...field} />
+                <Input {...field} disabled={isLoading} />
               </FormControl>
+              <FormDescription>
+                The title of your test.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-
         <FormField
           control={form.control}
           name="description"
@@ -76,19 +72,15 @@ export function TestForm({ initialData, onSubmit }: TestFormProps) {
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea
-                  placeholder="Enter test description"
-                  {...field}
-                />
+                <Textarea {...field} disabled={isLoading} />
               </FormControl>
               <FormDescription>
-                Optional: Provide additional details about the test
+                A brief description of your test.
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-
         <FormField
           control={form.control}
           name="isPublished"
@@ -99,32 +91,22 @@ export function TestForm({ initialData, onSubmit }: TestFormProps) {
                   Published
                 </FormLabel>
                 <FormDescription>
-                  Make this test available to users
+                  Make this test available to users.
                 </FormDescription>
               </div>
               <FormControl>
                 <Switch
                   checked={field.value}
                   onCheckedChange={field.onChange}
+                  disabled={isLoading}
                 />
               </FormControl>
             </FormItem>
           )}
         />
-
-        <div className="flex justify-end gap-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.back()}
-            disabled={isLoading}
-          >
-            Cancel
-          </Button>
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? "Saving..." : initialData ? "Update Test" : "Create Test"}
-          </Button>
-        </div>
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? "Saving..." : "Save"}
+        </Button>
       </form>
     </Form>
   )

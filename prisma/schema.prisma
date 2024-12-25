@@ -26,4 +26,5 @@ model Test {
   isPublished Boolean     @default(false)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+  createdBy   String    
 }

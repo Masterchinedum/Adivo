@@ -1,11 +1,34 @@
-//app/(dashboards)/admindash/tests/page.tsx
+// app/(dashboards)/admindash/tests/page.tsx
 
-import React from 'react'
+import { Suspense } from "react"
+import { TestHeader } from "./components/TestHeader"
+import { TestsTable } from "./components/TestsTable"
+import { TestsTableSkeleton } from "./components/TestsTableSkeleton"
+import { TestFilters } from "./components/TestFilters"
+import prisma from "@/lib/prisma"
 
-const Test = () => {
-  return (
-    <div>Test </div>
-  )
+async function getTests() {
+  const tests = await prisma.test.findMany({
+    orderBy: {
+      createdAt: 'desc'
+    }
+  })
+  return tests
 }
 
-export default Test
+export default async function TestsPage() {
+  const tests = await getTests()
+
+  return (
+    <div className="flex flex-col gap-8 p-8">
+      <TestHeader
+        title="Tests"
+        description="Manage your tests and assessments here."
+      />
+      <TestFilters />
+      <Suspense fallback={<TestsTableSkeleton />}>
+        <TestsTable data={tests} />
+      </Suspense>
+    </div>
+  )
+}
