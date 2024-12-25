@@ -12,10 +12,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import type { TestFormValues } from "@/lib/validations/tests"
+import type { TestFormValues, UpdateTestFormValues } from "@/lib/validations/tests"
 
 interface TestFormFieldsProps {
-  form: ReturnType<typeof useForm<TestFormValues>>
+  form: ReturnType<typeof useForm<TestFormValues | UpdateTestFormValues>>
 }
 
 export function TestFormFields({ form }: TestFormFieldsProps) {
