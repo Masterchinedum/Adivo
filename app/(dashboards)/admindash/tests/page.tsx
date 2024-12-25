@@ -1,3 +1,5 @@
+//app/(dashboards)/admindash/tests/page.tsx
+
 import React from 'react'
 
 const Test = () => {
