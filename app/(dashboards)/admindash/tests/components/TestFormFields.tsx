@@ -14,8 +14,10 @@ import {
 } from "@/components/ui/form"
 import type { TestFormValues, UpdateTestFormValues } from "@/lib/validations/tests"
 
+type FormData = TestFormValues | UpdateTestFormValues
+
 interface TestFormFieldsProps {
-  form: ReturnType<typeof useForm<TestFormValues | UpdateTestFormValues>>
+  form: ReturnType<typeof useForm<FormData>>
 }
 
 export function TestFormFields({ form }: TestFormFieldsProps) {
