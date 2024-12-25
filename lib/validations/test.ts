@@ -1,19 +1,33 @@
-// lib/validations/test.ts
-import { z } from "zod"
+// lib/validations/tests.ts
 
-// Create schema requires questions
-export const createTestSchema = z.object({
-  title: z.string().min(3).max(100),
-  description: z.string().max(500).optional(),
-  isPublished: z.boolean().optional()
-});
+import * as z from 'zod'
 
-// Update schema makes everything optional
-export const updateTestSchema = z.object({
-  title: z.string().min(3).max(100).optional(),
-  description: z.string().max(500).optional(),
-  isPublished: z.boolean().optional()
-});
+export const testSchema = z.object({
+  title: z
+    .string()
+    .min(1, 'Title is required')
+    .max(100, 'Title must be less than 100 characters'),
+  description: z
+    .string()
+    .max(500, 'Description must be less than 500 characters')
+    .optional(),
+  isPublished: z.boolean().default(false)
+})
 
-export type CreateTestSchema = z.infer<typeof createTestSchema>
-export type UpdateTestSchema = z.infer<typeof updateTestSchema>
+// Schema for updating a test
+export const updateTestSchema = testSchema.partial().extend({
+  id: z.string().min(1, 'Test ID is required')
+})
+
+// For query parameters
+export const testQuerySchema = z.object({
+  page: z.string().optional(),
+  limit: z.string().optional(),
+  search: z.string().optional(),
+  sort: z.enum(['asc', 'desc']).optional(),
+  isPublished: z.enum(['true', 'false']).optional()
+})
+
+export type TestFormValues = z.infer<typeof testSchema>
+export type UpdateTestFormValues = z.infer<typeof updateTestSchema>
+export type TestQueryParams = z.infer<typeof testQuerySchema>
