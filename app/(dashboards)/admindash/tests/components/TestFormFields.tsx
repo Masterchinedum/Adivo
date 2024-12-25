@@ -12,12 +12,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import type { TestFormValues, UpdateTestFormValues } from "@/lib/validations/tests"
-
-type FormData = TestFormValues | UpdateTestFormValues
+import type { TestFormValues } from "@/lib/validations/tests"
 
 interface TestFormFieldsProps {
-  form: ReturnType<typeof useForm<FormData>>
+  form: ReturnType<typeof useForm<TestFormValues>>
 }
 
 export function TestFormFields({ form }: TestFormFieldsProps) {
@@ -74,7 +72,7 @@ export function TestFormFields({ form }: TestFormFieldsProps) {
             </div>
             <FormControl>
               <Switch
-                checked={field.value ?? false}
+                checked={field.value}
                 onCheckedChange={field.onChange}
               />
             </FormControl>
