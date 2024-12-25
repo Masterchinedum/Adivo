@@ -1,12 +1,9 @@
 // app/(dashboards)/admindash/tests/[id]/page.tsx
-"use client"
-
-import { useEffect, useState } from "react"
+import { Suspense } from "react"
 import { notFound } from "next/navigation"
+import prisma from "@/lib/prisma"
 import { TestFormHeader } from "../components/TestFormHeader"
-import { TestEditForm } from "./components/TestEditForm"
-import { TestDeleteAlert } from "./components/TestDeleteAlert"
-import { TestStatusToggle } from "./components/TestStatusToggle"
+import { TestContent } from "./components/TestContent"
 import type { Test } from "@/types/tests/test"
 
 interface TestEditPageProps {
@@ -15,52 +12,34 @@ interface TestEditPageProps {
   }
 }
 
-export default function TestEditPage({ params }: TestEditPageProps) {
-  const [test, setTest] = useState<Test | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+async function getTest(id: string): Promise<Test | null> {
+  try {
+    const test = await prisma.test.findUnique({
+      where: { id }
+    })
 
-  useEffect(() => {
-    async function fetchTest() {
-      try {
-        const response = await fetch(`/api/admin/tests/${params.id}`)
-        if (!response.ok) {
-          if (response.status === 404) {
-            notFound()
-          }
-          throw new Error("Failed to fetch test")
-        }
-
-        const data = await response.json()
-        setTest(data)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred")
-      } finally {
-        setLoading(false)
-      }
+    if (!test) {
+      return null
     }
 
-    fetchTest()
-  }, [params.id])
-
-  if (loading) {
-    return (
-      <div className="container py-8">
-        <p className="text-center">Loading...</p>
-      </div>
-    )
+    // Transform the Prisma response to match the Test type
+    // by converting null to undefined for the description
+    return {
+      ...test,
+      description: test.description || undefined,
+      user: undefined // Add this if the user field is optional in your Test type
+    } as Test
+  } catch (error) {
+    console.error("Failed to fetch test:", error)
+    throw new Error("Failed to fetch test")
   }
+}
 
-  if (error) {
-    return (
-      <div className="container py-8">
-        <p className="text-center text-red-500">Error: {error}</p>
-      </div>
-    )
-  }
+export default async function TestEditPage({ params }: TestEditPageProps) {
+  const test = await getTest(params.id)
 
   if (!test) {
-    return notFound()
+    notFound()
   }
 
   return (
@@ -71,18 +50,9 @@ export default function TestEditPage({ params }: TestEditPageProps) {
       />
 
       <div className="mx-auto max-w-2xl space-y-8">
-        <div className="flex items-center justify-between">
-          <TestStatusToggle
-            testId={test.id}
-            isPublished={test.isPublished}
-          />
-          <TestDeleteAlert
-            testId={test.id}
-            testTitle={test.title}
-          />
-        </div>
-
-        <TestEditForm test={test} />
+        <Suspense fallback={<div>Loading test content...</div>}>
+          <TestContent test={test} />
+        </Suspense>
       </div>
     </div>
   )
