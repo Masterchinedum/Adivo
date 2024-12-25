@@ -12,10 +12,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import type { TestFormValues, UpdateTestFormValues } from "@/lib/validations/tests"
+import type { TestFormValues } from "@/lib/validations/tests"
+
+// Create a more generic type that combines all possible form fields
+type TestFormData = TestFormValues & {
+  id?: string
+}
 
 interface TestFormFieldsProps {
-  form: ReturnType<typeof useForm<TestFormValues | UpdateTestFormValues>>
+  form: ReturnType<typeof useForm<TestFormData>>
 }
 
 export function TestFormFields({ form }: TestFormFieldsProps) {
