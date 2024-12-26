@@ -70,22 +70,28 @@ export async function PATCH(req: Request) {
 }
 
 // DELETE - Delete a specific test by ID
-export async function DELETE(req: Request) {
+// app/api/admin/tests/[id]/route.ts
+
+export async function DELETE(
+  req: Request,
+  context: { params: { id: string } }
+) {
   try {
     const { userId } = await auth()
     if (!userId) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
-    const { searchParams } = new URL(req.url)
-    const id = searchParams.get('id')
+    // Make sure to await the params
+    const id = context.params.id
     if (!id) {
       return new NextResponse('Bad Request: Missing test ID', { status: 400 })
     }
 
     await prisma.test.delete({ where: { id } })
 
-    return new NextResponse('No Content', { status: 204 })
+    // Fix the 204 response
+    return new NextResponse(null, { status: 204 })
   } catch (error) {
     console.error('[TEST_DELETE]', error)
     return NextResponse.json(
