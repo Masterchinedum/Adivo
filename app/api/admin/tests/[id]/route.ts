@@ -20,7 +20,17 @@ export async function GET(req: Request) {
       return new NextResponse('Bad Request: Missing test ID', { status: 400 })
     }
 
-    const test = await prisma.test.findUnique({ where: { id } })
+    const test = await prisma.test.findUnique({
+      where: { id },
+      include: {
+        questions: {
+          include: {
+            options: true
+          }
+        }
+      }
+    })
+
     if (!test) {
       return new NextResponse('Not Found', { status: 404 })
     }

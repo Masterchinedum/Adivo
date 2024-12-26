@@ -89,6 +89,9 @@ export async function GET(req: Request) {
 }
 
 // Add POST handler for creating tests
+// app/api/admin/tests/route.ts
+
+// Update the POST handler to handle questions and options
 export async function POST(req: Request) {
   try {
     const { userId } = await auth()
@@ -116,11 +119,44 @@ export async function POST(req: Request) {
       )
     }
 
-    const test = await prisma.test.create({
-      data: {
-        ...validationResult.data,
-        createdBy: user.id // Use the database user ID
+    const { questions, ...testData } = validationResult.data
+
+    // Create test with questions and options in a transaction
+    const test = await prisma.$transaction(async (tx) => {
+      // Create the test first
+      const newTest = await tx.test.create({
+        data: {
+          ...testData,
+          createdBy: user.id
+        }
+      })
+
+      // If questions are provided, create them with their options
+      if (questions && questions.length > 0) {
+        await tx.question.createMany({
+          data: questions.map(question => ({
+            title: question.title,
+            testId: newTest.id,
+            options: {
+              create: question.options?.map(option => ({
+                text: option.text
+              })) || []
+            }
+          }))
+        })
       }
+
+      // Return the complete test with questions and options
+      return tx.test.findUnique({
+        where: { id: newTest.id },
+        include: {
+          questions: {
+            include: {
+              options: true
+            }
+          }
+        }
+      })
     })
 
     return NextResponse.json(test, { status: 201 })
