@@ -89,9 +89,6 @@ export async function GET(req: Request) {
 }
 
 // Add POST handler for creating tests
-// app/api/admin/tests/route.ts
-
-// Update the POST handler to handle questions and options
 export async function POST(req: Request) {
   try {
     const { userId } = await auth()
@@ -127,24 +124,19 @@ export async function POST(req: Request) {
       const newTest = await tx.test.create({
         data: {
           ...testData,
-          createdBy: user.id
+          createdBy: user.id,
+          questions: {
+            create: questions?.map((question: { title: string; options?: { text: string }[] }) => ({
+              title: question.title,
+              options: {
+                create: question.options?.map((option: { text: string }) => ({
+                  text: option.text
+                })) || []
+              }
+            })) || []
+          }
         }
       })
-
-      // If questions are provided, create them with their options
-      if (questions && questions.length > 0) {
-        await tx.question.createMany({
-          data: questions.map(question => ({
-            title: question.title,
-            testId: newTest.id,
-            options: {
-              create: question.options?.map(option => ({
-                text: option.text
-              })) || []
-            }
-          }))
-        })
-      }
 
       // Return the complete test with questions and options
       return tx.test.findUnique({

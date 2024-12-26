@@ -64,10 +64,38 @@ export async function PATCH(req: Request) {
       return NextResponse.json(errorResponse, { status: 400 })
     }
 
-    const test = await prisma.test.update({
-      where: { id: validationResult.data.id },
-      data: validationResult.data
+    const { questions, ...testData } = validationResult.data
+
+    const test = await prisma.$transaction(async (tx) => {
+      // Update the test basic info
+      const updatedTest = await tx.test.update({
+        where: { id: testData.id },
+        data: {
+          ...testData,
+          questions: questions ? {
+            deleteMany: {}, // Delete existing questions
+            create: questions.map(question => ({
+              title: question.title,
+              options: {
+                create: question.options?.map(option => ({
+                  text: option.text
+                })) || []
+              }
+            }))
+          } : undefined
+        },
+        include: {
+          questions: {
+            include: {
+              options: true
+            }
+          }
+        }
+      })
+
+      return updatedTest
     })
+
 
     return NextResponse.json(test)
   } catch (error) {

@@ -2,6 +2,21 @@
 
 import * as z from 'zod'
 
+const optionSchema = z.object({
+  text: z
+    .string()
+    .min(1, 'Option text is required')
+    .max(500, 'Option text must be less than 500 characters')
+})
+
+const questionSchema = z.object({
+  title: z
+    .string()
+    .min(1, 'Question title is required')
+    .max(1000, 'Question title must be less than 1000 characters'),
+  options: z.array(optionSchema).optional()
+})
+
 export const testSchema = z.object({
   title: z
     .string()
@@ -11,7 +26,8 @@ export const testSchema = z.object({
     .string()
     .max(500, 'Description must be less than 500 characters')
     .optional(),
-  isPublished: z.boolean().default(false)
+  isPublished: z.boolean().default(false),
+  questions: z.array(questionSchema).optional()
 })
 
 // Schema for updating a test
