@@ -5,8 +5,8 @@ import { NextResponse } from 'next/server'
 import { Prisma } from '@prisma/client'
 import prisma from '@/lib/prisma'
 import { createQuestionSchema } from '@/lib/validations/question'
-import type { Question } from '@/types/tests/question'
-import { getUserById } from '@/lib/users'
+// import type { Question } from '@/types/tests/question'
+// import { getUserById } from '@/lib/users'
 
 // GET - List all questions for a specific test with pagination
 export async function GET(req: Request) {
