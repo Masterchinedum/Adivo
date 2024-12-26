@@ -69,26 +69,49 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string; questionId: string } }
-) {
-  try {
-    const { userId } = await auth()
-    if (!userId) {
-      return new NextResponse('Unauthorized', { status: 401 })
+interface RouteParams {
+    params: {
+      id: string
+      questionId: string
     }
-
-    await prisma.question.delete({
-      where: { id: params.questionId }
-    })
-
-    return new NextResponse(null, { status: 204 })
-  } catch (error) {
-    console.error('[QUESTION_DELETE]', error)
-    return NextResponse.json(
-      { message: 'Internal Server Error' },
-      { status: 500 }
-    )
   }
-}
+  
+  // DELETE - Delete a specific question
+  export async function DELETE(
+    request: Request,
+    { params }: RouteParams
+  ) {
+    try {
+      const { userId } = await auth()
+      if (!userId) {
+        return new NextResponse('Unauthorized', { status: 401 })
+      }
+  
+      // First verify that the question belongs to the specified test
+      const question = await prisma.question.findFirst({
+        where: {
+          id: params.questionId,
+          testId: params.id
+        }
+      })
+  
+      if (!question) {
+        return new NextResponse('Question not found', { status: 404 })
+      }
+  
+      // Delete the question
+      await prisma.question.delete({
+        where: {
+          id: params.questionId
+        }
+      })
+  
+      return new NextResponse(null, { status: 204 })
+    } catch (error) {
+      console.error('[QUESTION_DELETE]', error)
+      return NextResponse.json(
+        { message: 'Internal Server Error' },
+        { status: 500 }
+      )
+    }
+  }
