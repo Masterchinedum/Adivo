@@ -17,15 +17,6 @@ export async function GET(req: Request) {
     }
 
     const { searchParams } = new URL(req.url)
-    
-    // Log the received parameters for debugging
-    console.log('Received query parameters:', {
-      page: searchParams.get('page'),
-      limit: searchParams.get('limit'),
-      search: searchParams.get('search'),
-      sort: searchParams.get('sort'),
-      isPublished: searchParams.get('isPublished')
-    })
 
     // Parse and validate query parameters with default values
     const queryResult = testQuerySchema.safeParse({
@@ -69,9 +60,6 @@ export async function GET(req: Request) {
       whereClause.isPublished = queryResult.data.isPublished === 'true'
     }
 
-    // Log the constructed where clause for debugging
-    console.log('Where clause:', whereClause)
-
     // Get total count and tests
     const [totalTests, tests] = await Promise.all([
       prisma.test.count({ where: whereClause }),
@@ -84,14 +72,6 @@ export async function GET(req: Request) {
         }
       })
     ])
-
-    // Log the results for debugging
-    console.log('Query results:', {
-      totalTests,
-      testsCount: tests.length,
-      currentPage: page,
-      totalPages: Math.ceil(totalTests / limit)
-    })
 
     return NextResponse.json({
       tests,
