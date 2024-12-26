@@ -6,45 +6,62 @@ import { TestFormHeader } from "../components/TestFormHeader"
 import { TestContent } from "./components/TestContent"
 import type { Test } from "@/types/tests/test"
 
-// interface TestEditPageProps {
-//   params: {
-//     id: string
-//   }
-// }
+// Interface for the page props
+interface PageProps {
+  params: Promise<{
+    id: string
+  }>
+}
 
-async function getTest(id: string): Promise<Test | null> {
+// Fetch test data function
+async function getTest(testId: string): Promise<Test | null> {
   try {
     const test = await prisma.test.findUnique({
-      where: { id }
+      where: { id: testId },
+      include: {
+        user: true
+      }
     })
 
     if (!test) {
       return null
     }
 
-    // Transform the Prisma response to match the Test type
     return {
-      ...test,
+      id: test.id,
+      title: test.title,
       description: test.description ?? undefined,
-      user: undefined 
-    } as Test
+      createdAt: test.createdAt,
+      updatedAt: test.updatedAt,
+      isPublished: test.isPublished,
+      createdBy: test.createdBy,
+      user: undefined
+    }
   } catch (error) {
     console.error("Failed to fetch test:", error)
     throw new Error("Failed to fetch test")
   }
 }
 
-export default async function TestEditPage({
-  params,
-}: {
-  params: { id: string }
-}) {
-  if (!params?.id) {
+// Loading component
+function LoadingState() {
+  return <div>Loading test content...</div>
+}
+
+// Main page component
+export default async function TestPage({ params }: PageProps) {
+  // Await the params first
+  const resolvedParams = await params
+  
+  // Early return if no ID is provided
+  if (!resolvedParams?.id) {
     notFound()
   }
 
-  const test = await getTest(params.id)
+  // Fetch the test data using the resolved ID
+  const test = await getTest(resolvedParams.id)
 
+  // Handle non-existent test
   if (!test) {
     notFound()
   }
@@ -57,7 +74,7 @@ export default async function TestEditPage({
       />
 
       <div className="mx-auto max-w-2xl space-y-8">
-        <Suspense fallback={<div>Loading test content...</div>}>
+        <Suspense fallback={<LoadingState />}>
           <TestContent test={test} />
         </Suspense>
       </div>
