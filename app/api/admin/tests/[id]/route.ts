@@ -1,10 +1,17 @@
 // app/api/admin/tests/[id]/route.ts
 
 import { auth } from '@clerk/nextjs/server'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { updateTestSchema } from '@/lib/validations/tests'
 import type { TestError } from '@/types/tests/test'
+import { Prisma } from '@prisma/client'
+
+type RouteParams = {
+  params: {
+    id: string
+  }
+}
 
 // GET - Retrieve a specific test by ID
 export async function GET(req: Request) {
@@ -70,24 +77,39 @@ export async function PATCH(req: Request) {
 }
 
 // DELETE - Delete a specific test by ID
-export async function DELETE(req: Request) {
+// DELETE handler with correct typing
+export async function DELETE(
+  req: NextRequest,
+  context: RouteParams
+) {
   try {
     const { userId } = await auth()
     if (!userId) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
-    const { searchParams } = new URL(req.url)
-    const id = searchParams.get('id')
+    const { id } = context.params
     if (!id) {
       return new NextResponse('Bad Request: Missing test ID', { status: 400 })
     }
 
-    await prisma.test.delete({ where: { id } })
+    await prisma.test.delete({
+      where: { id }
+    })
 
-    return new NextResponse('No Content', { status: 204 })
+    return new NextResponse(null, { status: 204 })
   } catch (error) {
     console.error('[TEST_DELETE]', error)
+    
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === 'P2025') {
+        return NextResponse.json(
+          { message: 'Test not found' },
+          { status: 404 }
+        )
+      }
+    }
+
     return NextResponse.json(
       { message: 'Internal Server Error' },
       { status: 500 }
