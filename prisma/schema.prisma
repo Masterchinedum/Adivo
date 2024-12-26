@@ -30,4 +30,17 @@ model Test {
   updatedAt   DateTime    @updatedAt
   createdBy   String      // Add this field
   user        User        @relation(fields: [createdBy], references: [id])
+  questions   Question[] // One-to-many relationship with Question
+}
+
+model Question {
+  id        String   @id @default(cuid())
+  title     String
+  order     Int      @default(0)
+  test      Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
+  testId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([testId])
 }
