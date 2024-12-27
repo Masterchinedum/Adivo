@@ -116,44 +116,46 @@ export async function POST(req: Request) {
       )
     }
 
-    const { questions, ...testData } = validationResult.data
+    const { questions, categories, ...testData } = validationResult.data
 
-    // Create test with questions and options in a transaction
+    // Create test with questions and categories in a transaction
     const test = await prisma.$transaction(async (tx) => {
       const newTest = await tx.test.create({
         data: {
           ...testData,
           createdBy: user.id,
-          questions: {
-            create: questions?.map((question: { 
-              title: string; 
-              categoryId?: string;
-              options?: { text: string }[] 
-            }) => ({
+          // Handle categories creation
+          categories: categories ? {
+            create: categories.map(category => ({
+              name: category.name,
+              description: category.description
+            }))
+          } : undefined,
+          // Handle questions creation
+          questions: questions ? {
+            create: questions.map(question => ({
               title: question.title,
-              categoryId: question.categoryId, // handle category
+              categoryId: question.categoryId,
               options: {
-                create: question.options?.map((option: { text: string }) => ({
+                create: question.options?.map(option => ({
                   text: option.text
                 })) || []
               }
-            })) || []
-          }
-        }
-      })
-
-      return tx.test.findUnique({
-        where: { id: newTest.id },
+            }))
+          } : undefined
+        },
         include: {
           questions: {
             include: {
               options: true,
-              category: true //include category information
+              category: true
             }
           },
-          categories: true // include all categories
+          categories: true
         }
       })
+
+      return newTest
     })
 
     return NextResponse.json(test, { status: 201 })
