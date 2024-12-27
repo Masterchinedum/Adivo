@@ -22,7 +22,11 @@ import type { TestFormValues } from "@/lib/validations/tests"
 interface CategorySelectProps {
   form: UseFormReturn<TestFormValues>
   questionIndex: number
-  categories: Array<{ id: string; name: string }>
+  categories: Array<{
+    id?: string
+    name: string
+    description?: string
+  }>
 }
 
 export function CategorySelect({ form, questionIndex, categories }: CategorySelectProps) {
@@ -33,7 +37,11 @@ export function CategorySelect({ form, questionIndex, categories }: CategorySele
       render={({ field }) => (
         <FormItem>
           <FormLabel>Category</FormLabel>
-          <Select onValueChange={field.onChange} defaultValue={field.value}>
+          <Select 
+            onValueChange={field.onChange} 
+            value={field.value || ""} // Ensure a string value
+            defaultValue=""
+          >
             <FormControl>
               <SelectTrigger>
                 <SelectValue placeholder="Select a category" />
@@ -42,7 +50,10 @@ export function CategorySelect({ form, questionIndex, categories }: CategorySele
             <SelectContent>
               <SelectItem value="">None</SelectItem>
               {categories.map((category) => (
-                <SelectItem key={category.id} value={category.id}>
+                <SelectItem 
+                  key={category.id || category.name} 
+                  value={category.id || category.name} // Ensure a string value
+                >
                   {category.name}
                 </SelectItem>
               ))}

@@ -33,7 +33,10 @@ export function QuestionList({ form }: QuestionListProps) {
     });
   };
 
-  const categories = form.watch('categories') || [];
+  const categories = form.watch('categories')?.map((category, index) => ({
+    id: category.id || `temp-${index}`, // Use temporary ID if not available
+    name: category.name
+  })) || [];
 
   return (
     <div className="space-y-6">

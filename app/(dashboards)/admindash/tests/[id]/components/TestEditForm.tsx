@@ -29,6 +29,7 @@ export function TestEditForm({ test }: TestEditFormProps) {
       description: test.description || undefined,
       isPublished: test.isPublished,
       categories: test.categories?.map(c => ({
+        id: c.id, // Include the ID
         name: c.name,
         description: c.description
       })) || [],

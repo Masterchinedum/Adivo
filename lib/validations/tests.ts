@@ -30,6 +30,7 @@ export const testSchema = z.object({
   isPublished: z.boolean().default(false),
   categories: z.array(
     z.object({
+      id: z.string().optional(),
       name: z.string().min(1, 'Category name is required').max(100),
       description: z.string().max(500).optional()
     })

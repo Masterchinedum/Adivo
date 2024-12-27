@@ -14,7 +14,7 @@ export interface Test {
   createdBy: string
   user?: User
   questions?: Question[]
-  categories?: Category[]  // New field
+  categories?: Category[] 
 }
 
 // For creating a new test
@@ -23,9 +23,13 @@ export interface CreateTestInput {
   title: string;
   description?: string;
   isPublished: boolean;
+  categories?: Array<{
+    name: string
+    description?: string
+  }>;
   questions?: Array<{
     title: string;
-    categoryId?: string  // New field
+    categoryId?: string
     options?: Array<{
       text: string;
     }>;
