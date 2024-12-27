@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
+import { QuestionList } from "./QuestionList"
 import {
   FormControl,
   FormDescription,
@@ -20,7 +21,7 @@ interface TestFormFieldsProps {
 
 export function TestFormFields({ form }: TestFormFieldsProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <FormField
         control={form.control}
         name="title"
@@ -79,6 +80,9 @@ export function TestFormFields({ form }: TestFormFieldsProps) {
           </FormItem>
         )}
       />
+      <div className="border-t pt-6">
+        <QuestionList form={form} />
+      </div>
     </div>
   )
 }
