@@ -16,7 +16,7 @@ import {
 import { useFieldArray, UseFormReturn } from "react-hook-form"
 import type { TestFormValues } from "@/lib/validations/tests"
 import { QuestionList } from "./QuestionList"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Card, CardHeader, CardContent } from "@/components/ui/card"
 
 interface CategoryListProps {
   form: UseFormReturn<TestFormValues>
