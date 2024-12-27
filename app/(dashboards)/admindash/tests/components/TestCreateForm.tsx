@@ -1,4 +1,3 @@
-// app/(dashboards)/admindash/tests/components/TestCreateForm.tsx
 "use client"
 
 import * as React from "react"
@@ -15,8 +14,7 @@ const defaultValues: Partial<TestFormValues> = {
   title: "",
   description: "",
   isPublished: false,
-  categories: [],
-  questions: []
+  categories: [], // Each category will contain its own questions array
 }
 
 export function TestCreateForm() {
@@ -31,12 +29,24 @@ export function TestCreateForm() {
   async function onSubmit(data: TestFormValues) {
     setIsLoading(true)
     try {
+      // Transform the data to match your API expectations
+      const formattedData = {
+        ...data,
+        categories: data.categories.map(category => ({
+          ...category,
+          questions: category.questions?.map(question => ({
+            ...question,
+            options: question.options || []
+          }))
+        }))
+      }
+
       const response = await fetch("/api/admin/tests", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(formattedData),
       })
 
       if (!response.ok) {
