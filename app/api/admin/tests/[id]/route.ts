@@ -78,6 +78,7 @@ export async function PATCH(req: Request) {
             deleteMany: {}, // Delete existing questions
             create: questions.map(question => ({
               title: question.title,
+              categoryId: question.categoryId, // Add category support
               options: {
                 create: question.options?.map(option => ({
                   text: option.text
@@ -89,15 +90,16 @@ export async function PATCH(req: Request) {
         include: {
           questions: {
             include: {
-              options: true
+              options: true,
+              category: true // Include category information
             }
-          }
+          },
+          categories: true // Include all categories
         }
       })
 
       return updatedTest
     })
-
 
     return NextResponse.json(test)
   } catch (error) {
