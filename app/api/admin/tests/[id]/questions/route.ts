@@ -48,6 +48,7 @@ export async function POST(request: Request) {
       const question = await prisma.question.create({
         data: {
           ...questionData,
+          categoryId: questionData.categoryId, // Add this line
           options: {
             create: options?.map(option => ({
               text: option.text
@@ -55,7 +56,8 @@ export async function POST(request: Request) {
           }
         },
         include: {
-          options: true
+          options: true,
+          category: true // Add this line
         }
       })
   

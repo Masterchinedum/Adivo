@@ -120,14 +120,18 @@ export async function POST(req: Request) {
 
     // Create test with questions and options in a transaction
     const test = await prisma.$transaction(async (tx) => {
-      // Create the test first
       const newTest = await tx.test.create({
         data: {
           ...testData,
           createdBy: user.id,
           questions: {
-            create: questions?.map((question: { title: string; options?: { text: string }[] }) => ({
+            create: questions?.map((question: { 
+              title: string; 
+              categoryId?: string;
+              options?: { text: string }[] 
+            }) => ({
               title: question.title,
+              categoryId: question.categoryId, // handle category
               options: {
                 create: question.options?.map((option: { text: string }) => ({
                   text: option.text
@@ -138,15 +142,16 @@ export async function POST(req: Request) {
         }
       })
 
-      // Return the complete test with questions and options
       return tx.test.findUnique({
         where: { id: newTest.id },
         include: {
           questions: {
             include: {
-              options: true
+              options: true,
+              category: true //include category information
             }
-          }
+          },
+          categories: true // include all categories
         }
       })
     })
