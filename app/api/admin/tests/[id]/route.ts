@@ -25,9 +25,11 @@ export async function GET(req: Request) {
       include: {
         questions: {
           include: {
-            options: true
+            options: true,
+            category: true // Add this line to include category information
           }
-        }
+        },
+        categories: true // Add this line to include all categories
       }
     })
 
