@@ -2,6 +2,7 @@
 
 import { User } from '@/types'
 import { Question } from './question'
+import { Category } from './category'
 
 export interface Test {
   id: string
@@ -11,8 +12,9 @@ export interface Test {
   updatedAt: Date
   isPublished: boolean
   createdBy: string
-  user?: User // Reference to the admin who created the test
+  user?: User
   questions?: Question[]
+  categories?: Category[]  // New field
 }
 
 // For creating a new test
@@ -23,6 +25,7 @@ export interface CreateTestInput {
   isPublished: boolean;
   questions?: Array<{
     title: string;
+    categoryId?: string  // New field
     options?: Array<{
       text: string;
     }>;
