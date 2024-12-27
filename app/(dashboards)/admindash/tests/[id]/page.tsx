@@ -14,12 +14,18 @@ interface PageProps {
 }
 
 // Fetch test data function
+// app/(dashboards)/admindash/tests/[id]/page.tsx
 async function getTest(testId: string): Promise<Test | null> {
   try {
     const test = await prisma.test.findUnique({
       where: { id: testId },
       include: {
-        user: true
+        user: true,
+        questions: {  // Include questions
+          include: {
+            options: true  // Include options for each question
+          }
+        }
       }
     })
 
@@ -35,7 +41,21 @@ async function getTest(testId: string): Promise<Test | null> {
       updatedAt: test.updatedAt,
       isPublished: test.isPublished,
       createdBy: test.createdBy,
-      user: undefined
+      user: undefined,
+      questions: test.questions.map(question => ({  // Map questions and options
+        id: question.id,
+        title: question.title,
+        testId: question.testId,
+        createdAt: question.createdAt,
+        updatedAt: question.updatedAt,
+        options: question.options.map(option => ({  // Map options
+          id: option.id,
+          text: option.text,
+          questionId: option.questionId,
+          createdAt: option.createdAt,
+          updatedAt: option.updatedAt
+        }))
+      }))
     }
   } catch (error) {
     console.error("Failed to fetch test:", error)
