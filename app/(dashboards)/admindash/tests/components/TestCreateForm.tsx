@@ -15,6 +15,8 @@ const defaultValues: Partial<TestFormValues> = {
   title: "",
   description: "",
   isPublished: false,
+  categories: [],
+  questions: []
 }
 
 export function TestCreateForm() {
