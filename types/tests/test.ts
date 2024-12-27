@@ -18,9 +18,9 @@ export interface Test {
 // For creating a new test
 export interface CreateTestInput {
   id: string;
-  title?: string;
+  title: string;
   description?: string;
-  isPublished?: boolean;
+  isPublished: boolean;
   questions?: Array<{
     title: string;
     options?: Array<{

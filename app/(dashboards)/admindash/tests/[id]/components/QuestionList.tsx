@@ -13,10 +13,10 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { useFieldArray, UseFormReturn } from "react-hook-form"
-import type { TestFormValues } from "@/lib/validations/tests"
+import { UpdateTestInput } from "@/types/tests/test"
 
 interface QuestionListProps {
-    form: UseFormReturn<TestFormValues>
+    form: UseFormReturn<UpdateTestInput>
   }
 
 export function QuestionList({ form }: QuestionListProps) {
@@ -79,7 +79,7 @@ export function QuestionList({ form }: QuestionListProps) {
   );
 }
 
-function OptionList({ form, questionIndex }: { form: UseFormReturn<TestFormValues>; questionIndex: number }) {
+function OptionList({ form, questionIndex }: { form: UseFormReturn<UpdateTestInput>; questionIndex: number }) {
   const { fields: options, append, remove } = useFieldArray({
     control: form.control,
     name: `questions.${questionIndex}.options`

@@ -28,7 +28,12 @@ export function TestEditForm({ test }: TestEditFormProps) {
       title: test.title,
       description: test.description || undefined,
       isPublished: test.isPublished,
-      questions: test.questions ?? []
+      questions: test.questions?.map(q => ({
+        title: q.title,
+        options: q.options?.map(o => ({
+          text: o.text
+        }))
+      })) || []
     },
   })
 
