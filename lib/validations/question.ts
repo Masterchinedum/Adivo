@@ -14,6 +14,7 @@ export const createQuestionSchema = z.object({
         .min(1, "Question title is required")
         .max(1000, "Question title must be less than 1000 characters"),
     testId: z.string().cuid("Invalid test ID"),
+    categoryId: z.string().cuid("Invalid category ID").optional(),  // New field
     options: z.array(optionSchema).optional()
 })
 
@@ -23,6 +24,7 @@ export const updateQuestionSchema = z.object({
         .min(1, "Question title is required")
         .max(1000, "Question title must be less than 1000 characters")
         .optional(),
+    categoryId: z.string().cuid("Invalid category ID").optional(),  // New field
     options: z.array(
         z.object({
             id: z.string().cuid("Invalid option ID").optional(),
