@@ -31,7 +31,7 @@ model Test {
   createdBy   String
   user        User        @relation(fields: [createdBy], references: [id])
   questions   Question[]
-  categories  Category[]  // New relation to Category model
+  categories  Category[] 
 
   @@index([createdBy])
 }
@@ -40,9 +40,9 @@ model Category {
   id          String    @id @default(cuid())
   name        String
   description String?
-  testId      String    // Reference to parent Test
+  testId      String    
   test        Test      @relation(fields: [testId], references: [id], onDelete: Cascade)
-  questions   Question[] // Relation to Question model
+  questions   Question[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -54,7 +54,7 @@ model Question {
   title      String
   testId     String
   test       Test      @relation(fields: [testId], references: [id], onDelete: Cascade)
-  categoryId String?   // Optional reference to Category
+  categoryId String?
   category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   options    Option[]
   createdAt  DateTime  @default(now())
