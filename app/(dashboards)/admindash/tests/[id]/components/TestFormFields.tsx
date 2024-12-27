@@ -1,6 +1,6 @@
 // app/(dashboards)/admindash/tests/[id]/components/TestFormFields.tsx
 import * as React from "react"
-import { useForm } from "react-hook-form"
+import { UseFormReturn } from "react-hook-form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
@@ -13,10 +13,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import type { UpdateTestFormValues as UpdateTestInput } from "@/lib/validations/tests"
+import type { TestFormValues } from "@/lib/validations/tests"
 
 interface TestFormFieldsProps {
-  form: ReturnType<typeof useForm<UpdateTestInput>>
+  form: UseFormReturn<TestFormValues>
 }
 
 export function TestFormFields({ form }: TestFormFieldsProps) {
@@ -29,7 +29,11 @@ export function TestFormFields({ form }: TestFormFieldsProps) {
           <FormItem>
             <FormLabel>Title</FormLabel>
             <FormControl>
-              <Input placeholder="Enter test title" {...field} />
+              <Input 
+                placeholder="Enter test title" 
+                {...field} 
+                value={field.value || ''} 
+              />
             </FormControl>
             <FormDescription>
               Give your test a clear and descriptive title.
@@ -49,6 +53,7 @@ export function TestFormFields({ form }: TestFormFieldsProps) {
               <Textarea
                 placeholder="Enter test description (optional)"
                 {...field}
+                value={field.value || ''}
                 rows={4}
               />
             </FormControl>
@@ -73,13 +78,14 @@ export function TestFormFields({ form }: TestFormFieldsProps) {
             </div>
             <FormControl>
               <Switch
-                checked={field.value}
+                checked={field.value || false}
                 onCheckedChange={field.onChange}
               />
             </FormControl>
           </FormItem>
         )}
       />
+      
       <div className="border-t pt-6">
         <QuestionList form={form} />
       </div>

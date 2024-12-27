@@ -12,13 +12,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { useFieldArray } from "react-hook-form"
+import { useFieldArray, UseFormReturn } from "react-hook-form"
 import type { TestFormValues } from "@/lib/validations/tests"
-import type { UseFormReturn } from "react-hook-form"
 
 interface QuestionListProps {
-  form: UseFormReturn<TestFormValues>
-}
+    form: UseFormReturn<TestFormValues>
+  }
 
 export function QuestionList({ form }: QuestionListProps) {
   const { fields: questions, append, remove } = useFieldArray({
