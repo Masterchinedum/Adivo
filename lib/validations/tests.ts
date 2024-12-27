@@ -11,9 +11,10 @@ const optionSchema = z.object({
 
 const questionSchema = z.object({
   title: z
-    .string()
-    .min(1, 'Question title is required')
-    .max(1000, 'Question title must be less than 1000 characters'),
+      .string()
+      .min(1, 'Question title is required')
+      .max(1000, 'Question title must be less than 1000 characters'),
+  categoryId: z.string().cuid("Invalid category ID").optional(),  // New field
   options: z.array(optionSchema).optional()
 })
 
