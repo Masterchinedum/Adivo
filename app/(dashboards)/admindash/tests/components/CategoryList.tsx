@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/form"
 import { useFieldArray, UseFormReturn } from "react-hook-form"
 import type { TestFormValues } from "@/lib/validations/tests"
+import { QuestionList } from "./QuestionList"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 
 interface CategoryListProps {
   form: UseFormReturn<TestFormValues>
@@ -29,7 +31,8 @@ export function CategoryList({ form }: CategoryListProps) {
   const handleAddCategory = () => {
     append({
       name: "",
-      description: ""
+      description: "",
+      questions: [] // Initialize empty questions array for the category
     });
   };
 
@@ -49,8 +52,8 @@ export function CategoryList({ form }: CategoryListProps) {
       </div>
 
       {categories.map((field, index) => (
-        <div key={field.id} className="border p-4 rounded-lg space-y-4">
-          <div className="flex justify-between items-start">
+        <Card key={field.id} className="p-6">
+          <CardHeader className="flex flex-row items-start justify-between p-0 pb-4">
             <div className="flex-1 space-y-4">
               <FormField
                 control={form.control}
@@ -91,8 +94,11 @@ export function CategoryList({ form }: CategoryListProps) {
             >
               <Trash className="h-4 w-4" />
             </Button>
-          </div>
-        </div>
+          </CardHeader>
+          <CardContent className="p-0 pt-4">
+            <QuestionList form={form} categoryIndex={index} />
+          </CardContent>
+        </Card>
       ))}
     </div>
   );
