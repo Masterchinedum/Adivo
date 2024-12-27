@@ -31,7 +31,7 @@ export const testSchema = z.object({
 })
 
 // Schema for updating a test
-export const updateTestSchema = testSchema.partial().extend({
+export const updateTestSchema = testSchema.extend({
   id: z.string().min(1, 'Test ID is required')
 })
 

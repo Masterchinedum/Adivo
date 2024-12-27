@@ -1,6 +1,7 @@
 // types/tests/test.ts
 
 import { User } from '@/types'
+import { Question } from './question'
 
 export interface Test {
   id: string
@@ -11,13 +12,21 @@ export interface Test {
   isPublished: boolean
   createdBy: string
   user?: User // Reference to the admin who created the test
+  questions?: Question[]
 }
 
 // For creating a new test
 export interface CreateTestInput {
-  title: string
-  description?: string
-  isPublished?: boolean
+  id: string;
+  title?: string;
+  description?: string;
+  isPublished?: boolean;
+  questions?: Array<{
+    title: string;
+    options?: Array<{
+      text: string;
+    }>;
+  }>;
 }
 
 // For updating an existing test

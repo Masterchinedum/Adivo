@@ -9,7 +9,7 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
 import { TestFormFields } from "../components/TestFormFields"
-import { updateTestSchema } from "@/lib/validations/tests"
+import { TestFormValues, updateTestSchema } from "@/lib/validations/tests"
 import type { Test, UpdateTestInput } from "@/types/tests/test"
 
 interface TestEditFormProps {
@@ -21,14 +21,17 @@ export function TestEditForm({ test }: TestEditFormProps) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
 
   // Define form with correct types from UpdateTestInput
-  const form = useForm<UpdateTestInput>({
+  const form = useForm<TestFormValues>({
     resolver: zodResolver(updateTestSchema),
     defaultValues: {
-      id: test.id,
       title: test.title,
-      description: test.description || undefined,
-      isPublished: test.isPublished
-    },
+      isPublished: test.isPublished,
+      description: test.description,
+      questions: test.questions?.map(q => ({
+        title: q.title,
+        options: q.options?.map(o => ({ text: o.text }))
+      })) || []
+    }
   })
 
   async function onSubmit(data: UpdateTestInput) {
