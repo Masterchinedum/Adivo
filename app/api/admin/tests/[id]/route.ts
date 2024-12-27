@@ -66,19 +66,29 @@ export async function PATCH(req: Request) {
       return NextResponse.json(errorResponse, { status: 400 })
     }
 
-    const { questions, ...testData } = validationResult.data
+    const { questions, categories, ...testData } = validationResult.data
 
+    // Create test with questions and categories in a transaction
     const test = await prisma.$transaction(async (tx) => {
       // Update the test basic info
       const updatedTest = await tx.test.update({
         where: { id: testData.id },
         data: {
           ...testData,
+          // Handle categories update
+          categories: categories ? {
+            deleteMany: {}, // Delete existing categories
+            create: categories.map(category => ({
+              name: category.name,
+              description: category.description
+            }))
+          } : undefined,
+          // Handle questions update
           questions: questions ? {
             deleteMany: {}, // Delete existing questions
             create: questions.map(question => ({
               title: question.title,
-              categoryId: question.categoryId, // Add category support
+              categoryId: question.categoryId,
               options: {
                 create: question.options?.map(option => ({
                   text: option.text
@@ -91,10 +101,10 @@ export async function PATCH(req: Request) {
           questions: {
             include: {
               options: true,
-              category: true // Include category information
+              category: true
             }
           },
-          categories: true // Include all categories
+          categories: true
         }
       })
 
