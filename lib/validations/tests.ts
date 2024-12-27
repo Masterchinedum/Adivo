@@ -28,7 +28,13 @@ export const testSchema = z.object({
     .max(500, 'Description must be less than 500 characters')
     .optional(),
   isPublished: z.boolean().default(false),
-  questions: z.array(questionSchema).optional()
+  categories: z.array(
+    z.object({
+      name: z.string().min(1, 'Category name is required').max(100),
+      description: z.string().max(500).optional()
+    })
+  ).optional(),
+  questions: z.array(questionSchema).optional(),
 })
 
 // Schema for updating a test

@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { QuestionList } from "./QuestionList"
+import { CategoryList } from "./CategoryList"
 import {
   FormControl,
   FormDescription,
@@ -64,6 +65,9 @@ export function TestFormFields({ form }: TestFormFieldsProps) {
           </FormItem>
         )}
       />
+      <div className="border-t pt-6">
+        <CategoryList form={form} />
+      </div>
       <div className="border-t pt-6">
         <QuestionList form={form} />
       </div>

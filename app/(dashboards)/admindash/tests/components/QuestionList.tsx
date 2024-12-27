@@ -5,6 +5,7 @@ import * as React from "react"
 import { Plus, Trash } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { CategorySelect } from "./CategorySelect"
 import {
   FormControl,
   FormField,
@@ -31,6 +32,8 @@ export function QuestionList({ form }: QuestionListProps) {
       options: []
     });
   };
+
+  const categories = form.watch('categories') || [];
 
   return (
     <div className="space-y-6">
@@ -63,6 +66,13 @@ export function QuestionList({ form }: QuestionListProps) {
                 </FormItem>
               )}
             />
+            <div className="w-1/3 px-4">
+              <CategorySelect 
+                form={form} 
+                questionIndex={index}
+                categories={categories}
+              />
+            </div>
             <Button
               type="button"
               variant="ghost"
