@@ -1,5 +1,4 @@
 // app/(dashboards)/admindash/tests/[id]/components/TestFormFields.tsx
-
 "use client"
 
 import * as React from "react"
@@ -7,7 +6,7 @@ import { UseFormReturn } from "react-hook-form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
-import { QuestionList } from "./QuestionList"
+import { CategoryList } from "./CategoryList" // We'll create this next
 import {
   FormControl,
   FormDescription,
@@ -69,7 +68,7 @@ export function TestFormFields({ form }: TestFormFieldsProps) {
       />
       
       <div className="border-t pt-6">
-        <QuestionList form={form} />
+        <CategoryList form={form} />
       </div>
 
       <FormField

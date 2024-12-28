@@ -38,23 +38,23 @@ export interface CreateTestInput {
 
 // For updating an existing test
 export interface UpdateTestInput {
-  id: string
-  title?: string
-  description?: string
-  isPublished?: boolean
+  id: string;
+  title?: string;
+  description?: string | null; // Add null as a possible type
+  isPublished?: boolean;
   categories?: Array<{
-    id?: string // For existing categories
-    name: string
-    description?: string
+    id?: string;
+    name: string;
+    description?: string | null; // Add null as a possible type
     questions?: Array<{
-      id?: string // For existing questions
-      title: string
+      id?: string;
+      title: string;
       options?: Array<{
-        id?: string // For existing options
-        text: string
-      }>
-    }>
-  }>
+        id?: string;
+        text: string;
+      }>;
+    }>;
+  }>;
 }
 
 // For API responses
