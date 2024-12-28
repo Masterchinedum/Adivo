@@ -6,12 +6,6 @@ import { TestContent } from "./components/TestContent"
 import { TestFormHeader } from "../components/TestFormHeader"
 import type { Test } from "@/types/tests/test"
 
-type Props = {
-  params: {
-    id: string
-  }
-}
-
 export const metadata: Metadata = {
   title: "Edit Test",
   description: "Edit your test details and questions.",
@@ -43,8 +37,15 @@ async function getTest(id: string): Promise<Test | null> {
   } as Test
 }
 
-export default async function TestPage({ params }: Props) {
-  const test = await getTest(params.id)
+// Remove all custom type definitions and use the component directly
+export default async function page({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  // Await the params since they're a Promise
+  const resolvedParams = await params
+  const test = await getTest(resolvedParams.id)
 
   if (!test) {
     notFound()
