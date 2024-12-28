@@ -13,16 +13,17 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { useFieldArray, UseFormReturn } from "react-hook-form"
-import { UpdateTestInput } from "@/types/tests/test"
+import type { UpdateTestInput } from "@/types/tests/test"
 
 interface QuestionListProps {
-    form: UseFormReturn<UpdateTestInput>
-  }
+  form: UseFormReturn<UpdateTestInput>
+  categoryIndex: number
+}
 
-export function QuestionList({ form }: QuestionListProps) {
+export function QuestionList({ form, categoryIndex }: QuestionListProps) {
   const { fields: questions, append, remove } = useFieldArray({
     control: form.control,
-    name: "questions"
+    name: `categories.${categoryIndex}.questions`
   });
 
   const handleAddQuestion = () => {
@@ -33,9 +34,9 @@ export function QuestionList({ form }: QuestionListProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium">Questions</h3>
+        <h4 className="text-sm font-medium">Questions</h4>
         <Button
           type="button"
           onClick={handleAddQuestion}
@@ -47,15 +48,15 @@ export function QuestionList({ form }: QuestionListProps) {
         </Button>
       </div>
 
-      {questions.map((field, index) => (
-        <div key={field.id} className="border p-4 rounded-lg space-y-4">
+      {questions.map((question, questionIndex) => (
+        <div key={question.id} className="border p-4 rounded-lg space-y-4">
           <div className="flex justify-between items-start">
             <FormField
               control={form.control}
-              name={`questions.${index}.title`}
+              name={`categories.${categoryIndex}.questions.${questionIndex}.title`}
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>Question {index + 1}</FormLabel>
+                  <FormLabel>Question {questionIndex + 1}</FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="Enter question" />
                   </FormControl>
@@ -67,22 +68,34 @@ export function QuestionList({ form }: QuestionListProps) {
               type="button"
               variant="ghost"
               size="sm"
-              onClick={() => remove(index)}
+              onClick={() => remove(questionIndex)}
             >
               <Trash className="h-4 w-4" />
             </Button>
           </div>
-          <OptionList form={form} questionIndex={index} />
+          <OptionList 
+            form={form} 
+            categoryIndex={categoryIndex}
+            questionIndex={questionIndex} 
+          />
         </div>
       ))}
     </div>
   );
 }
 
-function OptionList({ form, questionIndex }: { form: UseFormReturn<UpdateTestInput>; questionIndex: number }) {
+function OptionList({ 
+  form, 
+  categoryIndex,
+  questionIndex 
+}: { 
+  form: UseFormReturn<UpdateTestInput>
+  categoryIndex: number
+  questionIndex: number 
+}) {
   const { fields: options, append, remove } = useFieldArray({
     control: form.control,
-    name: `questions.${questionIndex}.options`
+    name: `categories.${categoryIndex}.questions.${questionIndex}.options`
   });
 
   const handleAddOption = () => {
@@ -104,11 +117,11 @@ function OptionList({ form, questionIndex }: { form: UseFormReturn<UpdateTestInp
         </Button>
       </div>
 
-      {options.map((field, optionIndex) => (
-        <div key={field.id} className="flex items-center gap-2">
+      {options.map((option, optionIndex) => (
+        <div key={option.id} className="flex items-center gap-2">
           <FormField
             control={form.control}
-            name={`questions.${questionIndex}.options.${optionIndex}.text`}
+            name={`categories.${categoryIndex}.questions.${questionIndex}.options.${optionIndex}.text`}
             render={({ field }) => (
               <FormItem className="flex-1">
                 <FormControl>
