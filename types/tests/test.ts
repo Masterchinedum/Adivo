@@ -24,14 +24,16 @@ export interface CreateTestInput {
   description?: string;
   isPublished: boolean;
   categories?: Array<{
-    name: string
-    description?: string
-  }>;
-  questions?: Array<{
-    title: string;
-    categoryId?: string
-    options?: Array<{
-      text: string;
+    name: string;
+    description?: string;
+    scale: number;
+    questions?: Array<{
+      title: string;
+      categoryId?: string;
+      options?: Array<{
+        text: string;
+        point: number; // Add point field
+      }>;
     }>;
   }>;
 }
@@ -40,18 +42,20 @@ export interface CreateTestInput {
 export interface UpdateTestInput {
   id: string;
   title?: string;
-  description?: string | null; // Add null as a possible type
+  description?: string | null;
   isPublished?: boolean;
   categories?: Array<{
     id?: string;
     name: string;
-    description?: string | null; // Add null as a possible type
+    description?: string | null;
+    scale: number; // Add scale field
     questions?: Array<{
       id?: string;
       title: string;
       options?: Array<{
         id?: string;
         text: string;
+        point: number; // Add point field
       }>;
     }>;
   }>;

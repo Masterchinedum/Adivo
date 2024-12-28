@@ -144,8 +144,8 @@ function OptionList({
                     type="number"
                     min={0}
                     {...field}
-                    onChange={e => field.onChange(Number(e.target.value))}
-                    value={field.value || ''}
+                    onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                    value={field.value?.toString() || "0"}
                     placeholder="Points"
                   />
                 </FormControl>
