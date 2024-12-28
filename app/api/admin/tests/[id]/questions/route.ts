@@ -51,7 +51,8 @@ export async function POST(request: Request) {
           categoryId: questionData.categoryId, // Add this line
           options: {
             create: options?.map(option => ({
-              text: option.text
+              text: option.text,
+              point: option.point
             })) || []
           }
         },

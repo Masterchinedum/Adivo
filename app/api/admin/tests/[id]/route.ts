@@ -104,13 +104,15 @@ export async function PATCH(req: Request) {
             create: categories?.map(category => ({
               name: category.name,
               description: category.description,
+              scale: category.scale,
               questions: {
                 create: category.questions?.map(question => ({
                   title: question.title,
-                  testId: id, // Explicitly set testId
+                  testId: id,
                   options: {
                     create: question.options?.map(option => ({
-                      text: option.text
+                      text: option.text,
+                      point: option.point
                     })) || []
                   }
                 })) || []

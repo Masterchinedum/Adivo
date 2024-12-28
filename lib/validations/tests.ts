@@ -6,7 +6,11 @@ const optionSchema = z.object({
   text: z
     .string()
     .min(1, 'Option text is required')
-    .max(500, 'Option text must be less than 500 characters')
+    .max(500, 'Option text must be less than 500 characters'),
+  point: z
+    .number()
+    .int("Point must be an integer")
+    .min(0, "Point must be a non-negative number")
 })
 
 const questionSchema = z.object({
@@ -14,10 +18,6 @@ const questionSchema = z.object({
       .string()
       .min(1, 'Question title is required')
       .max(1000, 'Question title must be less than 1000 characters'),
-  scale: z
-      .number()
-      .int("Scale must be an integer")
-      .min(0, "Scale must be a non-negative number"),
   options: z.array(optionSchema).optional()
 })
 
@@ -30,6 +30,10 @@ const categorySchema = z.object({
     .string()
     .max(500, 'Description must be less than 500 characters')
     .optional(),
+  scale: z
+    .number()
+    .int("Scale must be an integer")
+    .min(0, "Scale must be a non-negative number"),
   questions: z.array(questionSchema).default([])
 })
 
@@ -61,7 +65,7 @@ export const updateTestSchema = z.object({
   isPublished: z.boolean().optional(),
   categories: z.array(
     z.object({
-      id: z.string().cuid("Invalid category ID").optional(), // For existing categories
+      id: z.string().cuid("Invalid category ID").optional(),
       name: z
         .string()
         .min(1, "Category name is required")
@@ -70,20 +74,28 @@ export const updateTestSchema = z.object({
         .string()
         .max(500, "Description must be less than 500 characters")
         .optional(),
+      scale: z
+        .number()
+        .int("Scale must be an integer")
+        .min(0, "Scale must be a non-negative number"),
       questions: z.array(
         z.object({
-          id: z.string().cuid("Invalid question ID").optional(), // For existing questions
+          id: z.string().cuid("Invalid question ID").optional(),
           title: z
             .string()
             .min(1, "Question title is required")
             .max(1000, "Question title must be less than 1000 characters"),
           options: z.array(
             z.object({
-              id: z.string().cuid("Invalid option ID").optional(), // For existing options
+              id: z.string().cuid("Invalid option ID").optional(),
               text: z
                 .string()
                 .min(1, "Option text is required")
-                .max(500, "Option text must be less than 500 characters")
+                .max(500, "Option text must be less than 500 characters"),
+              point: z
+                .number()
+                .int("Point must be an integer")
+                .min(0, "Point must be a non-negative number")
             })
           ).optional()
         })

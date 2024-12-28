@@ -68,6 +68,7 @@ export async function PATCH(request: Request) {
         await tx.option.createMany({
           data: options.map(option => ({
             text: option.text,
+            point: option.point,
             questionId: questionId
           }))
         })

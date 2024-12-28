@@ -164,10 +164,11 @@ export async function POST(req: Request) {
           categories.map(async (category) => {
             const { questions, ...categoryData } = category
             
-            // Create category
+            // Create category with scale field
             const newCategory = await tx.category.create({
               data: {
                 ...categoryData,
+                scale: categoryData.scale, // Include the required scale field
                 testId: newTest.id,
               }
             })
@@ -178,7 +179,7 @@ export async function POST(req: Request) {
                 questions.map(async (question) => {
                   const { options, ...questionData } = question
                   
-                  // Create question with its options
+                  // Create question with its options including points
                   await tx.question.create({
                     data: {
                       ...questionData,
@@ -186,7 +187,8 @@ export async function POST(req: Request) {
                       categoryId: newCategory.id,
                       options: {
                         create: options?.map(option => ({
-                          text: option.text
+                          text: option.text,
+                          point: option.point // Include the required point field
                         })) || []
                       }
                     }

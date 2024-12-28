@@ -75,9 +75,16 @@ export async function POST(request: Request) {
     }
 
     const category = await prisma.category.create({
-      data: validationResult.data,
+      data: {
+        ...validationResult.data,
+        scale: validationResult.data.scale, // Include scale field explicitly
+      },
       include: {
-        questions: true
+        questions: {
+          include: {
+            options: true
+          }
+        }
       }
     })
 
