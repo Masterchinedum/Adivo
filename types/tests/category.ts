@@ -4,6 +4,7 @@ export interface Category {
     id: string
     name: string
     description?: string
+    scale: number
     testId: string
     createdAt: Date
     updatedAt: Date
@@ -13,15 +14,16 @@ export interface Category {
 export interface CreateCategoryPayload {
     name: string
     description?: string
+    scale: number
     testId: string
 }
 
 export interface UpdateCategoryPayload {
     name?: string
     description?: string
+    scale?: number
 }
 
-// For API error responses
 export interface CategoryError {
     message: string
     errors?: Record<string, string[]>

@@ -10,6 +10,10 @@ export const createCategorySchema = z.object({
         .string()
         .max(500, "Description must be less than 500 characters")
         .optional(),
+    scale: z
+        .number()
+        .int("Scale must be an integer")
+        .min(0, "Scale must be a non-negative number"),
     testId: z.string().cuid("Invalid test ID")
 })
 
@@ -22,6 +26,11 @@ export const updateCategorySchema = z.object({
     description: z
         .string()
         .max(500, "Description must be less than 500 characters")
+        .optional(),
+    scale: z
+        .number()
+        .int("Scale must be an integer")
+        .min(0, "Scale must be a non-negative number")
         .optional()
 })
 

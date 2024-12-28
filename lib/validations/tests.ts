@@ -14,6 +14,10 @@ const questionSchema = z.object({
       .string()
       .min(1, 'Question title is required')
       .max(1000, 'Question title must be less than 1000 characters'),
+  scale: z
+      .number()
+      .int("Scale must be an integer")
+      .min(0, "Scale must be a non-negative number"),
   options: z.array(optionSchema).optional()
 })
 

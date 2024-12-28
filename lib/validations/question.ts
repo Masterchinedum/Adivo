@@ -5,7 +5,11 @@ const optionSchema = z.object({
     text: z
         .string()
         .min(1, "Option text is required")
-        .max(500, "Option text must be less than 500 characters")
+        .max(500, "Option text must be less than 500 characters"),
+    point: z
+        .number()
+        .int("Point must be an integer")
+        .min(0, "Point must be a non-negative number")
 })
 
 export const createQuestionSchema = z.object({
