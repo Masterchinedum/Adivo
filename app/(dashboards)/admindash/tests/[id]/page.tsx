@@ -6,10 +6,12 @@ import { TestContent } from "./components/TestContent"
 import { TestFormHeader } from "../components/TestFormHeader"
 import type { Test } from "@/types/tests/test"
 
-interface TestPageProps {
+// Update the props interface to match Next.js requirements
+interface PageProps {
   params: {
-    id: string
-  }
+    id: string;
+  };
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
 export const metadata: Metadata = {
@@ -37,14 +39,14 @@ async function getTest(id: string): Promise<Test | null> {
     return null
   }
 
-  // Transform the data to match the Test interface
   return {
     ...test,
-    description: test.description || undefined // Convert null to undefined
+    description: test.description || undefined // Handle null to undefined conversion
   } as Test
 }
 
-export default async function TestPage({ params }: TestPageProps) {
+// Update the page component to use the correct props type
+export default async function TestPage({ params }: PageProps) {
   const test = await getTest(params.id)
 
   if (!test) {
