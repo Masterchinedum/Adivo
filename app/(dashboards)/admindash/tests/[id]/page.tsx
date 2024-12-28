@@ -21,9 +21,13 @@ async function getTest(testId: string): Promise<Test | null> {
       where: { id: testId },
       include: {
         user: true,
-        questions: {  // Include questions
+        categories: {
           include: {
-            options: true  // Include options for each question
+            questions: {
+              include: {
+                options: true
+              }
+            }
           }
         }
       }
@@ -42,18 +46,27 @@ async function getTest(testId: string): Promise<Test | null> {
       isPublished: test.isPublished,
       createdBy: test.createdBy,
       user: undefined,
-      questions: test.questions.map(question => ({  // Map questions and options
-        id: question.id,
-        title: question.title,
-        testId: question.testId,
-        createdAt: question.createdAt,
-        updatedAt: question.updatedAt,
-        options: question.options.map(option => ({  // Map options
-          id: option.id,
-          text: option.text,
-          questionId: option.questionId,
-          createdAt: option.createdAt,
-          updatedAt: option.updatedAt
+      categories: test.categories.map(category => ({
+        id: category.id,
+        name: category.name,
+        description: category.description,
+        testId: category.testId,
+        createdAt: category.createdAt,
+        updatedAt: category.updatedAt,
+        questions: category.questions.map(question => ({
+          id: question.id,
+          title: question.title,
+          testId: question.testId,
+          categoryId: question.categoryId,
+          createdAt: question.createdAt,
+          updatedAt: question.updatedAt,
+          options: question.options.map(option => ({
+            id: option.id,
+            text: option.text,
+            questionId: option.questionId,
+            createdAt: option.createdAt,
+            updatedAt: option.updatedAt
+          }))
         }))
       }))
     }
