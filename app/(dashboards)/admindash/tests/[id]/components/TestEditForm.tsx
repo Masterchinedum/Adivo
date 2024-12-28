@@ -8,8 +8,8 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
-import { TestFormFields } from "../components/TestFormFields"
 import { updateTestSchema } from "@/lib/validations/tests"
+import { TestFormFields } from "./TestFormFields"
 import type { Test, UpdateTestInput } from "@/types/tests/test"
 
 interface TestEditFormProps {
@@ -18,29 +18,29 @@ interface TestEditFormProps {
 
 export function TestEditForm({ test }: TestEditFormProps) {
   const router = useRouter()
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const [isLoading, setIsLoading] = React.useState(false)
 
-  // Define form with correct types from UpdateTestInput
   const form = useForm<UpdateTestInput>({
     resolver: zodResolver(updateTestSchema),
     defaultValues: {
       id: test.id,
       title: test.title,
-      description: test.description || undefined,
+      description: test.description,
       isPublished: test.isPublished,
-      categories: test.categories?.map(c => ({
-        id: c.id, // Include the ID
-        name: c.name,
-        description: c.description
-      })) || [],
-      questions: test.questions?.map(q => ({
-        title: q.title,
-        categoryId: q.categoryId,
-        options: q.options?.map(o => ({
-          text: o.text
+      categories: test.categories?.map(category => ({
+        id: category.id,
+        name: category.name,
+        description: category.description,
+        questions: category.questions?.map(question => ({
+          id: question.id,
+          title: question.title,
+          options: question.options?.map(option => ({
+            id: option.id,
+            text: option.text
+          }))
         }))
       })) || []
-    },
+    }
   })
 
   async function onSubmit(data: UpdateTestInput) {
@@ -48,15 +48,12 @@ export function TestEditForm({ test }: TestEditFormProps) {
     try {
       const response = await fetch(`/api/admin/tests/${test.id}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || "Failed to update test")
+        throw new Error("Failed to update test")
       }
 
       toast.success("Test updated successfully")
@@ -64,7 +61,6 @@ export function TestEditForm({ test }: TestEditFormProps) {
       router.refresh()
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong")
-      console.error("Update error:", error)
     } finally {
       setIsLoading(false)
     }
@@ -74,14 +70,12 @@ export function TestEditForm({ test }: TestEditFormProps) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <TestFormFields form={form} />
-        
         <div className="flex gap-4">
           <Button
             type="submit"
             disabled={isLoading}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
-            {isLoading ? "Updating..." : "Update Test"}
+            {isLoading ? "Saving..." : "Save Changes"}
           </Button>
           <Button
             type="button"

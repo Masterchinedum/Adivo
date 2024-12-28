@@ -12,7 +12,7 @@ interface TestContentProps {
 
 export function TestContent({ test }: TestContentProps) {
   return (
-    <>
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <TestStatusToggle
           testId={test.id}
@@ -23,8 +23,7 @@ export function TestContent({ test }: TestContentProps) {
           testTitle={test.title}
         />
       </div>
-
       <TestEditForm test={test} />
-    </>
+    </div>
   )
 }

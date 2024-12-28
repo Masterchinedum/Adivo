@@ -7,7 +7,7 @@ import { Category } from './category'
 export interface Test {
   id: string
   title: string
-  description?: string
+  description: string | null | undefined;
   createdAt: Date
   updatedAt: Date
   isPublished: boolean

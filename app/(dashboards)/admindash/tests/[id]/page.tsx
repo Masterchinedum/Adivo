@@ -1,9 +1,10 @@
 // app/(dashboards)/admindash/tests/[id]/page.tsx
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
+import prisma from "@/lib/prisma"
 import { TestContent } from "./components/TestContent"
 import { TestFormHeader } from "../components/TestFormHeader"
-import prisma from "@/lib/prisma"
+import type { Test } from "@/types/tests/test"
 
 interface TestPageProps {
   params: {
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
   description: "Edit your test details and questions.",
 }
 
-async function getTest(id: string) {
+async function getTest(id: string): Promise<Test | null> {
   const test = await prisma.test.findUnique({
     where: { id },
     include: {
@@ -36,7 +37,11 @@ async function getTest(id: string) {
     return null
   }
 
-  return test
+  // Transform the data to match the Test interface
+  return {
+    ...test,
+    description: test.description || undefined // Convert null to undefined
+  } as Test
 }
 
 export default async function TestPage({ params }: TestPageProps) {
@@ -52,7 +57,7 @@ export default async function TestPage({ params }: TestPageProps) {
         title="Edit Test"
         description={`Edit "${test.title}" details and questions.`}
       />
-      <div className="mx-auto max-w-2xl space-y-6">
+      <div className="mx-auto max-w-2xl">
         <TestContent test={test} />
       </div>
     </div>
