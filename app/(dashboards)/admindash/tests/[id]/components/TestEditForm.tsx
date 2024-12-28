@@ -31,17 +31,19 @@ export function TestEditForm({ test }: TestEditFormProps) {
         id: category.id,
         name: category.name,
         description: category.description,
+        scale: category.scale, // Add scale
         questions: category.questions?.map(question => ({
           id: question.id,
           title: question.title,
           options: question.options?.map(option => ({
             id: option.id,
-            text: option.text
+            text: option.text,
+            point: option.point // Add point
           }))
         }))
       })) || []
     }
-  })
+  });
 
   async function onSubmit(data: UpdateTestInput) {
     setIsLoading(true)

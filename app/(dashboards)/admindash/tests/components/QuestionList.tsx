@@ -99,7 +99,10 @@ function OptionList({
   });
 
   const handleAddOption = () => {
-    append({ text: "" });
+    append({ 
+      text: "",
+      point: 0 // Add default point value
+    });
   };
 
   return (
@@ -126,6 +129,25 @@ function OptionList({
               <FormItem className="flex-1">
                 <FormControl>
                   <Input {...field} placeholder={`Option ${optionIndex + 1}`} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name={`categories.${categoryIndex}.questions.${questionIndex}.options.${optionIndex}.point`}
+            render={({ field }) => (
+              <FormItem className="w-24">
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={0}
+                    {...field}
+                    onChange={e => field.onChange(Number(e.target.value))}
+                    value={field.value || ''}
+                    placeholder="Points"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

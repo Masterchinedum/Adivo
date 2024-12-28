@@ -32,6 +32,7 @@ export function CategoryList({ form }: CategoryListProps) {
     append({
       name: "",
       description: "",
+      scale: 0,
       questions: []
     });
   };
@@ -68,6 +69,26 @@ export function CategoryList({ form }: CategoryListProps) {
                   </FormItem>
                 )}
               />
+              <FormField
+                  control={form.control}
+                  name={`categories.${index}.scale`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Scale</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number"
+                          min={0}
+                          {...field}
+                          onChange={e => field.onChange(Number(e.target.value))}
+                          value={field.value || ''}
+                          placeholder="Enter scale value"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               <FormField
                 control={form.control}
                 name={`categories.${index}.description`}
