@@ -22,15 +22,15 @@ interface QuestionListProps {
 export function QuestionList({ form }: QuestionListProps) {
   const { fields: questions, append, remove } = useFieldArray({
     control: form.control,
-    name: "questions"
-  });
+    name: "categories.0.questions" // Using first category for now
+  })
 
   const handleAddQuestion = () => {
     append({
       title: "",
       options: []
-    });
-  };
+    })
+  }
 
   return (
     <div className="space-y-6">
@@ -47,21 +47,17 @@ export function QuestionList({ form }: QuestionListProps) {
         </Button>
       </div>
 
-      {questions.map((question, index) => (
-        <div key={question.id} className="border p-4 rounded-lg space-y-4">
+      {questions.map((field, index) => (
+        <div key={field.id} className="border p-4 rounded-lg space-y-4">
           <div className="flex justify-between items-start">
             <FormField
               control={form.control}
-              name={`questions.${index}.title`}
+              name={`categories.0.questions.${index}.title`}
               render={({ field }) => (
                 <FormItem className="flex-1">
                   <FormLabel>Question {index + 1}</FormLabel>
                   <FormControl>
-                    <Input 
-                      {...field} 
-                      placeholder="Enter question" 
-                      value={field.value || ''}
-                    />
+                    <Input {...field} placeholder="Enter question" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -80,7 +76,7 @@ export function QuestionList({ form }: QuestionListProps) {
         </div>
       ))}
     </div>
-  );
+  )
 }
 
 function OptionList({ 
@@ -92,12 +88,12 @@ function OptionList({
 }) {
   const { fields: options, append, remove } = useFieldArray({
     control: form.control,
-    name: `questions.${questionIndex}.options`
-  });
+    name: `categories.0.questions.${questionIndex}.options`
+  })
 
   const handleAddOption = () => {
-    append({ text: "" });
-  };
+    append({ text: "" })
+  }
 
   return (
     <div className="ml-6 space-y-3">
@@ -114,19 +110,15 @@ function OptionList({
         </Button>
       </div>
 
-      {options.map((option, optionIndex) => (
-        <div key={option.id} className="flex items-center gap-2">
+      {options.map((field, optionIndex) => (
+        <div key={field.id} className="flex items-center gap-2">
           <FormField
             control={form.control}
-            name={`questions.${questionIndex}.options.${optionIndex}.text`}
+            name={`categories.0.questions.${questionIndex}.options.${optionIndex}.text`}
             render={({ field }) => (
               <FormItem className="flex-1">
                 <FormControl>
-                  <Input 
-                    {...field} 
-                    placeholder={`Option ${optionIndex + 1}`}
-                    value={field.value || ''}
-                  />
+                  <Input {...field} placeholder={`Option ${optionIndex + 1}`} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -143,5 +135,5 @@ function OptionList({
         </div>
       ))}
     </div>
-  );
+  )
 }
