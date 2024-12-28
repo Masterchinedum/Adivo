@@ -4,7 +4,6 @@ import { UseFormReturn } from "react-hook-form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
-import { QuestionList } from "./QuestionList"
 import { CategoryList } from "./CategoryList"
 import {
   FormControl,
@@ -33,7 +32,6 @@ export function TestFormFields({ form }: TestFormFieldsProps) {
               <Input 
                 placeholder="Enter test title" 
                 {...field} 
-                value={field.value || ''} 
               />
             </FormControl>
             <FormDescription>
@@ -54,7 +52,6 @@ export function TestFormFields({ form }: TestFormFieldsProps) {
               <Textarea
                 placeholder="Enter test description (optional)"
                 {...field}
-                value={field.value || ''}
                 rows={4}
               />
             </FormControl>
@@ -67,9 +64,6 @@ export function TestFormFields({ form }: TestFormFieldsProps) {
       />
       <div className="border-t pt-6">
         <CategoryList form={form} />
-      </div>
-      <div className="border-t pt-6">
-        <QuestionList form={form} />
       </div>
       <FormField
         control={form.control}
@@ -84,7 +78,7 @@ export function TestFormFields({ form }: TestFormFieldsProps) {
             </div>
             <FormControl>
               <Switch
-                checked={field.value || false}
+                checked={field.value}
                 onCheckedChange={field.onChange}
               />
             </FormControl>

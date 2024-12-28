@@ -32,7 +32,7 @@ export function CategoryList({ form }: CategoryListProps) {
     append({
       name: "",
       description: "",
-      questions: [] // Initialize empty questions array for the category
+      questions: []
     });
   };
 
@@ -51,8 +51,8 @@ export function CategoryList({ form }: CategoryListProps) {
         </Button>
       </div>
 
-      {categories.map((field, index) => (
-        <Card key={field.id} className="p-6">
+      {categories.map((category, index) => (
+        <Card key={category.id} className="p-6">
           <CardHeader className="flex flex-row items-start justify-between p-0 pb-4">
             <div className="flex-1 space-y-4">
               <FormField
@@ -96,7 +96,10 @@ export function CategoryList({ form }: CategoryListProps) {
             </Button>
           </CardHeader>
           <CardContent className="p-0 pt-4">
-            <QuestionList form={form} categoryIndex={index} />
+            <QuestionList 
+              form={form} 
+              categoryIndex={index} 
+            />
           </CardContent>
         </Card>
       ))}

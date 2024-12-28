@@ -23,7 +23,7 @@ interface QuestionListProps {
 export function QuestionList({ form, categoryIndex }: QuestionListProps) {
   const { fields: questions, append, remove } = useFieldArray({
     control: form.control,
-    name: `categories.${categoryIndex}.questions`
+    name: `categories.${categoryIndex}.questions`,
   });
 
   const handleAddQuestion = () => {

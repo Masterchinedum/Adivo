@@ -14,8 +14,19 @@ const questionSchema = z.object({
       .string()
       .min(1, 'Question title is required')
       .max(1000, 'Question title must be less than 1000 characters'),
-  categoryId: z.string().cuid("Invalid category ID").optional(),  // New field
   options: z.array(optionSchema).optional()
+})
+
+const categorySchema = z.object({
+  name: z
+    .string()
+    .min(1, 'Category name is required')
+    .max(100, 'Category name must be less than 100 characters'),
+  description: z
+    .string()
+    .max(500, 'Description must be less than 500 characters')
+    .optional(),
+  questions: z.array(questionSchema).default([])
 })
 
 export const testSchema = z.object({
@@ -28,14 +39,7 @@ export const testSchema = z.object({
     .max(500, 'Description must be less than 500 characters')
     .optional(),
   isPublished: z.boolean().default(false),
-  categories: z.array(
-    z.object({
-      id: z.string().optional(),
-      name: z.string().min(1, 'Category name is required').max(100),
-      description: z.string().max(500).optional()
-    })
-  ).optional(),
-  questions: z.array(questionSchema).optional(),
+  categories: z.array(categorySchema).default([])
 })
 
 // Schema for updating a test
