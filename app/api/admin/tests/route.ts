@@ -28,7 +28,6 @@ export async function GET(req: Request) {
     })
 
     if (!queryResult.success) {
-      // Log validation errors for debugging
       console.error('Validation errors:', queryResult.error.flatten())
       return NextResponse.json(
         { 
@@ -69,12 +68,43 @@ export async function GET(req: Request) {
         take: limit,
         orderBy: {
           createdAt: queryResult.data.sort
+        },
+        include: {
+          categories: {
+            include: {
+              questions: {
+                include: {
+                  options: true
+                }
+              }
+            }
+          },
+          user: {
+            select: {
+              id: true,
+              email: true,
+              firstName: true,
+              lastName: true,
+              imageUrl: true
+            }
+          }
         }
       })
     ])
+    // Format the response data
+    const formattedTests = tests.map(test => ({
+      ...test,
+      categories: test.categories.map(category => ({
+        ...category,
+        questions: category.questions.map(question => ({
+          ...question,
+          options: question.options
+        }))
+      }))
+    }))
 
     return NextResponse.json({
-      tests,
+      tests: formattedTests,
       totalTests,
       currentPage: page,
       totalPages: Math.ceil(totalTests / limit)
@@ -116,51 +146,84 @@ export async function POST(req: Request) {
       )
     }
 
-    const { questions, categories, ...testData } = validationResult.data
+    const { categories, ...testData } = validationResult.data
 
-    // Create test with questions and categories in a transaction
+    // Create test with categories and their questions in a transaction
     const test = await prisma.$transaction(async (tx) => {
+      // First create the test
       const newTest = await tx.test.create({
         data: {
           ...testData,
           createdBy: user.id,
-          // Handle categories creation
-          categories: categories ? {
-            create: categories.map(category => ({
-              name: category.name,
-              description: category.description
-            }))
-          } : undefined,
-          // Handle questions creation
-          questions: questions ? {
-            create: questions.map(question => ({
-              title: question.title,
-              categoryId: question.categoryId,
-              options: {
-                create: question.options?.map(option => ({
-                  text: option.text
-                })) || []
-              }
-            }))
-          } : undefined
-        },
-        include: {
-          questions: {
-            include: {
-              options: true,
-              category: true
-            }
-          },
-          categories: true
         }
       })
 
-      return newTest
+      // Then create categories with their questions
+      if (categories && categories.length > 0) {
+        await Promise.all(
+          categories.map(async (category) => {
+            const { questions, ...categoryData } = category
+            
+            // Create category
+            const newCategory = await tx.category.create({
+              data: {
+                ...categoryData,
+                testId: newTest.id,
+              }
+            })
+
+            // Create questions for this category if they exist
+            if (questions && questions.length > 0) {
+              await Promise.all(
+                questions.map(async (question) => {
+                  const { options, ...questionData } = question
+                  
+                  // Create question with its options
+                  await tx.question.create({
+                    data: {
+                      ...questionData,
+                      testId: newTest.id,
+                      categoryId: newCategory.id,
+                      options: {
+                        create: options?.map(option => ({
+                          text: option.text
+                        })) || []
+                      }
+                    }
+                  })
+                })
+              )
+            }
+          })
+        )
+      }
+
+      // Return the complete test with all relations
+      return tx.test.findUnique({
+        where: { id: newTest.id },
+        include: {
+          categories: {
+            include: {
+              questions: {
+                include: {
+                  options: true
+                }
+              }
+            }
+          }
+        }
+      })
     })
 
     return NextResponse.json(test, { status: 201 })
   } catch (error) {
     console.error('[TEST_POST]', error)
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return NextResponse.json(
+        { message: 'Database error: ' + error.message },
+        { status: 400 }
+      )
+    }
     return NextResponse.json(
       { message: 'Internal Server Error' },
       { status: 500 }
