@@ -16,8 +16,8 @@ import { useFieldArray, UseFormReturn } from "react-hook-form"
 import { UpdateTestInput } from "@/types/tests/test"
 
 interface QuestionListProps {
-    form: UseFormReturn<UpdateTestInput>
-  }
+  form: UseFormReturn<UpdateTestInput>
+}
 
 export function QuestionList({ form }: QuestionListProps) {
   const { fields: questions, append, remove } = useFieldArray({
@@ -47,8 +47,8 @@ export function QuestionList({ form }: QuestionListProps) {
         </Button>
       </div>
 
-      {questions.map((field, index) => (
-        <div key={field.id} className="border p-4 rounded-lg space-y-4">
+      {questions.map((question, index) => (
+        <div key={question.id} className="border p-4 rounded-lg space-y-4">
           <div className="flex justify-between items-start">
             <FormField
               control={form.control}
@@ -57,7 +57,11 @@ export function QuestionList({ form }: QuestionListProps) {
                 <FormItem className="flex-1">
                   <FormLabel>Question {index + 1}</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Enter question" />
+                    <Input 
+                      {...field} 
+                      placeholder="Enter question" 
+                      value={field.value || ''}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -79,7 +83,13 @@ export function QuestionList({ form }: QuestionListProps) {
   );
 }
 
-function OptionList({ form, questionIndex }: { form: UseFormReturn<UpdateTestInput>; questionIndex: number }) {
+function OptionList({ 
+  form, 
+  questionIndex 
+}: { 
+  form: UseFormReturn<UpdateTestInput>
+  questionIndex: number 
+}) {
   const { fields: options, append, remove } = useFieldArray({
     control: form.control,
     name: `questions.${questionIndex}.options`
@@ -104,15 +114,19 @@ function OptionList({ form, questionIndex }: { form: UseFormReturn<UpdateTestInp
         </Button>
       </div>
 
-      {options.map((field, optionIndex) => (
-        <div key={field.id} className="flex items-center gap-2">
+      {options.map((option, optionIndex) => (
+        <div key={option.id} className="flex items-center gap-2">
           <FormField
             control={form.control}
             name={`questions.${questionIndex}.options.${optionIndex}.text`}
             render={({ field }) => (
               <FormItem className="flex-1">
                 <FormControl>
-                  <Input {...field} placeholder={`Option ${optionIndex + 1}`} />
+                  <Input 
+                    {...field} 
+                    placeholder={`Option ${optionIndex + 1}`}
+                    value={field.value || ''}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
