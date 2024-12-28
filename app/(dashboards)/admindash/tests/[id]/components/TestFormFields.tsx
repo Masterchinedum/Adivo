@@ -4,7 +4,7 @@ import { UseFormReturn } from "react-hook-form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
-import { QuestionList } from "./QuestionList"
+import { CategoryList } from "./CategoryList"
 import {
   FormControl,
   FormDescription,
@@ -14,7 +14,6 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import type { UpdateTestInput } from "@/types/tests/test"
-// import { TestFormValues } from "@/lib/validations/tests"
 
 interface TestFormFieldsProps {
   form: UseFormReturn<UpdateTestInput>
@@ -66,7 +65,7 @@ export function TestFormFields({ form }: TestFormFieldsProps) {
         )}
       />
       <div className="border-t pt-6">
-        <QuestionList form={form} />
+        <CategoryList form={form} />
       </div>
       <FormField
         control={form.control}
