@@ -1,3 +1,4 @@
+// app/(dashboards)/admindash/tests/[id]/page.tsx
 import React from 'react'
 
 const page = () => {

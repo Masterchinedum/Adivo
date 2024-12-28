@@ -37,8 +37,24 @@ export interface CreateTestInput {
 }
 
 // For updating an existing test
-export interface UpdateTestInput extends Partial<CreateTestInput> {
+export interface UpdateTestInput {
   id: string
+  title?: string
+  description?: string
+  isPublished?: boolean
+  categories?: Array<{
+    id?: string // For existing categories
+    name: string
+    description?: string
+    questions?: Array<{
+      id?: string // For existing questions
+      title: string
+      options?: Array<{
+        id?: string // For existing options
+        text: string
+      }>
+    }>
+  }>
 }
 
 // For API responses
