@@ -2,7 +2,6 @@
 import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
-import { TestStatus } from '@prisma/client'
 
 export async function PATCH(request: Request) {
   try {

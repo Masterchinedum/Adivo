@@ -3,6 +3,7 @@ import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
+
 export async function PATCH(request: Request) {
   try {
     const { userId } = await auth()
@@ -117,8 +118,9 @@ export async function GET(request: Request) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
+    // Extract IDs from URL
     const pathParts = request.url.split('/')
-    const attemptId = pathParts.pop()
+    const attemptId = pathParts[pathParts.indexOf('attempt') + 1]
 
     const attempt = await prisma.testAttempt.findFirst({
       where: {
@@ -130,8 +132,8 @@ export async function GET(request: Request) {
           include: {
             question: {
               include: {
-                options: true,
-                category: true
+                category: true,
+                options: true
               }
             },
             selectedOption: true
@@ -141,7 +143,8 @@ export async function GET(request: Request) {
           include: {
             category: true
           }
-        }
+        },
+        test: true
       }
     })
 
