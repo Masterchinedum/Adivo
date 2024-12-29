@@ -7,7 +7,7 @@ export const createTestAttemptSchema = z.object({
 })
 
 export const updateTestAttemptSchema = z.object({
-  status: z.enum(['IN_PROGRESS', 'COMPLETED', 'ABANDONED']),
+  status: z.nativeEnum(TestStatus), // Fix: Use the imported TestStatus enum
   completedAt: z.date().optional(),
   totalScore: z.number().min(0, 'Score must be non-negative'),
   percentageScore: z.number().min(0, 'Percentage must be non-negative').max(100)
