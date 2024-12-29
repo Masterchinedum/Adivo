@@ -9,70 +9,139 @@ generator client {
 }
 
 model User {
-  id          String    @id @default(uuid()) @map("_id")
-  email       String    @unique
-  firstName   String?   @default("")
-  lastName    String?   @default("")
-  imageUrl    String?   @default("")
-  clerkUserId String    @unique
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id           String        @id @default(uuid()) @map("_id")
+  email        String        @unique
+  firstName    String?       @default("")
+  lastName     String?       @default("")
+  imageUrl     String?       @default("")
+  clerkUserId  String        @unique
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  Test         Test[]
+  testAttempts TestAttempt[] // Added this relation
 
-  Test Test[]
+  @@index([clerkUserId])
 }
 
 model Test {
-  id          String      @id @default(uuid())
-  title       String
-  description String?
-  isPublished Boolean     @default(false)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  createdBy   String
-  user        User        @relation(fields: [createdBy], references: [id])
-  questions   Question[]
-  categories  Category[] 
+  id           String        @id @default(uuid())
+  title        String
+  description  String?
+  isPublished  Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  createdBy    String
+  user         User          @relation(fields: [createdBy], references: [id])
+  questions    Question[]
+  categories   Category[]
+  testAttempts TestAttempt[] // Added this relation
 
   @@index([createdBy])
 }
 
 model Category {
-  id          String    @id @default(cuid())
-  name        String
-  description String?
-  scale       Int
-  testId      String    
-  test        Test      @relation(fields: [testId], references: [id], onDelete: Cascade)
-  questions   Question[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id            String          @id @default(cuid())
+  name          String
+  description   String?
+  scale         Int
+  testId        String
+  test          Test            @relation(fields: [testId], references: [id], onDelete: Cascade)
+  questions     Question[]
+  categoryScores CategoryScore[] // Added this relation
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 
   @@index([testId])
 }
 
 model Question {
-  id         String    @id @default(cuid())
-  title      String
-  testId     String
-  test       Test      @relation(fields: [testId], references: [id], onDelete: Cascade)
-  categoryId String?
-  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  options    Option[]
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id               String            @id @default(cuid())
+  title            String
+  testId           String
+  test             Test              @relation(fields: [testId], references: [id], onDelete: Cascade)
+  categoryId       String?
+  category         Category?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  options          Option[]
+  questionResponses QuestionResponse[] // Added this relation
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 
   @@index([testId])
   @@index([categoryId])
 }
 
 model Option {
-  id         String   @id @default(cuid())
-  text       String
-  point      Int
-  questionId String
-  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id               String            @id @default(cuid())
+  text             String
+  point            Int
+  questionId       String
+  question         Question          @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionResponses QuestionResponse[] // Added this relation
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 
   @@index([questionId])
+}
+
+// New models below
+
+model TestAttempt {
+  id              String            @id @default(cuid())
+  userId          String
+  testId          String
+  startedAt       DateTime          @default(now())
+  completedAt     DateTime?
+  totalScore      Float             // Actual total test score
+  percentageScore Float             // Score in percentage
+  status          TestStatus        @default(IN_PROGRESS)
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  test            Test              @relation(fields: [testId], references: [id], onDelete: Cascade)
+  responses       QuestionResponse[]
+  categoryScores  CategoryScore[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([userId])
+  @@index([testId])
+}
+
+model QuestionResponse {
+  id              String      @id @default(cuid())
+  testAttemptId   String
+  questionId      String
+  selectedOptionId String
+  pointsEarned    Int        // Actual points from selected option
+  maxPoints       Int        // Highest possible points for this question
+  testAttempt     TestAttempt @relation(fields: [testAttemptId], references: [id], onDelete: Cascade)
+  question        Question    @relation(fields: [questionId], references: [id])
+  selectedOption   Option     @relation(fields: [selectedOptionId], references: [id])
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([testAttemptId])
+  @@index([questionId])
+  @@index([selectedOptionId])
+}
+
+model CategoryScore {
+  id            String      @id @default(cuid())
+  testAttemptId String
+  categoryId    String
+  actualScore   Float       // Scaled score for category
+  maxScale      Float       // Highest possible scale for category
+  rawScore      Int        // Sum of actual points
+  maxRawScore   Int        // Sum of max possible points
+  testAttempt   TestAttempt @relation(fields: [testAttemptId], references: [id], onDelete: Cascade)
+  category      Category    @relation(fields: [categoryId], references: [id])
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([testAttemptId])
+  @@index([categoryId])
+}
+
+enum TestStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
 }
