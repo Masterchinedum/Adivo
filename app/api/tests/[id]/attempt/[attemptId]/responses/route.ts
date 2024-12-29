@@ -31,6 +31,20 @@ export async function POST(request: Request) {
 
     const { questionId, selectedOptionId } = validationResult.data
 
+    // Verify the test attempt belongs to the user and test
+    const testAttempt = await prisma.testAttempt.findFirst({
+      where: {
+        id: attemptId,
+        userId,
+        testId,
+        status: 'IN_PROGRESS' // Only allow responses for attempts in progress
+      }
+    })
+
+    if (!testAttempt) {
+      return new NextResponse('Test attempt not found or not in progress', { status: 404 })
+    }
+
     // Get the selected option to calculate points
     const option = await prisma.option.findUnique({
       where: { id: selectedOptionId },
@@ -46,6 +60,11 @@ export async function POST(request: Request) {
 
     if (!option) {
       return new NextResponse('Option not found', { status: 404 })
+    }
+
+    // Verify the question belongs to this test
+    if (option.question.testId !== testId) {
+      return new NextResponse('Question does not belong to this test', { status: 400 })
     }
 
     // Calculate max points for this question
