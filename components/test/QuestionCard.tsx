@@ -1,7 +1,7 @@
 // components/test/QuestionCard.tsx
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { OptionsList } from "./OptionsList"
-import type { Question } from "@/types/tests/test"
+import type { Question } from "@/types/tests/question"
 
 interface QuestionCardProps {
   question: Question
@@ -23,7 +23,7 @@ export function QuestionCard({
       </CardHeader>
       <CardContent>
         <OptionsList
-          options={question.options}
+          options={question.options || []} // Add fallback empty array
           selectedOptionId={selectedOptionId}
           onSelect={onSelectOption}
           disabled={isSubmitting}

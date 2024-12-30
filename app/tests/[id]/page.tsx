@@ -37,8 +37,14 @@ async function getTest(id: string) {
   }
 }
 
-export default async function TestPage({ params }: { params: { id: string } }) {
-  const test = await getTest(params.id)
+export default async function TestPage({ 
+  params 
+}: { 
+  params: Promise<{ id: string }> 
+}) {
+  // Await params before accessing id
+  const { id } = await params
+  const test = await getTest(id)
 
   if (!test) {
     notFound()

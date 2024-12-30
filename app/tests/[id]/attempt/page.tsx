@@ -8,18 +8,10 @@ import { useTestResponse } from "@/hooks/useTestResponse"
 import { TestHeader } from "@/components/test/TestHeader"
 import { QuestionCard } from "@/components/test/QuestionCard"
 import { TestNavigation } from "@/components/test/TestNavigation"
-import { Button } from "@/components/ui/button"
+// import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 
-interface Question {
-  id: string
-  title: string
-  options: Array<{
-    id: string
-    text: string
-    point: number
-  }>
-}
+import { Question } from "@/types/tests/question"
 
 export default function TestAttemptPage({ 
   params 

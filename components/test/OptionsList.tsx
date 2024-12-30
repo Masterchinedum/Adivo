@@ -1,7 +1,7 @@
 // components/test/OptionsList.tsx
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import type { Option } from "@/types/tests/test"
+import type { Option } from "@/types/tests/option"
 
 interface OptionsListProps {
   options: Option[]
