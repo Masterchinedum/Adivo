@@ -31,20 +31,22 @@ export async function POST(request: Request) {
     // Create test attempt
     const testAttempt = await prisma.testAttempt.create({
       data: {
-        userId: userId,
-        testId: testId,
+        userId,
+        testId,
         status: 'IN_PROGRESS',
         totalScore: 0,
         percentageScore: 0
       }
     })
 
-    return NextResponse.json(testAttempt, { status: 201 })
+    return NextResponse.json(testAttempt)
   } catch (error) {
     console.error('[TEST_ATTEMPT_CREATE]', error)
-    return NextResponse.json(
-      { message: 'Internal Server Error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ 
+      success: false,
+      message: error instanceof Error ? error.message : 'Internal Server Error'
+    }, { 
+      status: 500 
+    })
   }
 }

@@ -1,4 +1,3 @@
-// app/tests/[id]/attempt/page.tsx
 "use client"
 
 import { useEffect, useState } from "react"
@@ -18,17 +17,19 @@ export default function TestAttemptPage({
 }: { 
   params: { id: string } 
 }) {
+  const { id } = params
+
   const router = useRouter()
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [questions, setQuestions] = useState<Question[]>([])
   const [responses, setResponses] = useState<Record<string, string>>({})
 
   const { attemptId, startAttempt, completeAttempt, isLoading } = useTestAttempt({
-    testId: params.id
+    testId: id
   })
 
   const { saveResponse } = useTestResponse({
-    testId: params.id,
+    testId: id,
     attemptId: attemptId || ""
   })
 
@@ -38,17 +39,17 @@ export default function TestAttemptPage({
       try {
         // Start new attempt and get questions
         const newAttemptId = await startAttempt()
-        const response = await fetch(`/api/tests/${params.id}/questions`)
+        const response = await fetch(`/api/tests/${id}/questions`)
         const data = await response.json()
         setQuestions(data.questions)
       } catch (error) {
         toast.error("Failed to start test")
-        router.push(`/tests/${params.id}`)
+        router.push(`/tests/${id}`)
       }
     }
 
     void initializeTest()
-  }, [params.id, startAttempt, router])
+  }, [id, startAttempt, router])
 
   const handleOptionSelect = async (optionId: string) => {
     const currentQuestion = questions[currentQuestionIndex]
@@ -76,7 +77,7 @@ export default function TestAttemptPage({
   const handleSubmit = async () => {
     try {
       await completeAttempt()
-      router.push(`/tests/${params.id}/result?attemptId=${attemptId}`)
+      router.push(`/tests/${id}/result?attemptId=${attemptId}`)
     } catch (error) {
       toast.error("Failed to submit test")
     }
