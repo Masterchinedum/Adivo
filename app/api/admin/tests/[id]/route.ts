@@ -50,9 +50,7 @@ export async function GET(req: Request) {
 
 export async function PATCH(req: Request) {
   try {
-    console.log("Full URL:", req.url)
     const id = req.url.split('/tests/')[1].split('/')[0]
-    console.log("Extracted ID:", id)
     const { userId } = await auth()
     if (!userId) {
       return new NextResponse('Unauthorized', { status: 401 })
@@ -82,15 +80,12 @@ export async function PATCH(req: Request) {
     try {
       const test = await prisma.$transaction(async (tx) => {
         // Verify test exists and user has access
-        const existingTest = await tx.test.findFirst({
-          where: {
-            id,
-            createdBy: userId
-          }
-        })
+        const existingTest = await tx.test.findUnique({
+          where: { id }
+        });
 
         if (!existingTest) {
-          throw new Error('Test not found or access denied')
+          throw new Error('Test not found');
         }
 
         // Delete existing categories (cascade deletes questions and options)
