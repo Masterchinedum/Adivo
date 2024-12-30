@@ -4,17 +4,20 @@ import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
-export async function GET(
-  request: Request,
-  { params }: { params: { testId: string } }
-) {
+export async function GET(req: Request) {
   try {
     const { userId } = await auth()
 
+    // Extract testId from URL following admin route pattern
+    const testId = req.url.split('/tests/')[1].split('/')[0]
+    if (!testId) {
+      return new NextResponse('Invalid test ID', { status: 400 })
+    }
+
     const test = await prisma.test.findUnique({
       where: {
-        id: params.testId,
-        isPublished: true
+        id: testId,
+        isPublished: true // Only return published tests
       },
       select: {
         id: true,
@@ -48,12 +51,12 @@ export async function GET(
       )
     }
 
-    // If user is logged in, check if they have any attempts
+    // If user is logged in, get their previous attempts
     let attempts = []
     if (userId) {
       attempts = await prisma.testAttempt.findMany({
         where: {
-          testId: params.testId,
+          testId: testId,
           userId: userId
         },
         select: {
