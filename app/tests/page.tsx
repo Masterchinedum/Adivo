@@ -1,14 +1,11 @@
 //@/app/tests/page.tsx
 
-import React from 'react';
+import { TestList } from "./components/TestList"
 
-const TestPage: React.FC = () => {
-    return (
-        <div>
-            <h1>Test Page</h1>
-            <p>This is a simple test list page.</p>
-        </div>
-    );
-};
-
-export default TestPage;
+export default function TestsPage() {
+  return (
+    <div className="container py-8">
+      <TestList />
+    </div>
+  )
+}

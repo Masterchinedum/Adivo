@@ -25,7 +25,7 @@ export function TestCard({ test }: TestCardProps) {
   return (
     <Card className="flex flex-col">
       <CardHeader>
-        <CardTitle>{test.title}</CardTitle>
+        <CardTitle className="line-clamp-2">{test.title}</CardTitle>
         <CardDescription className="line-clamp-2">
           {test.description || "No description provided"}
         </CardDescription>

@@ -55,6 +55,7 @@ export function TestEditForm({ test }: TestEditFormProps) {
       })
 
       if (!response.ok) {
+        const errorData = await response.json()
         throw new Error("Failed to update test")
       }
 
