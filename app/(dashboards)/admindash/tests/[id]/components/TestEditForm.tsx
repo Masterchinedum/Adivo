@@ -1,4 +1,3 @@
-// app/(dashboards)/admindash/tests/[id]/components/TestEditForm.tsx
 "use client"
 
 import * as React from "react"
@@ -24,46 +23,64 @@ export function TestEditForm({ test }: TestEditFormProps) {
     resolver: zodResolver(updateTestSchema),
     defaultValues: {
       id: test.id,
-      title: test.title,
-      description: test.description,
-      isPublished: test.isPublished,
-      categories: test.categories?.map(category => ({
+      title: test.title || "",
+      description: test.description || "",
+      isPublished: test.isPublished || false,
+      categories: (test.categories || []).map(category => ({
         id: category.id,
-        name: category.name,
-        description: category.description,
+        name: category.name || "",
+        description: category.description || "",
         scale: category.scale || 100,
-        questions: category.questions?.map(question => ({
+        questions: (category.questions || []).map(question => ({
           id: question.id,
-          title: question.title,
-          options: question.options?.map(option => ({
+          title: question.title || "",
+          options: (question.options || []).map(option => ({
             id: option.id,
-            text: option.text,
-            point: option.point || 0
+            text: option.text || "",
+            point: Number(option.point) || 0
           }))
         }))
-      })) || []
+      }))
     }
-  });
+  })
 
   async function onSubmit(data: UpdateTestInput) {
     setIsLoading(true)
     try {
+      const payload = {
+        ...data,
+        categories: data.categories?.map(cat => ({
+          ...cat,
+          scale: Number(cat.scale),
+          questions: cat.questions?.map(q => ({
+            ...q,
+            options: q.options?.map(opt => ({
+              ...opt,
+              point: Number(opt.point)
+            }))
+          }))
+        }))
+      }
+
       const response = await fetch(`/api/admin/tests/${test.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
+        body: JSON.stringify(payload)
       })
 
+      const responseData = await response.json()
+
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error("Failed to update test")
+        const message = responseData.message || responseData.error || "Failed to update test"
+        throw new Error(message)
       }
 
       toast.success("Test updated successfully")
       router.push("/admindash/tests")
       router.refresh()
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Something went wrong")
+      const errorMessage = error instanceof Error ? error.message : "Failed to update test"
+      toast.error(errorMessage)
     } finally {
       setIsLoading(false)
     }

@@ -52,7 +52,7 @@ export const testSchema = z.object({
 
 // Schema for updating a test
 export const updateTestSchema = z.object({
-  id: z.string().cuid("Invalid test ID"),
+  id: z.string().min(1, "Test ID is required"),
   title: z
     .string()
     .min(1, "Title is required")

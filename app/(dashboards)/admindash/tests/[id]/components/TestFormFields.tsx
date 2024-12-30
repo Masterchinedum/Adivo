@@ -71,7 +71,7 @@ export function TestFormFields({ form }: TestFormFieldsProps) {
         <CategoryList form={form} />
       </div>
 
-      {/* <FormField
+      <FormField
         control={form.control}
         name="isPublished"
         render={({ field }) => (
@@ -90,7 +90,7 @@ export function TestFormFields({ form }: TestFormFieldsProps) {
             </FormControl>
           </FormItem>
         )}
-      /> */}
+      />
     </div>
   )
 }

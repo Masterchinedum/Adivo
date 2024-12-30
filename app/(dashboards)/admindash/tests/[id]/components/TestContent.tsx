@@ -3,7 +3,7 @@
 
 import { TestEditForm } from "./TestEditForm"
 import { TestDeleteAlert } from "./TestDeleteAlert"
-import { TestStatusToggle } from "./TestStatusToggle"
+// import { TestStatusToggle } from "./TestStatusToggle"
 import type { Test } from "@/types/tests/test"
 
 interface TestContentProps {
@@ -14,10 +14,11 @@ export function TestContent({ test }: TestContentProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <TestStatusToggle
+        {/* <TestStatusToggle
           testId={test.id}
           isPublished={test.isPublished}
-        />
+        /> */}
+        <div></div>
         <TestDeleteAlert
           testId={test.id}
           testTitle={test.title}

@@ -50,12 +50,14 @@ export async function GET(req: Request) {
 
 export async function PATCH(req: Request) {
   try {
+    console.log("Full URL:", req.url)
+    const id = req.url.split('/tests/')[1].split('/')[0]
+    console.log("Extracted ID:", id)
     const { userId } = await auth()
     if (!userId) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
-    const id = req.url.split('/tests/')[1].split('/')[0]
     if (!id) {
       return new NextResponse('Bad Request: Missing test ID', { status: 400 })
     }
