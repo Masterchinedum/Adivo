@@ -1,7 +1,7 @@
 // app/tests/components/TestList.tsx
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { TestCard } from "./TestCard"
 import { TestSearch } from "./TestSearch"
 import { Button } from "@/components/ui/button"
@@ -22,7 +22,7 @@ export function TestList() {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
 
-  const fetchTests = async () => {
+  const fetchTests = useCallback(async () => {
     try {
       setLoading(true)
       const query = new URLSearchParams({
@@ -41,11 +41,11 @@ export function TestList() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [page, searchQuery])
 
   useEffect(() => {
     void fetchTests()
-  }, [page])
+  }, [fetchTests])
 
   const handleSearch = () => {
     setPage(1)
