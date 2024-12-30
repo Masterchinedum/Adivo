@@ -18,18 +18,6 @@ export const submitTestResponsesSchema = z.object({
   responses: z.array(questionResponseSchema)
 })
 
-// Schema for fetching test attempts
-export const testAttemptsQuerySchema = z.object({
-  page: z.string().regex(/^\d+$/).optional().default('1'),
-  limit: z.string().regex(/^\d+$/).optional().default('10'),
-  status: z.enum(['IN_PROGRESS', 'COMPLETED', 'ABANDONED']).optional()
-}).transform(data => ({
-  ...data,
-  page: data.page ?? '1',
-  limit: data.limit ?? '10'
-}))
-
 export type QuestionResponseInput = z.infer<typeof questionResponseSchema>
 export type StartTestAttemptInput = z.infer<typeof startTestAttemptSchema>
 export type SubmitTestResponsesInput = z.infer<typeof submitTestResponsesSchema>
-export type TestAttemptsQueryParams = z.infer<typeof testAttemptsQuerySchema>
