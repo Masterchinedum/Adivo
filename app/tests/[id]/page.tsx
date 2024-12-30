@@ -1,12 +1,74 @@
-import React from 'react';
+// app/tests/[id]/page.tsx
+import { notFound } from "next/navigation"
+import prisma from "@/lib/prisma"
+import { Button } from "@/components/ui/button"
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card"
+import Link from "next/link"
 
-const TestPage: React.FC = () => {
-    return (
-        <div>
-            <h1>single Test Page</h1>
-            <p>This is a simple test page.</p>
-        </div>
-    );
-};
+async function getTest(id: string) {
+  const test = await prisma.test.findUnique({
+    where: { 
+      id,
+      isPublished: true 
+    },
+    include: {
+      categories: true,
+      questions: {
+        include: {
+          category: true
+        }
+      }
+    }
+  })
 
-export default TestPage;
+  if (!test) {
+    return null
+  }
+
+  return {
+    ...test,
+    totalQuestions: test.questions.length
+  }
+}
+
+export default async function TestPage({ params }: { params: { id: string } }) {
+  const test = await getTest(params.id)
+
+  if (!test) {
+    notFound()
+  }
+
+  return (
+    <div className="container max-w-3xl py-8 space-y-8">
+      <Card>
+        <CardHeader>
+          <CardTitle>{test.title}</CardTitle>
+          <CardDescription>{test.description}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-2">
+            <p className="text-sm font-medium">Test Details:</p>
+            <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
+              <li>{test.totalQuestions} questions</li>
+              <li>{test.categories.length} categories</li>
+            </ul>
+          </div>
+          
+          <div className="flex justify-end">
+            <Button asChild>
+              <Link href={`/tests/${test.id}/attempt`}>
+                Start Test
+              </Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
