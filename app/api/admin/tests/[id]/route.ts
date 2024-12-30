@@ -79,78 +79,91 @@ export async function PATCH(req: Request) {
     const { categories, ...testData } = validationResult.data
 
     // Update test with categories and their questions in a transaction
-    const test = await prisma.$transaction(async (tx) => {
-      // Verify test exists and user has access
-      const existingTest = await tx.test.findFirst({
-        where: {
-          id,
-          createdBy: userId
-        }
-      })
-
-      if (!existingTest) {
-        throw new Error('Test not found or access denied')
-      }
-
-      // Delete existing categories (cascade deletes questions and options)
-      await tx.category.deleteMany({
-        where: { testId: id }
-      })
-
-      // Update test with new data
-      const updatedTest = await tx.test.update({
-        where: { id },
-        data: {
-          ...testData,
-          categories: {
-            create: categories?.map(category => ({
-              name: category.name,
-              description: category.description,
-              scale: category.scale,
-              questions: {
-                create: category.questions?.map(question => ({
-                  title: question.title,
-                  testId: id,
-                  options: {
-                    create: question.options?.map(option => ({
-                      text: option.text,
-                      point: option.point
-                    })) || []
-                  }
-                })) || []
-              }
-            })) || []
+    try {
+      const test = await prisma.$transaction(async (tx) => {
+        // Verify test exists and user has access
+        const existingTest = await tx.test.findFirst({
+          where: {
+            id,
+            createdBy: userId
           }
-        },
-        include: {
-          categories: {
-            include: {
-              questions: {
-                include: {
-                  options: true
+        })
+
+        if (!existingTest) {
+          throw new Error('Test not found or access denied')
+        }
+
+        // Delete existing categories (cascade deletes questions and options)
+        await tx.category.deleteMany({
+          where: { testId: id }
+        })
+
+        // Update test with new data
+        const updatedTest = await tx.test.update({
+          where: { id },
+          data: {
+            ...testData,
+            categories: {
+              create: categories?.map(category => ({
+                name: category.name,
+                description: category.description,
+                scale: category.scale,
+                questions: {
+                  create: category.questions?.map(question => ({
+                    title: question.title,
+                    testId: id,
+                    options: {
+                      create: question.options?.map(option => ({
+                        text: option.text,
+                        point: option.point
+                      })) || []
+                    }
+                  })) || []
+                }
+              })) || []
+            }
+          },
+          include: {
+            categories: {
+              include: {
+                questions: {
+                  include: {
+                    options: true
+                  }
                 }
               }
             }
           }
-        }
+        })
+
+        return updatedTest
       })
 
-      return updatedTest
-    })
+      if (!test) {
+        return NextResponse.json(
+          { message: 'Failed to update test' },
+          { status: 500 }
+        )
+      }
 
-    return NextResponse.json(test)
+      return NextResponse.json(test)
+    } catch (txError) {
+      if (txError instanceof Error) {
+        if (txError.message === 'Test not found or access denied') {
+          return NextResponse.json(
+            { message: txError.message },
+            { status: 404 }
+          )
+        }
+      }
+      throw txError // Re-throw to be caught by outer catch
+    }
   } catch (error) {
     console.error('[TEST_PATCH]', error)
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       return NextResponse.json(
         { message: 'Database error: ' + error.message },
         { status: 400 }
-      )
-    }
-    if (error instanceof Error && error.message === 'Test not found or access denied') {
-      return NextResponse.json(
-        { message: error.message },
-        { status: 404 }
       )
     }
     return NextResponse.json(
