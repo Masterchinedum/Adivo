@@ -2,6 +2,7 @@
 
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { Prisma } from '@prisma/client'
 import { publicTestQuerySchema } from '@/lib/validations/public-test'
 
 // GET - List published tests with pagination
@@ -29,13 +30,13 @@ export async function GET(req: Request) {
     const limit = Math.max(1, Math.min(100, parseInt(queryResult.data.limit)))
     const skip = (page - 1) * limit
 
-    // Build query for published tests only
-    const whereClause = {
+    // Fix: Use proper Prisma types for where clause
+    const whereClause: Prisma.TestWhereInput = {
       isPublished: true,
       ...(queryResult.data.search && {
         title: {
           contains: queryResult.data.search.trim(),
-          mode: 'insensitive'
+          mode: 'insensitive' as Prisma.QueryMode
         }
       })
     }
