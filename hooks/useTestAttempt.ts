@@ -82,12 +82,49 @@ export function useTestAttempt({ testId }: UseTestAttemptProps) {
     }
   }, [testId, attemptId, router])
 
+  // Get current attempt status and details
+  const getAttemptDetails = useCallback(async () => {
+    if (!attemptId) return null
+    try {
+      setIsLoading(true)
+      const response = await fetch(`/api/tests/${testId}/attempt/${attemptId}`)
+      if (!response.ok) throw new Error('Failed to get attempt details')
+      return await response.json()
+    } catch (error) {
+      toast.error('Failed to get attempt details')
+      return null
+    } finally {
+      setIsLoading(false)
+    }
+  }, [testId, attemptId])
+
+  // Resume existing attempt
+  const resumeAttempt = useCallback(async (existingAttemptId: string) => {
+    try {
+      setIsLoading(true)
+      const response = await fetch(`/api/tests/${testId}/attempt/${existingAttemptId}`)
+      if (!response.ok) throw new Error('Failed to resume test')
+      
+      const data = await response.json()
+      setAttemptId(existingAttemptId)
+      setStatus(data.status)
+      return data
+    } catch (error) {
+      toast.error('Failed to resume test')
+      throw error
+    } finally {
+      setIsLoading(false)
+    }
+  }, [testId])
+
   return {
     attemptId,
     status,
     isLoading,
     startAttempt,
     completeAttempt,
-    abandonAttempt
+    abandonAttempt,
+    getAttemptDetails,
+    resumeAttempt
   }
 }

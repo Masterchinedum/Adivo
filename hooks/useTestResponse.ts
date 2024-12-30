@@ -1,5 +1,5 @@
 // hooks/useTestResponse.ts
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { QuestionResponse } from '@/types/answers/questionResponse'
 
 interface UseTestResponseProps {
@@ -43,10 +43,61 @@ export function useTestResponse({ testId, attemptId }: UseTestResponseProps) {
     }
   }
 
+  // Get all responses for current attempt
+  const getResponses = useCallback(async () => {
+    try {
+      setIsSubmitting(true)
+      const response = await fetch(
+        `/api/tests/${testId}/attempt/${attemptId}/responses`
+      )
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.message)
+      setResponses(data)
+      return data
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch responses')
+      return []
+    } finally {
+      setIsSubmitting(false)
+    }
+  }, [testId, attemptId])
+
+  // Update existing response
+  const updateResponse = useCallback(async (
+    questionId: string, 
+    selectedOptionId: string
+  ) => {
+    try {
+      setIsSubmitting(true)
+      const response = await fetch(
+        `/api/tests/${testId}/attempt/${attemptId}/responses/${questionId}`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ selectedOptionId })
+        }
+      )
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.message)
+      
+      setResponses(prev => 
+        prev.map(r => r.questionId === questionId ? data : r)
+      )
+      return data
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update response')
+      throw err
+    } finally {
+      setIsSubmitting(false)
+    }
+  }, [testId, attemptId])
+
   return {
     responses,
     isSubmitting,
     error,
-    saveResponse
+    saveResponse,
+    getResponses,
+    updateResponse
   }
 }
