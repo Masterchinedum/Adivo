@@ -9,7 +9,6 @@ import { useTestResponse } from "@/hooks/useTestResponse"
 import { TestHeader } from "@/components/test/TestHeader"
 import { QuestionCard } from "@/components/test/QuestionCard"
 import { TestNavigation } from "@/components/test/TestNavigation"
-// import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 
 import { Question } from "@/types/tests/question"
@@ -42,6 +41,9 @@ export default function TestAttemptPage({
         // Start new attempt and get questions
         const newAttemptId = await startAttempt()
         const response = await fetch(`/api/tests/${id}/questions`)
+        if (!response.ok) {
+          throw new Error('Failed to fetch questions')
+        }
         const data = await response.json()
         setQuestions(data.questions)
       } catch (error) {

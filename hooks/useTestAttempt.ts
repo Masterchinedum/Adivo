@@ -19,11 +19,7 @@ export function useTestAttempt({ testId }: UseTestAttemptProps) {
     try {
       setIsLoading(true)
       const response = await fetch(`/api/tests/${testId}/attempt`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({}) // Sending an empty JSON object
+        method: 'POST'
       })
 
       if (!response.ok) {

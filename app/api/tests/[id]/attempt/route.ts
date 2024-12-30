@@ -4,6 +4,7 @@ import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
+// GET handler remains unchanged
 export async function GET(request: Request) {
   try {
     const { userId } = await auth()
@@ -12,10 +13,11 @@ export async function GET(request: Request) {
     }
 
     // Extract test ID from URL
-    const testId = request.url.split('/tests/')[1].split('/')[0]
-    if (!testId) {
+    const testIdMatch = request.url.match(/\/tests\/([^/]+)/)
+    if (!testIdMatch) {
       return new NextResponse('Invalid test ID', { status: 400 })
     }
+    const testId = testIdMatch[1]
 
     // Get pagination params
     const { searchParams } = new URL(request.url)
@@ -70,6 +72,7 @@ export async function GET(request: Request) {
   }
 }
 
+// Updated POST handler
 export async function POST(request: Request) {
   try {
     const { userId } = await auth()
@@ -78,12 +81,13 @@ export async function POST(request: Request) {
     }
 
     // Extract test ID from URL
-    const testId = request.url.split('/tests/')[1].split('/')[0]
-    if (!testId) {
+    const testIdMatch = request.url.match(/\/tests\/([^/]+)/)
+    if (!testIdMatch) {
       return new NextResponse('Invalid test ID', { status: 400 })
     }
+    const testId = testIdMatch[1]
 
-    // Create a new test attempt
+    // Create a new test attempt without parsing request body
     const newAttempt = await prisma.testAttempt.create({
       data: {
         userId,
