@@ -26,7 +26,7 @@ export function CategoryList({ categories }: CategoryListProps) {
                 </p>
               )}
               <p className="text-sm">
-                Questions: {category._count?.questions || 0}
+                Questions: {category.questions?.length || 0}
               </p>
               <p className="text-sm">
                 Scale: {category.scale}
