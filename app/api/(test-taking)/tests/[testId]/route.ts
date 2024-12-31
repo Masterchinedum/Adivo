@@ -36,11 +36,6 @@ export async function GET(req: Request) {
               }
             }
           }
-        },
-        _count: {
-          select: {
-            questions: true
-          }
         }
       }
     })
