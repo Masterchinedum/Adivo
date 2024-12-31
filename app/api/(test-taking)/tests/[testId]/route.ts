@@ -36,6 +36,11 @@ export async function GET(req: Request) {
               }
             }
           }
+        },
+        _count: {  // Add this to get total questions count
+          select: {
+            questions: true
+          }
         }
       }
     })
