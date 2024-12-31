@@ -9,6 +9,9 @@ export interface Category {
     createdAt: Date
     updatedAt: Date
     questions?: Question[]  // Optional array of questions in this category
+    _count?: {
+        questions: number
+    }
 }
 
 export interface CreateCategoryPayload {
