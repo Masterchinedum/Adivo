@@ -9,21 +9,21 @@ export const metadata: Metadata = {
 }
 
 interface PageProps {
-  params: {
+  params: Promise<{
     testId: string
-  }
+  }>
 }
 
-export default async function TestPage({ 
-  params 
-}: PageProps) {
-  // Ensure testId is available
-  if (!params?.testId) {
+export default async function TestPage({ params }: PageProps) {
+  // Await the params first
+  const resolvedParams = await params
+
+  if (!resolvedParams?.testId) {
     notFound()
   }
 
   try {
-    const response = await getPublicTest(params.testId)
+    const response = await getPublicTest(resolvedParams.testId)
     
     if (!response?.test) {
       notFound()
