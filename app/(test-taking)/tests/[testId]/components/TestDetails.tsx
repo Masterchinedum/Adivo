@@ -27,7 +27,7 @@ export function TestDetails({ test, attempts = [] }: TestDetailsProps) {
       </div>
 
       {/* Categories Overview */}
-      <CategoryList categories={test.categories} />
+      <CategoryList categories={test.categories || []} />
 
       {/* Test Stats */}
       <Card>
