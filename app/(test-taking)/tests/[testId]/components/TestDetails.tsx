@@ -12,9 +12,9 @@ interface TestDetailsProps {
 }
 
 export function TestDetails({ test, attempts = [] }: TestDetailsProps) {
-  const lastAttempt = attempts[0]
+  const lastAttempt = attempts[0];
   const canStartNewAttempt = !lastAttempt || 
-    lastAttempt.status !== 'IN_PROGRESS'
+    lastAttempt.status !== 'IN_PROGRESS';
 
   return (
     <div className="space-y-6">
@@ -35,8 +35,8 @@ export function TestDetails({ test, attempts = [] }: TestDetailsProps) {
           <CardTitle>Test Information</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
-          <p>Total Questions: {test._count?.questions || 0}</p>
-          <p>Categories: {test.categories?.length || 0}</p>
+          <p>Total Questions: {test._count?.questions ?? 0}</p>
+          <p>Categories: {test.categories?.length ?? 0}</p>
         </CardContent>
       </Card>
 
@@ -72,5 +72,5 @@ export function TestDetails({ test, attempts = [] }: TestDetailsProps) {
         disabled={!canStartNewAttempt} 
       />
     </div>
-  )
+  );
 }
