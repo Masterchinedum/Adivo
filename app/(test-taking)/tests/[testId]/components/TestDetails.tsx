@@ -35,7 +35,7 @@ export function TestDetails({ test, attempts = [] }: TestDetailsProps) {
           <CardTitle>Test Information</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
-          <p>Total Questions: {test._count?.questions || 0}</p>
+          {/* <p>Total Questions: {test._count?.questions || 0}</p> */}
           <p>Categories: {test.categories?.length || 0}</p>
         </CardContent>
       </Card>
