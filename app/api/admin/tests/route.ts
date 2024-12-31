@@ -1,231 +1,83 @@
-// app/api/admin/tests/route.ts
-
 import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
-import { Prisma } from '@prisma/client'
 import prisma from '@/lib/prisma'
-import { testQuerySchema, testSchema } from '@/lib/validations/tests'
-import type { TestError } from '@/types/tests/test'
-import { getUserById } from '@/lib/users'
+import type { TestAttempt } from '@/types/tests/test-attempt'
 
-// GET - List all tests with pagination and filtering
 export async function GET(req: Request) {
   try {
     const { userId } = await auth()
-    if (!userId) {
-      return new NextResponse('Unauthorized', { status: 401 })
+
+    const testId = req.url.split('/tests/')[1].split('/')[0]
+    if (!testId) {
+      return new NextResponse('Invalid test ID', { status: 400 })
     }
 
-    const { searchParams } = new URL(req.url)
-
-    // Parse and validate query parameters with default values
-    const queryResult = testQuerySchema.safeParse({
-      page: searchParams.get('page') ?? '1',
-      limit: searchParams.get('limit') ?? '10',
-      search: searchParams.get('search') ?? '',
-      sort: searchParams.get('sort') ?? 'desc',
-      isPublished: searchParams.get('isPublished') || undefined
-    })
-
-    if (!queryResult.success) {
-      console.error('Validation errors:', queryResult.error.flatten())
-      return NextResponse.json(
-        { 
-          message: 'Invalid query parameters',
-          errors: queryResult.error.flatten()
-        },
-        { status: 400 }
-      )
-    }
-
-    // Safely parse integers with fallback values
-    const page = Math.max(1, parseInt(queryResult.data.page))
-    const limit = Math.max(1, Math.min(100, parseInt(queryResult.data.limit))) // Add upper bound for safety
-    const skip = (page - 1) * limit
-
-    // Build the query with proper types
-    const whereClause: Prisma.TestWhereInput = {}
-
-    // Only add search condition if search string is not empty
-    if (queryResult.data.search && queryResult.data.search.trim()) {
-      whereClause.title = {
-        contains: queryResult.data.search.trim(),
-        mode: 'insensitive'
-      }
-    }
-
-    // Only add isPublished condition if it's provided
-    if (queryResult.data.isPublished) {
-      whereClause.isPublished = queryResult.data.isPublished === 'true'
-    }
-
-    // Get total count and tests
-    const [totalTests, tests] = await Promise.all([
-      prisma.test.count({ where: whereClause }),
-      prisma.test.findMany({
-        where: whereClause,
-        skip,
-        take: limit,
-        orderBy: {
-          createdAt: queryResult.data.sort
-        },
-        include: {
-          categories: {
-            include: {
-              questions: {
-                include: {
-                  options: true
-                }
+    const test = await prisma.test.findUnique({
+      where: {
+        id: testId,
+        isPublished: true
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        categories: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            scale: true,
+            _count: {
+              select: {
+                questions: true
               }
             }
-          },
-          user: {
-            select: {
-              id: true,
-              email: true,
-              firstName: true,
-              lastName: true,
-              imageUrl: true
-            }
+          }
+        },
+        _count: {
+          select: {
+            questions: true
           }
         }
-      })
-    ])
-    // Format the response data
-    const formattedTests = tests.map(test => ({
-      ...test,
-      categories: test.categories.map(category => ({
-        ...category,
-        questions: category.questions.map(question => ({
-          ...question,
-          options: question.options
-        }))
-      }))
-    }))
-
-    return NextResponse.json({
-      tests: formattedTests,
-      totalTests,
-      currentPage: page,
-      totalPages: Math.ceil(totalTests / limit)
-    })
-  } catch (error) {
-    console.error('[TESTS_GET]', error)
-    return NextResponse.json(
-      { message: 'Internal Server Error' },
-      { status: 500 }
-    )
-  }
-}
-
-// Add POST handler for creating tests
-export async function POST(req: Request) {
-  try {
-    const { userId } = await auth()
-    if (!userId) {
-      return new NextResponse('Unauthorized', { status: 401 })
-    }
-
-    const json = await req.json()
-    const validationResult = testSchema.safeParse(json)
-
-    if (!validationResult.success) {
-      const errorResponse: TestError = {
-        message: 'Invalid request data',
-        errors: validationResult.error.flatten().fieldErrors
       }
-      return NextResponse.json(errorResponse, { status: 400 })
-    }
+    })
 
-    // Get the user's ID from the database using their Clerk ID
-    const { user } = await getUserById({ clerkUserId: userId })
-    if (!user) {
+    if (!test) {
       return NextResponse.json(
-        { message: 'User not found' },
+        { message: 'Test not found' },
         { status: 404 }
       )
     }
 
-    const { categories, ...testData } = validationResult.data
-
-    // Create test with categories and their questions in a transaction
-    const test = await prisma.$transaction(async (tx) => {
-      // First create the test
-      const newTest = await tx.test.create({
-        data: {
-          ...testData,
-          createdBy: user.id,
+    // Explicitly type the attempts array using Pick to select only the fields we need
+    let attempts: Pick<TestAttempt, 'id' | 'startedAt' | 'completedAt' | 'status' | 'totalScore' | 'percentageScore'>[] = []
+    
+    if (userId) {
+      attempts = await prisma.testAttempt.findMany({
+        where: {
+          testId: testId,
+          userId: userId
+        },
+        select: {
+          id: true,
+          startedAt: true,
+          completedAt: true,
+          status: true,
+          totalScore: true,
+          percentageScore: true
+        },
+        orderBy: {
+          startedAt: 'desc'
         }
       })
-
-      // Then create categories with their questions
-      if (categories && categories.length > 0) {
-        await Promise.all(
-          categories.map(async (category) => {
-            const { questions, ...categoryData } = category
-            
-            // Create category with scale field
-            const newCategory = await tx.category.create({
-              data: {
-                ...categoryData,
-                scale: categoryData.scale, // Include the required scale field
-                testId: newTest.id,
-              }
-            })
-
-            // Create questions for this category if they exist
-            if (questions && questions.length > 0) {
-              await Promise.all(
-                questions.map(async (question) => {
-                  const { options, ...questionData } = question
-                  
-                  // Create question with its options including points
-                  await tx.question.create({
-                    data: {
-                      ...questionData,
-                      testId: newTest.id,
-                      categoryId: newCategory.id,
-                      options: {
-                        create: options?.map(option => ({
-                          text: option.text,
-                          point: option.point // Include the required point field
-                        })) || []
-                      }
-                    }
-                  })
-                })
-              )
-            }
-          })
-        )
-      }
-
-      // Return the complete test with all relations
-      return tx.test.findUnique({
-        where: { id: newTest.id },
-        include: {
-          categories: {
-            include: {
-              questions: {
-                include: {
-                  options: true
-                }
-              }
-            }
-          }
-        }
-      })
-    })
-
-    return NextResponse.json(test, { status: 201 })
-  } catch (error) {
-    console.error('[TEST_POST]', error)
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      return NextResponse.json(
-        { message: 'Database error: ' + error.message },
-        { status: 400 }
-      )
     }
+
+    return NextResponse.json({ 
+      test,
+      attempts
+    })
+  } catch (error) {
+    console.error('[TEST_GET]', error)
     return NextResponse.json(
       { message: 'Internal Server Error' },
       { status: 500 }

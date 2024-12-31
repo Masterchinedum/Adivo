@@ -3,6 +3,7 @@
 import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import type { TestAttempt } from '@/types/tests/test-attempt'
 
 export async function GET(req: Request) {
   try {
@@ -51,8 +52,9 @@ export async function GET(req: Request) {
       )
     }
 
-    // If user is logged in, get their previous attempts
-    let attempts = []
+    // Explicitly type the attempts array using Pick to select only the fields we need
+    let attempts: Pick<TestAttempt, 'id' | 'startedAt' | 'completedAt' | 'status' | 'totalScore' | 'percentageScore'>[] = []
+    
     if (userId) {
       attempts = await prisma.testAttempt.findMany({
         where: {
