@@ -14,16 +14,28 @@ interface PageProps {
   }
 }
 
-export default async function TestPage({ params }: PageProps) {
-  const response = await getPublicTest(params.testId)
-  
-  if (!response?.test) {
+export default async function TestPage({ 
+  params 
+}: PageProps) {
+  // Ensure testId is available
+  if (!params?.testId) {
     notFound()
   }
 
-  return (
-    <div className="container py-8 space-y-8">
-      <TestDetails test={response.test} attempts={response.attempts} />
-    </div>
-  )
+  try {
+    const response = await getPublicTest(params.testId)
+    
+    if (!response?.test) {
+      notFound()
+    }
+
+    return (
+      <div className="container py-8 space-y-8">
+        <TestDetails test={response.test} attempts={response.attempts} />
+      </div>
+    )
+  } catch (error) {
+    console.error('Error fetching test:', error)
+    notFound()
+  }
 }
