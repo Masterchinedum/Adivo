@@ -14,7 +14,11 @@ export interface Test {
   createdBy: string
   user?: User
   questions?: Question[]
-  categories?: Category[] 
+  categories?: Category[]
+  _count?: {
+    questions: number;
+    categories: number;
+  };
 }
 
 // For creating a new test
