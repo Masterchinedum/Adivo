@@ -8,11 +8,13 @@ export const metadata: Metadata = {
   description: "View test details and start assessment"
 }
 
-export default async function TestPage({ 
-  params 
-}: { 
-  params: { testId: string } 
-}) {
+interface PageProps {
+  params: {
+    testId: string
+  }
+}
+
+export default async function TestPage({ params }: PageProps) {
   const response = await getPublicTest(params.testId)
   
   if (!response?.test) {
