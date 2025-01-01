@@ -1,127 +1,16 @@
-// import { Metadata } from "next"
-// import { notFound } from "next/navigation"
-// import { auth } from "@clerk/nextjs/server"
-// import prisma from "@/lib/prisma"
-
-// export const metadata: Metadata = {
-//   title: "Test Attempt",
-//   description: "Take your test"
-// }
-
-// interface PageProps {
-//   params: Promise<{
-//     testId: string
-//     attemptId: string
-//   }>
-// }
-
-// async function getTestAttempt(attemptId: string, userId: string) {
-//   try {
-//     const attempt = await prisma.testAttempt.findFirst({
-//       where: {
-//         id: attemptId,
-//         userId,
-//         status: "IN_PROGRESS"
-//       },
-//       include: {
-//         test: {
-//           select: {
-//             id: true,
-//             title: true,
-//             description: true,
-//             categories: {
-//               select: {
-//                 id: true,
-//                 name: true,
-//                 scale: true,
-//                 questions: {
-//                   select: {
-//                     id: true,
-//                     title: true,
-//                     options: {
-//                       select: {
-//                         id: true,
-//                         text: true,
-//                         point: true
-//                       }
-//                     }
-//                   }
-//                 }
-//               }
-//             }
-//           }
-//         }
-//       }
-//     })
-//     return attempt
-//   } catch (error) {
-//     console.error("Error fetching test attempt:", error)
-//     return null
-//   }
-// }
-
-// export default async function TestAttemptPage({ params }: PageProps) {
-//   try {
-//     const resolvedParams = await params
-//     const { userId: clerkUserId } = await auth()
-    
-//     if (!clerkUserId) {
-//       return notFound()
-//     }
-
-//     const user = await prisma.user.findUnique({
-//       where: { clerkUserId },
-//       select: { id: true }
-//     })
-
-//     if (!user) {
-//       return notFound()
-//     }
-
-//     const attempt = await getTestAttempt(resolvedParams.attemptId, user.id)
-
-//     if (!attempt) {
-//       return notFound()
-//     }
-
-//     return (
-//       <div className="container py-8 space-y-8">
-//         <div className="space-y-2">
-//           <h1 className="text-3xl font-bold tracking-tight">
-//             {attempt.test.title}
-//           </h1>
-//           {attempt.test.description && (
-//             <p className="text-muted-foreground">
-//               {attempt.test.description}
-//             </p>
-//           )}
-//         </div>
-
-//         <div className="space-y-4">
-//           <p>Test Started: {attempt.startedAt.toLocaleString()}</p>
-//           <p>Status: {attempt.status}</p>
-//         </div>
-
-//         {/* Test interface placeholder */}
-//         <div className="border rounded-lg p-4">
-//           <p>Test interface will be implemented here</p>
-//         </div>
-//       </div>
-//     )
-//   } catch {
-//     // Log error internally but show not found to user
-//     return notFound()
-//   }
-// }
-
+// app/(test-taking)/tests/[testId]/attempt/[attemptId]/page.tsx
 "use client"
 
-import { useEffect, useState } from "react"
-import { TestLayout } from "./_components/TestLayout"
-import type { TestAttemptQuestion } from "@/types/tests/test-attempt-question"
+import { useState, useEffect } from "react"
+import { type TestAttemptQuestion } from "@/types/tests/test-attempt-question"
+import { LoadingState } from "./_components/LoadingState"
+import { TestHeader } from "./_components/TestHeader"
+import { CategorySection } from "./_components/CategorySection"
+import { QuestionNavigation } from "./_components/QuestionNavigation"
 
 export default function TestAttemptPage({ params }: { params: { attemptId: string } }) {
   const [questions, setQuestions] = useState<TestAttemptQuestion[]>([])
+  const [currentQuestionId, setCurrentQuestionId] = useState<string>("")
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -129,6 +18,9 @@ export default function TestAttemptPage({ params }: { params: { attemptId: strin
       .then(res => res.json())
       .then(data => {
         setQuestions(data.questions)
+        if (data.questions.length > 0) {
+          setCurrentQuestionId(data.questions[0].id)
+        }
         setIsLoading(false)
       })
       .catch(error => {
@@ -137,11 +29,44 @@ export default function TestAttemptPage({ params }: { params: { attemptId: strin
       })
   }, [params.attemptId])
 
+  if (isLoading) return <LoadingState />
+
+  // Group questions by category
+  const questionsByCategory = questions.reduce((acc, question) => {
+    const categoryId = question.question.categoryId || 'uncategorized'
+    if (!acc[categoryId]) {
+      acc[categoryId] = []
+    }
+    acc[categoryId].push(question)
+    return acc
+  }, {} as Record<string, TestAttemptQuestion[]>)
+
   return (
-    <TestLayout 
-      attemptId={params.attemptId}
-      questions={questions}
-      isLoading={isLoading}
-    />
+    <div className="min-h-screen bg-gray-50">
+      <TestHeader 
+        totalQuestions={questions.length} 
+        answeredQuestions={questions.filter(q => q.isAnswered).length} 
+      />
+      
+      <div className="grid grid-cols-[300px_1fr] gap-6 p-6">
+        <QuestionNavigation 
+          questions={questions}
+          currentQuestionId={currentQuestionId}
+          onQuestionSelect={setCurrentQuestionId}
+        />
+        
+        <main className="space-y-6">
+          {Object.entries(questionsByCategory).map(([categoryId, categoryQuestions]) => (
+            <CategorySection
+              key={categoryId}
+              categoryId={categoryId}
+              questions={categoryQuestions}
+              currentQuestionId={currentQuestionId}
+              attemptId={params.attemptId}
+            />
+          ))}
+        </main>
+      </div>
+    </div>
   )
 }
