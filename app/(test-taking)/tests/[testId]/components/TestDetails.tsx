@@ -56,7 +56,7 @@ export function TestDetails({ test, attempts = [] }: TestDetailsProps) {
                 </div>
                 {attempt.status === 'COMPLETED' && (
                   <div className="text-right">
-                    <p>Score: {attempt.totalScore.toFixed(1)}</p>
+                    <p>Scores: {attempt.totalScore.toFixed(1)}</p>
                     <p>{attempt.percentageScore.toFixed(1)}%</p>
                   </div>
                 )}
