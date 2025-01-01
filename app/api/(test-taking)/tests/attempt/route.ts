@@ -25,14 +25,7 @@ export async function POST(request: Request) {
     }
 
     // 3. Parse and validate request
-    let body;
-    try {
-      body = await request.json()
-    } catch {
-      return NextResponse.json({ error: "Invalid request body" }, { status: 400 })
-    }
-
-    const validation = startTestAttemptSchema.safeParse(body)
+    const validation = startTestAttemptSchema.safeParse(await request.json())
     if (!validation.success) {
       return NextResponse.json({ 
         error: "Validation failed",
@@ -62,19 +55,27 @@ export async function POST(request: Request) {
           userId: user.id,
           status: "IN_PROGRESS"
         },
-        select: { id: true }
+        select: {
+          id: true,
+          testId: true,
+          userId: true,
+          startedAt: true,
+          status: true
+        }
       })
 
+      // 4.3 If existing attempt found, return it instead of creating new one
       if (existingAttempt) {
-        throw new Error("Active attempt exists")
+        return existingAttempt
       }
 
-      // 4.3 Create new attempt
+      // 4.4 Create new attempt if none exists
       return await tx.testAttempt.create({
         data: {
           testId: test.id,
           userId: user.id,
-          status: "IN_PROGRESS"
+          status: "IN_PROGRESS",
+          startedAt: new Date()
         },
         select: {
           id: true,
@@ -86,15 +87,8 @@ export async function POST(request: Request) {
       })
     })
 
-    // 5. Format and return response
     const response: TestAttemptApiResponse = {
-      testAttempt: {
-        id: result.id,
-        testId: result.testId,
-        userId: result.userId,
-        startedAt: result.startedAt,
-        status: result.status
-      }
+      testAttempt: result
     }
 
     return NextResponse.json(response, { status: 201 })
@@ -105,9 +99,6 @@ export async function POST(request: Request) {
     if (error instanceof Error) {
       if (error.message === "Test not found or not published") {
         return NextResponse.json({ error: error.message }, { status: 404 })
-      }
-      if (error.message === "Active attempt exists") {
-        return NextResponse.json({ error: error.message }, { status: 409 })
       }
     }
     
