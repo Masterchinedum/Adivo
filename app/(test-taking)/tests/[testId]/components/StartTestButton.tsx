@@ -1,12 +1,10 @@
-//app/(test-taking)/tests/[testId]/components/StartTestButton.tsx
-
 "use client"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { startTestAttemptSchema } from "@/lib/validations/test-attempt"
 import { toast } from "sonner"
+import type { TestAttemptApiResponse } from "@/types/tests/test-attempt"
 
 interface StartTestButtonProps {
   testId: string
@@ -14,33 +12,35 @@ interface StartTestButtonProps {
 }
 
 export function StartTestButton({ testId, disabled }: StartTestButtonProps) {
-  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
 
-  async function startTest() {
+  const startTest = async () => {
     try {
       setIsLoading(true)
-      
-      // Validate input
-      const input = startTestAttemptSchema.parse({ testId })
-      
-      // Create test attempt
-      const response = await fetch("/api/test-attempts", {
+      const response = await fetch("/api/tests/attempt", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(input)
+        headers: { 
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ 
+          testId 
+        })
       })
 
+      const data = await response.json()
+
       if (!response.ok) {
-        throw new Error("Failed to start test")
+        throw new Error(data.message || "Failed to start test")
       }
 
-      const data = await response.json()
-      
-      // Redirect to test taking page
+      if (!data.testAttempt?.id) {
+        throw new Error("Invalid response from server")
+      }
+
       router.push(`/tests/${testId}/attempt/${data.testAttempt.id}`)
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Something went wrong")
+      toast.error(error instanceof Error ? error.message : "Failed to start test")
     } finally {
       setIsLoading(false)
     }
@@ -48,9 +48,9 @@ export function StartTestButton({ testId, disabled }: StartTestButtonProps) {
 
   return (
     <Button 
-      className="w-full" 
-      onClick={startTest}
+      onClick={startTest} 
       disabled={disabled || isLoading}
+      className="w-full"
     >
       {isLoading ? "Starting..." : "Start Test"}
     </Button>

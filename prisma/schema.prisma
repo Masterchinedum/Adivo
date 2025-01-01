@@ -91,8 +91,8 @@ model TestAttempt {
   testId          String
   startedAt       DateTime          @default(now())
   completedAt     DateTime?
-  totalScore      Float             // Actual total test score
-  percentageScore Float             // Score in percentage
+  totalScore      Float             @default(0)  // Changed to have default
+  percentageScore Float             @default(0)  // Changed to have default
   status          TestStatus        @default(IN_PROGRESS)
   user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   test            Test              @relation(fields: [testId], references: [id], onDelete: Cascade)
@@ -103,6 +103,7 @@ model TestAttempt {
 
   @@index([userId])
   @@index([testId])
+  @@index([status])
 }
 
 model QuestionResponse {

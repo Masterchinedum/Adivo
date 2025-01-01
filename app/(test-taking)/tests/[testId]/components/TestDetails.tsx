@@ -1,6 +1,6 @@
 //app/(test-taking)/tests/[testId]/components/TestDetails.tsx
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CategoryList } from "./CategoryList"
 import { StartTestButton } from "./StartTestButton"
 import type { Test } from "@/types/tests/test"

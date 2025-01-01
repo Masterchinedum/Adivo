@@ -5,6 +5,7 @@ import { Question } from "./question"
 import { Option } from "./option"
 import { Category } from "./category"
 
+
 export interface QuestionResponse {
   id: string
   testAttemptId: string
@@ -61,4 +62,27 @@ export interface TestAttemptsResponse {
 export interface TestAttemptError {
   message: string
   errors?: Record<string, string[]>
+}
+
+export interface CreateTestAttemptInput {
+  testId: string
+}
+
+export interface TestAttemptApiResponse {
+  testAttempt: {
+    id: string;
+    testId: string;
+    userId: string;
+    startedAt: Date;
+    status: TestStatus;
+  }
+}
+
+export interface TestAttemptCreateInput {
+  testId: string;
+  userId: string;
+  status: TestStatus;
+  startedAt: Date;
+  totalScore: number;
+  percentageScore: number;
 }
