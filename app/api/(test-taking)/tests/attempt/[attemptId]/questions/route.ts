@@ -4,7 +4,10 @@ import { auth } from "@clerk/nextjs/server"
 import { NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
 import { testAttemptQuestionsQuerySchema } from "@/lib/validations/test-attempt-question"
-import type { TestAttemptQuestionsResponse } from "@/types/tests/test-attempt-question"
+import type { 
+  TestAttemptQuestion,
+  TestAttemptQuestionsResponse 
+} from "@/types/tests/test-attempt-question"
 
 export async function GET(req: Request) {
   try {
