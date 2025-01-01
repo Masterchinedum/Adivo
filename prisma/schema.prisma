@@ -90,7 +90,7 @@ model TestAttempt {
   userId          String
   testId          String
   startedAt       DateTime          @default(now())
-  completedAt     DateTime?
+  completedAt     DateTime?         
   totalScore      Float             @default(0)  // Changed to have default
   percentageScore Float             @default(0)  // Changed to have default
   status          TestStatus        @default(IN_PROGRESS)

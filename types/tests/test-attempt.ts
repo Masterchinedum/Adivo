@@ -5,6 +5,7 @@ import { Question } from "./question"
 import { Option } from "./option"
 import { Category } from "./category"
 
+export type TestStatus = 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED'
 
 export interface QuestionResponse {
   id: string
@@ -37,15 +38,15 @@ export interface TestAttempt {
   userId: string
   testId: string
   startedAt: Date
-  completedAt: Date | null
-  totalScore: number
-  percentageScore: number
-  status: 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED'
-  test: Test
-  responses: QuestionResponse[]
-  categoryScores: CategoryScore[]
-  createdAt: Date
-  updatedAt: Date
+  completedAt: Date | null  // Change from Date | undefined to Date | null
+  status: TestStatus
+  totalScore: number | null  // Add null for consistency
+  percentageScore: number | null  // Add null for consistency
+  test?: Test
+  responses?: QuestionResponse[]
+  categoryScores?: CategoryScore[]
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 export interface TestAttemptResponse {
@@ -70,19 +71,19 @@ export interface CreateTestAttemptInput {
 
 export interface TestAttemptApiResponse {
   testAttempt: {
-    id: string;
-    testId: string;
-    userId: string;
-    startedAt: Date;
-    status: TestStatus;
+    id: string
+    testId: string
+    userId: string
+    startedAt: Date
+    status: TestStatus
   }
 }
 
 export interface TestAttemptCreateInput {
-  testId: string;
-  userId: string;
-  status: TestStatus;
-  startedAt: Date;
-  totalScore: number;
-  percentageScore: number;
+  testId: string
+  userId: string
+  status: TestStatus
+  startedAt: Date
+  totalScore: number
+  percentageScore: number
 }

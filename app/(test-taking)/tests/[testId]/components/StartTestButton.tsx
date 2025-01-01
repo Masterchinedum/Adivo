@@ -28,16 +28,11 @@ export function StartTestButton({ testId, disabled }: StartTestButtonProps) {
         })
       })
 
-      const data = await response.json()
-
       if (!response.ok) {
-        throw new Error(data.message || "Failed to start test")
+        throw new Error("Failed to start test")
       }
 
-      if (!data.testAttempt?.id) {
-        throw new Error("Invalid response from server")
-      }
-
+      const data: TestAttemptApiResponse = await response.json()
       router.push(`/tests/${testId}/attempt/${data.testAttempt.id}`)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to start test")
