@@ -1,3 +1,5 @@
+//app/(test-taking)/tests/[testId]/page.tsx
+
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { TestDetails } from "./components/TestDetails"

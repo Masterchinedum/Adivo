@@ -41,7 +41,7 @@ export function TestDetails({ test, attempts = [] }: TestDetailsProps) {
       </Card>
 
       {/* Previous Attempts */}
-      {attempts.length > 0 && (
+      {/* {attempts.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>Your Attempts</CardTitle>
@@ -64,7 +64,7 @@ export function TestDetails({ test, attempts = [] }: TestDetailsProps) {
             ))}
           </CardContent>
         </Card>
-      )}
+      )} */}
 
       {/* Start Test Button */}
       <StartTestButton 
