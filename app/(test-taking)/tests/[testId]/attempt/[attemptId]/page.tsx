@@ -16,67 +16,102 @@ interface PageProps {
 }
 
 async function getTestAttempt(attemptId: string, userId: string) {
-  return await prisma.testAttempt.findFirst({
-    where: {
-      id: attemptId,
-      userId,
-      status: "IN_PROGRESS"
-    },
-    include: {
-      test: {
-        include: {
-          categories: {
-            include: {
-              questions: {
-                include: {
-                  options: true
+  try {
+    const attempt = await prisma.testAttempt.findFirst({
+      where: {
+        id: attemptId,
+        userId,
+        status: "IN_PROGRESS"
+      },
+      include: {
+        test: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            categories: {
+              select: {
+                id: true,
+                name: true,
+                scale: true,
+                questions: {
+                  select: {
+                    id: true,
+                    title: true,
+                    options: {
+                      select: {
+                        id: true,
+                        text: true,
+                        point: true
+                      }
+                    }
+                  }
                 }
               }
             }
           }
         }
       }
-    }
-  })
+    })
+    return attempt
+  } catch (error) {
+    console.error("Error fetching test attempt:", error)
+    return null
+  }
 }
 
 export default async function TestAttemptPage({ params }: PageProps) {
-  // Await the params first
   const resolvedParams = await params
-  const { userId } = await auth()
+  const { userId: clerkUserId } = await auth() // Changed to be explicit
   
-  if (!userId) {
+  if (!clerkUserId) {
     return notFound()
   }
 
-  const attempt = await getTestAttempt(resolvedParams.attemptId, userId)
+  // Get internal user ID first
+  const user = await prisma.user.findUnique({
+    where: { clerkUserId },
+    select: { id: true }
+  })
+
+  if (!user) {
+    return notFound()
+  }
+
+  // Use internal user ID
+  const attempt = await getTestAttempt(resolvedParams.attemptId, user.id)
 
   if (!attempt) {
     return notFound()
   }
 
-  return (
-    <div className="container py-8 space-y-8">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">
-          {attempt.test.title}
-        </h1>
-        {attempt.test.description && (
-          <p className="text-muted-foreground">
-            {attempt.test.description}
-          </p>
-        )}
-      </div>
+  // PROBLEM 2: Add error boundary
+  try {
+    return (
+      <div className="container py-8 space-y-8">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight">
+            {attempt.test.title}
+          </h1>
+          {attempt.test.description && (
+            <p className="text-muted-foreground">
+              {attempt.test.description}
+            </p>
+          )}
+        </div>
 
-      <div className="space-y-4">
-        <p>Test Started: {attempt.startedAt.toLocaleString()}</p>
-        <p>Status: {attempt.status}</p>
-      </div>
+        <div className="space-y-4">
+          <p>Test Started: {attempt.startedAt.toLocaleString()}</p>
+          <p>Status: {attempt.status}</p>
+        </div>
 
-      {/* We'll add the test interface components here later */}
-      <div className="border rounded-lg p-4">
-        <p>Test interface will be implemented here</p>
+        {/* We'll add the test interface components here later */}
+        <div className="border rounded-lg p-4">
+          <p>Test interface will be implemented here</p>
+        </div>
       </div>
-    </div>
-  )
+    )
+  } catch (error) {
+    return notFound()
+  }
 }

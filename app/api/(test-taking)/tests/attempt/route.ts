@@ -1,3 +1,5 @@
+//app/api/(test-taking)/tests/attempt/route.ts
+
 import { auth } from "@clerk/nextjs/server"
 import { NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
@@ -6,13 +8,13 @@ import type { TestAttemptApiResponse } from "@/types/tests/test-attempt"
 
 export async function POST(request: Request) {
   try {
-    // 1. Authentication
+    // 1. Get clerk user ID
     const { userId: clerkUserId } = await auth()
     if (!clerkUserId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // 2. Get internal user
+    // 2. Get internal user ID
     const user = await prisma.user.findUnique({
       where: { clerkUserId },
       select: { id: true }
@@ -86,7 +88,13 @@ export async function POST(request: Request) {
 
     // 5. Format and return response
     const response: TestAttemptApiResponse = {
-      testAttempt: result
+      testAttempt: {
+        id: result.id,
+        testId: result.testId,
+        userId: result.userId,
+        startedAt: result.startedAt,
+        status: result.status
+      }
     }
 
     return NextResponse.json(response, { status: 201 })
