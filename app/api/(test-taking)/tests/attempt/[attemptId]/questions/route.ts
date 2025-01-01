@@ -75,12 +75,15 @@ export async function GET(req: Request) {
     }
 
     // 5. Format response
-    const questions = attempt.test.questions.map(question => ({
+    const questions: TestAttemptQuestion[] = attempt.test.questions.map(question => ({
       id: `${attempt.id}_${question.id}`, // Composite ID
       testAttemptId: attempt.id,
       questionId: question.id,
-      question,
-      selectedOptionId: attempt.responses.find(r => r.questionId === question.id)?.selectedOptionId || null,
+      question: {
+        ...question,
+        categoryId: question.categoryId ?? null // Explicitly handle null case
+      },
+      selectedOptionId: attempt.responses.find(r => r.questionId === question.id)?.selectedOptionId ?? null,
       isAnswered: attempt.responses.some(r => r.questionId === question.id),
       createdAt: new Date(),
       updatedAt: new Date()
