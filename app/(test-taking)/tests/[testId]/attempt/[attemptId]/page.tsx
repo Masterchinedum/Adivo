@@ -61,32 +61,29 @@ async function getTestAttempt(attemptId: string, userId: string) {
 }
 
 export default async function TestAttemptPage({ params }: PageProps) {
-  const resolvedParams = await params
-  const { userId: clerkUserId } = await auth() // Changed to be explicit
-  
-  if (!clerkUserId) {
-    return notFound()
-  }
-
-  // Get internal user ID first
-  const user = await prisma.user.findUnique({
-    where: { clerkUserId },
-    select: { id: true }
-  })
-
-  if (!user) {
-    return notFound()
-  }
-
-  // Use internal user ID
-  const attempt = await getTestAttempt(resolvedParams.attemptId, user.id)
-
-  if (!attempt) {
-    return notFound()
-  }
-
-  // PROBLEM 2: Add error boundary
   try {
+    const resolvedParams = await params
+    const { userId: clerkUserId } = await auth()
+    
+    if (!clerkUserId) {
+      return notFound()
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { clerkUserId },
+      select: { id: true }
+    })
+
+    if (!user) {
+      return notFound()
+    }
+
+    const attempt = await getTestAttempt(resolvedParams.attemptId, user.id)
+
+    if (!attempt) {
+      return notFound()
+    }
+
     return (
       <div className="container py-8 space-y-8">
         <div className="space-y-2">
@@ -105,13 +102,14 @@ export default async function TestAttemptPage({ params }: PageProps) {
           <p>Status: {attempt.status}</p>
         </div>
 
-        {/* We'll add the test interface components here later */}
+        {/* Test interface placeholder */}
         <div className="border rounded-lg p-4">
           <p>Test interface will be implemented here</p>
         </div>
       </div>
     )
-  } catch (error) {
+  } catch {
+    // Log error internally but show not found to user
     return notFound()
   }
 }
