@@ -9,15 +9,23 @@ interface CategoryScoresProps {
 export function CategoryScores({ categoryScores }: CategoryScoresProps) {
   return (
     <div className="p-4 border rounded-lg">
-      <h2 className="text-xl font-bold">Category Scores</h2>
-      <ul className="space-y-2">
+      <h2 className="text-xl font-bold mb-4">Category Breakdown</h2>
+      <div className="space-y-4">
         {categoryScores.map((score) => (
-          <li key={score.categoryId} className="flex justify-between">
-            <span>{score.category.name}</span>
-            <span>{score.rawScore} / {score.maxRawScore} ({score.scaledScore.toFixed(2)} / {score.maxScale})</span>
-          </li>
+          <div key={score.categoryId} className="space-y-2">
+            <div className="flex justify-between items-center">
+              <h3 className="font-medium">{score.category.name}</h3>
+              <span className="text-sm text-muted-foreground">
+                {(score.actualScore / score.maxScale * 100).toFixed(1)}%
+              </span>
+            </div>
+            <div className="flex justify-between text-sm text-muted-foreground">
+              <span>Raw Score: {score.rawScore} / {score.maxRawScore}</span>
+              <span>Scaled Score: {score.actualScore} / {score.maxScale}</span>
+            </div>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   )
 }
