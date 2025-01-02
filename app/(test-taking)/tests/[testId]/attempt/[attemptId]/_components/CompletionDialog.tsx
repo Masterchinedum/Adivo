@@ -13,7 +13,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import type { TestCompletionResponse } from "@/types/tests/test-attempt"
 
@@ -64,7 +63,7 @@ export function CompletionDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Complete Test</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to complete this test? You won't be able to change your answers after submission.
+            Are you sure you want to complete this test? You won&apos;t be able to change your answers after submission.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
