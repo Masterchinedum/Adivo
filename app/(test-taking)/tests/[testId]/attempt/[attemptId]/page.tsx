@@ -8,7 +8,13 @@ import { TestHeader } from "./_components/TestHeader"
 import { CategorySection } from "./_components/CategorySection"
 import { QuestionNavigation } from "./_components/QuestionNavigation"
 
-export default function TestAttemptPage({ params }: { params: { attemptId: string } }) {
+interface TestAttemptPageProps {
+  params: {
+    attemptId: string
+  }
+}
+
+export default function TestAttemptPage({ params }: TestAttemptPageProps) {
   const [questions, setQuestions] = useState<TestAttemptQuestion[]>([])
   const [currentQuestionId, setCurrentQuestionId] = useState<string>("")
   const [isLoading, setIsLoading] = useState(true)

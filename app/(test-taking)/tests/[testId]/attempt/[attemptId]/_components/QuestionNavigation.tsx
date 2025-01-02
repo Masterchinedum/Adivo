@@ -5,9 +5,15 @@ import { cn } from "@/lib/utils"
 
 interface QuestionNavigationProps {
   questions: TestAttemptQuestion[]
+  currentQuestionId: string
+  onQuestionSelect: (questionId: string) => void
 }
 
-export function QuestionNavigation({ questions }: QuestionNavigationProps) {
+export function QuestionNavigation({ 
+  questions, 
+  currentQuestionId, 
+  onQuestionSelect 
+}: QuestionNavigationProps) {
   return (
     <nav className="border-r p-4 h-screen overflow-auto">
       <h2 className="font-semibold mb-4">Questions</h2>
@@ -17,8 +23,10 @@ export function QuestionNavigation({ questions }: QuestionNavigationProps) {
             key={question.id}
             className={cn(
               "w-full text-left p-3 rounded-lg hover:bg-gray-100",
-              question.isAnswered && "bg-green-50 hover:bg-green-100"
+              question.isAnswered && "bg-green-50 hover:bg-green-100",
+              question.id === currentQuestionId && "ring-2 ring-blue-500"
             )}
+            onClick={() => onQuestionSelect(question.id)}
           >
             {index + 1}. {question.question.title}
           </button>

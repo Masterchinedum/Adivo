@@ -18,8 +18,28 @@ export function QuestionCard({ question, isActive, attemptId }: QuestionCardProp
   )
 
   const handleOptionSelect = async (optionId: string) => {
-    setSelectedOption(optionId)
-    // TODO: Implement answer submission logic
+    try {
+      setSelectedOption(optionId)
+      
+      const response = await fetch(`/api/tests/attempt/${attemptId}/questions`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          questionId: question.questionId,
+          selectedOptionId: optionId
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to save answer')
+      }
+    } catch (error) {
+      console.error('Error saving answer:', error)
+      // Optionally revert the selection on error
+      setSelectedOption(question.selectedOptionId || undefined)
+    }
   }
 
   return (

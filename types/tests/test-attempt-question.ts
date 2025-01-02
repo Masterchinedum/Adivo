@@ -7,7 +7,11 @@ export interface TestAttemptQuestion {
   question: {
     id: string
     title: string
-    categoryId: string | null  // Updated to match Prisma schema
+    categoryId: string | null
+    category?: {  // Add category information
+      id: string
+      name: string
+    }
     options: {
       id: string
       text: string
