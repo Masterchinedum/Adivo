@@ -9,18 +9,30 @@ import { CategorySection } from "./_components/CategorySection"
 import { QuestionNavigation } from "./_components/QuestionNavigation"
 
 interface TestAttemptPageProps {
-  params: {
+  params: Promise<{
+    testId: string
     attemptId: string
-  }
+  }>
 }
 
 export default function TestAttemptPage({ params }: TestAttemptPageProps) {
   const [questions, setQuestions] = useState<TestAttemptQuestion[]>([])
   const [currentQuestionId, setCurrentQuestionId] = useState<string>("")
   const [isLoading, setIsLoading] = useState(true)
+  const [attemptId, setAttemptId] = useState<string>("")
 
   useEffect(() => {
-    fetch(`/api/tests/attempt/${params.attemptId}/questions`)
+    // Resolve params since they're a Promise
+    params.then(resolvedParams => {
+      setAttemptId(resolvedParams.attemptId)
+    })
+  }, [params])
+
+  useEffect(() => {
+    // Only fetch when attemptId is available
+    if (!attemptId) return
+
+    fetch(`/api/tests/attempt/${attemptId}/questions`)
       .then(res => res.json())
       .then(data => {
         setQuestions(data.questions)
@@ -33,11 +45,10 @@ export default function TestAttemptPage({ params }: TestAttemptPageProps) {
         console.error('Failed to load questions:', error)
         setIsLoading(false)
       })
-  }, [params.attemptId])
+  }, [attemptId])
 
   if (isLoading) return <LoadingState />
 
-  // Group questions by category
   const questionsByCategory = questions.reduce((acc, question) => {
     const categoryId = question.question.categoryId || 'uncategorized'
     if (!acc[categoryId]) {
@@ -68,7 +79,7 @@ export default function TestAttemptPage({ params }: TestAttemptPageProps) {
               categoryId={categoryId}
               questions={categoryQuestions}
               currentQuestionId={currentQuestionId}
-              attemptId={params.attemptId}
+              attemptId={attemptId}
             />
           ))}
         </main>
