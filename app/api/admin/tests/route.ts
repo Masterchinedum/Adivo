@@ -1,81 +1,68 @@
 import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
-import type { TestAttempt } from '@/types/tests/test-attempt'
+import { Prisma } from '@prisma/client'
 
 export async function GET(req: Request) {
   try {
     const { userId } = await auth()
-
-    const testId = req.url.split('/tests/')[1].split('/')[0]
-    if (!testId) {
-      return new NextResponse('Invalid test ID', { status: 400 })
+    if (!userId) {
+      return new NextResponse('Unauthorized', { status: 401 })
     }
 
-    const test = await prisma.test.findUnique({
-      where: {
-        id: testId,
-        isPublished: true
-      },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        categories: {
-          select: {
-            id: true,
-            name: true,
-            description: true,
-            scale: true,
-            _count: {
-              select: {
-                questions: true
-              }
-            }
-          }
-        },
-        _count: {
-          select: {
-            questions: true
-          }
-        }
-      }
-    })
+    // Get query parameters from URL
+    const { searchParams } = new URL(req.url)
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '10')
+    const search = searchParams.get('search') || ''
+    const sort = searchParams.get('sort') || 'desc'
+    const isPublished = searchParams.get('isPublished')
 
-    if (!test) {
-      return NextResponse.json(
-        { message: 'Test not found' },
-        { status: 404 }
-      )
-    }
-
-    // Explicitly type the attempts array using Pick to select only the fields we need
-    let attempts: Pick<TestAttempt, 'id' | 'startedAt' | 'completedAt' | 'status' | 'totalScore' | 'percentageScore'>[] = []
-    
-    if (userId) {
-      attempts = await prisma.testAttempt.findMany({
-        where: {
-          testId: testId,
-          userId: userId
-        },
-        select: {
-          id: true,
-          startedAt: true,
-          completedAt: true,
-          status: true,
-          totalScore: true,
-          percentageScore: true
-        },
-        orderBy: {
-          startedAt: 'desc'
+    // Build where clause without createdBy filter
+    const where: Prisma.TestWhereInput = {
+      ...(search && {
+        title: {
+          contains: search,
+          mode: 'insensitive' as Prisma.QueryMode
         }
+      }),
+      ...(isPublished && {
+        isPublished: isPublished === 'true'
       })
     }
 
-    return NextResponse.json({ 
-      test,
-      attempts
+    // Get tests with pagination
+    const [tests, totalTests] = await prisma.$transaction([
+      prisma.test.findMany({
+        where,
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          isPublished: true,
+          createdAt: true,
+          _count: {
+            select: {
+              questions: true
+            }
+          }
+        },
+        orderBy: {
+          createdAt: sort === 'desc' ? 'desc' : 'asc'
+        },
+        skip: (page - 1) * limit,
+        take: limit
+      }),
+      prisma.test.count({ where })
+    ])
+
+    return NextResponse.json({
+      tests,
+      totalTests,
+      currentPage: page,
+      totalPages: Math.ceil(totalTests / limit)
     })
+
   } catch (error) {
     console.error('[TEST_GET]', error)
     return NextResponse.json(

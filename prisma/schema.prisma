@@ -57,7 +57,7 @@ model Category {
 model Question {
   id               String            @id @default(cuid())
   title            String
-  testId           String
+  testI           String
   test             Test              @relation(fields: [testId], references: [id], onDelete: Cascade)
   categoryId       String?
   category         Category?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
