@@ -181,17 +181,14 @@ export async function DELETE(request: Request) {
       return new NextResponse('Bad Request: Missing test ID', { status: 400 })
     }
 
-    // Verify test exists and user has access
-    const test = await prisma.test.findFirst({
-      where: {
-        id,
-        createdBy: userId
-      }
+    // Check if test exists
+    const test = await prisma.test.findUnique({
+      where: { id }
     })
 
     if (!test) {
       return NextResponse.json(
-        { message: 'Test not found or access denied' },
+        { message: 'Test not found' },
         { status: 404 }
       )
     }
