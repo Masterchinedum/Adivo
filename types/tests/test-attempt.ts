@@ -87,3 +87,31 @@ export interface TestAttemptCreateInput {
   totalScore: number
   percentageScore: number
 }
+
+// Add these new interfaces
+
+export interface CategoryCompletion {
+  categoryId: string
+  rawScore: number
+  maxRawScore: number
+  scaledScore: number
+  maxScale: number
+}
+
+export interface TestCompletion {
+  testAttemptId: string
+  categoryScores: CategoryCompletion[]
+  totalScore: number
+  percentageScore: number
+}
+
+export interface TestCompletionResponse {
+  success: boolean
+  result?: {
+    testAttemptId: string
+    totalScore: number
+    percentageScore: number
+    categoryScores: CategoryCompletion[]
+  }
+  error?: string
+}
