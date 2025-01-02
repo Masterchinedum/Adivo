@@ -7,6 +7,7 @@ import { LoadingState } from "./_components/LoadingState"
 import { TestHeader } from "./_components/TestHeader"
 import { CategorySection } from "./_components/CategorySection"
 import { QuestionNavigation } from "./_components/QuestionNavigation"
+import { TestControls } from "./_components/TestControls"
 
 interface TestAttemptPageProps {
   params: Promise<{
@@ -84,6 +85,25 @@ export default function TestAttemptPage({ params }: TestAttemptPageProps) {
           ))}
         </main>
       </div>
+      <TestControls
+        testId={testId}
+        attemptId={attemptId}
+        questions={questions}
+        currentQuestionIndex={questions.findIndex(q => q.id === currentQuestionId)}
+        totalQuestions={questions.length}
+        onPrevious={() => {
+          const currentIndex = questions.findIndex(q => q.id === currentQuestionId)
+          if (currentIndex > 0) {
+            setCurrentQuestionId(questions[currentIndex - 1].id)
+          }
+        }}
+        onNext={() => {
+          const currentIndex = questions.findIndex(q => q.id === currentQuestionId)
+          if (currentIndex < questions.length - 1) {
+            setCurrentQuestionId(questions[currentIndex + 1].id)
+          }
+        }}
+      />
     </div>
   )
 }
