@@ -8,10 +8,10 @@ export interface TestAttemptQuestion {
     id: string
     title: string
     categoryId: string | null
-    category?: {  // Add category information
+    category?: {  // Change this to accept null
       id: string
       name: string
-    }
+    } | null     // Add null as possible type
     options: {
       id: string
       text: string
@@ -26,7 +26,6 @@ export interface TestAttemptQuestion {
 
 export interface SubmitAnswerResponse {
   success: boolean
-  isCorrect?: boolean
   pointsEarned?: number
   maxPoints?: number
   error?: string

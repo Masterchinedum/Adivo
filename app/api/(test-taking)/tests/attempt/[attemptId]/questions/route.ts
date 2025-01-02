@@ -3,7 +3,10 @@
 import { auth } from "@clerk/nextjs/server"
 import { NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
-import { testAttemptQuestionsQuerySchema, submitAnswerSchema } from "@/lib/validations/test-attempt-question"
+import { 
+  testAttemptQuestionsQuerySchema, 
+  submitAnswerSchema 
+} from "@/lib/validations/test-attempt-question"
 import type { 
   TestAttemptQuestion,
   TestAttemptQuestionsResponse,
@@ -54,6 +57,12 @@ export async function GET(req: Request) {
                 id: true,
                 title: true,
                 categoryId: true,
+                category: {
+                  select: {
+                    id: true,
+                    name: true
+                  }
+                },
                 options: {
                   select: {
                     id: true,
@@ -80,12 +89,13 @@ export async function GET(req: Request) {
 
     // 5. Format response
     const questions: TestAttemptQuestion[] = attempt.test.questions.map(question => ({
-      id: `${attempt.id}_${question.id}`, // Composite ID
+      id: `${attempt.id}_${question.id}`,
       testAttemptId: attempt.id,
       questionId: question.id,
       question: {
         ...question,
-        categoryId: question.categoryId ?? null // Explicitly handle null case
+        categoryId: question.categoryId,
+        category: question.category
       },
       selectedOptionId: attempt.responses.find(r => r.questionId === question.id)?.selectedOptionId ?? null,
       isAnswered: attempt.responses.some(r => r.questionId === question.id),
@@ -129,6 +139,7 @@ export async function PATCH(req: Request) {
     
     if (!validation.success) {
       return NextResponse.json({
+        success: false,
         error: "Invalid request data",
         details: validation.error.flatten()
       }, { status: 400 })
@@ -141,7 +152,10 @@ export async function PATCH(req: Request) {
     })
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 })
+      return NextResponse.json({ 
+        success: false, 
+        error: "User not found" 
+      }, { status: 404 })
     }
 
     // 5. Process answer submission in transaction
@@ -159,28 +173,9 @@ export async function PATCH(req: Request) {
         throw new Error("Test attempt not found or not in progress")
       }
 
-      // 5.2 Get question and selected option details
-      const question = await tx.question.findUnique({
-        where: { id: validation.data.questionId },
-        include: { options: true }
-      })
-
-      if (!question) {
-        throw new Error("Question not found")
-      }
-
-      const selectedOption = question.options.find(
-        opt => opt.id === validation.data.selectedOptionId
-      )
-
-      if (!selectedOption) {
-        throw new Error("Selected option not found")
-      }
-
-      // 5.3 Create or update response
-      const response = await tx.questionResponse.upsert({
+      // 5.2 Store the response
+      await tx.questionResponse.upsert({
         where: {
-          // Use the composite unique constraint
           testAttemptId_questionId: {
             testAttemptId: attemptId,
             questionId: validation.data.questionId
@@ -189,24 +184,16 @@ export async function PATCH(req: Request) {
         create: {
           testAttemptId: attemptId,
           questionId: validation.data.questionId,
-          selectedOptionId: validation.data.selectedOptionId,
-          pointsEarned: selectedOption.point,
-          maxPoints: Math.max(...question.options.map(opt => opt.point))
+          selectedOptionId: validation.data.selectedOptionId
         },
         update: {
-          selectedOptionId: validation.data.selectedOptionId,
-          pointsEarned: selectedOption.point
+          selectedOptionId: validation.data.selectedOptionId
         }
       })
 
-      const result: SubmitAnswerResponse = {
-        success: true,
-        isCorrect: selectedOption.point > 0,
-        pointsEarned: selectedOption.point,
-        maxPoints: Math.max(...question.options.map(opt => opt.point))
+      return {
+        success: true
       }
-
-      return result
     })
 
     return NextResponse.json(result)
