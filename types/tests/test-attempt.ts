@@ -38,15 +38,23 @@ export interface TestAttempt {
   userId: string
   testId: string
   startedAt: Date
-  completedAt: Date | null  // Change from Date | undefined to Date | null
+  completedAt: Date | null
   status: TestStatus
-  totalScore: number | null  // Add null for consistency
-  percentageScore: number | null  // Add null for consistency
+  totalScore: number | null
+  percentageScore: number | null
   test?: Test
   responses?: QuestionResponse[]
   categoryScores?: CategoryScore[]
   createdAt?: Date
   updatedAt?: Date
+}
+
+export interface TestAttemptResult {
+  totalScore: number
+  maxScore: number
+  percentageScore: number
+  categoryScores: CategoryScore[]
+  responses: QuestionResponse[]
 }
 
 export interface TestAttemptResponse {
@@ -78,17 +86,6 @@ export interface TestAttemptApiResponse {
     status: TestStatus
   }
 }
-
-export interface TestAttemptCreateInput {
-  testId: string
-  userId: string
-  status: TestStatus
-  startedAt: Date
-  totalScore: number
-  percentageScore: number
-}
-
-// Add these new interfaces
 
 export interface CategoryCompletion {
   categoryId: string
