@@ -1,4 +1,4 @@
-//types/tests/test-attempt.ts
+// types/tests/test-attempt.ts
 
 import { Test } from "./test"
 import { Question } from "./question"
