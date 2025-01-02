@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/router"
 import { ResultsSummary } from "./_components/ResultsSummary"
 import { CategoryScores } from "./_components/CategoryScores"
-import { QuestionReview } from "./_components/QuestionReview"
 import type { TestAttemptResult } from "@/types/tests/test-attempt"
 
 export default function ResultsPage() {
@@ -47,7 +46,6 @@ export default function ResultsPage() {
         percentageScore={results.percentageScore} 
       />
       <CategoryScores categoryScores={results.categoryScores} />
-      <QuestionReview responses={results.responses} />
     </div>
   )
 }

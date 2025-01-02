@@ -28,6 +28,7 @@ export interface CategoryScore {
   maxScale: number
   rawScore: number
   maxRawScore: number
+  scaledScore: number
   category: Category
   createdAt: Date
   updatedAt: Date
