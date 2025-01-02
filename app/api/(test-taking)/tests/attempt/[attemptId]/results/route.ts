@@ -95,16 +95,17 @@ export async function GET(req: Request): Promise<NextResponse<TestAttemptResult 
       percentageScore,
       categoryScores: attempt.categoryScores.map(cs => ({
         ...cs,
+        scaledScore: cs.actualScore, // Map actualScore to scaledScore
         category: {
           ...cs.category,
           description: cs.category.description || undefined // Ensure description is string | undefined
         }
       })),
-      responses: attempt.responses.map(r => ({
-        ...r,
+      responses: attempt.responses.map(response => ({
+        ...response,
         question: {
-          ...r.question,
-          categoryId: r.question.categoryId || undefined // Ensure categoryId is string | undefined
+          ...response.question,
+          categoryId: response.question.categoryId || undefined // Convert null to undefined
         }
       }))
     }
