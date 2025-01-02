@@ -3,14 +3,12 @@
 import { auth } from "@clerk/nextjs/server"
 import { NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
-import { testAttemptQuestionsQuerySchema } from "@/lib/validations/test-attempt-question"
+import { testAttemptQuestionsQuerySchema, submitAnswerSchema } from "@/lib/validations/test-attempt-question"
 import type { 
   TestAttemptQuestion,
-  TestAttemptQuestionsResponse 
+  TestAttemptQuestionsResponse,
+  SubmitAnswerResponse 
 } from "@/types/tests/test-attempt-question"
-import { z } from "zod"
-import { submitAnswerSchema } from "@/lib/validations/test-attempt-question"
-import type { SubmitAnswerResponse } from "@/types/tests/test-attempt-question"
 
 export async function GET(req: Request) {
   try {
@@ -182,6 +180,7 @@ export async function PATCH(req: Request) {
       // 5.3 Create or update response
       const response = await tx.questionResponse.upsert({
         where: {
+          // Use the composite unique constraint
           testAttemptId_questionId: {
             testAttemptId: attemptId,
             questionId: validation.data.questionId
@@ -200,12 +199,14 @@ export async function PATCH(req: Request) {
         }
       })
 
-      return {
+      const result: SubmitAnswerResponse = {
         success: true,
         isCorrect: selectedOption.point > 0,
         pointsEarned: selectedOption.point,
         maxPoints: Math.max(...question.options.map(opt => opt.point))
       }
+
+      return result
     })
 
     return NextResponse.json(result)
@@ -213,16 +214,13 @@ export async function PATCH(req: Request) {
   } catch (error) {
     console.error("[QUESTION_SUBMIT]", error)
     
-    if (error instanceof Error) {
-      return NextResponse.json({ 
-        success: false,
-        error: error.message 
-      }, { status: 400 })
+    const errorResponse: SubmitAnswerResponse = {
+      success: false,
+      error: error instanceof Error ? error.message : "Internal server error"
     }
     
-    return NextResponse.json({ 
-      success: false,
-      error: "Internal server error" 
-    }, { status: 500 })
+    return NextResponse.json(errorResponse, { 
+      status: error instanceof Error ? 400 : 500 
+    })
   }
 }

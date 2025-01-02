@@ -115,7 +115,7 @@ model QuestionResponse {
   maxPoints      Float
   testAttempt    TestAttempt @relation(fields: [testAttemptId], references: [id], onDelete: Cascade)
   question       Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  selectedOption Option      @relation(fields: [selectedOptionId], references: [id])
+  selectedOption Option      @relation(fields: [selectedOptionId], references: [id], onDelete: Cascade)
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
 
