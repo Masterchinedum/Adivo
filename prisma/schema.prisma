@@ -107,18 +107,19 @@ model TestAttempt {
 }
 
 model QuestionResponse {
-  id              String      @id @default(cuid())
-  testAttemptId   String
-  questionId      String
+  id             String     @id @default(cuid())
+  testAttemptId  String
+  questionId     String
   selectedOptionId String
-  pointsEarned    Int        // Actual points from selected option
-  maxPoints       Int        // Highest possible points for this question
-  testAttempt     TestAttempt @relation(fields: [testAttemptId], references: [id], onDelete: Cascade)
-  question        Question    @relation(fields: [questionId], references: [id])
-  selectedOption   Option     @relation(fields: [selectedOptionId], references: [id])
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  pointsEarned   Float
+  maxPoints      Float
+  testAttempt    TestAttempt @relation(fields: [testAttemptId], references: [id], onDelete: Cascade)
+  question       Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  selectedOption Option      @relation(fields: [selectedOptionId], references: [id])
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
 
+  @@unique([testAttemptId, questionId])
   @@index([testAttemptId])
   @@index([questionId])
   @@index([selectedOptionId])
