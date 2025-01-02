@@ -173,7 +173,31 @@ export async function PATCH(req: Request) {
         throw new Error("Test attempt not found or not in progress")
       }
 
-      // 5.2 Store the response
+      // 5.2 Get question details to calculate points
+      const question = await tx.question.findFirst({
+        where: { id: validation.data.questionId },
+        include: {
+          options: true
+        }
+      })
+
+      if (!question) {
+        throw new Error("Question not found")
+      }
+
+      // 5.3 Calculate points
+      const selectedOption = question.options.find(
+        opt => opt.id === validation.data.selectedOptionId
+      )
+
+      if (!selectedOption) {
+        throw new Error("Selected option not found")
+      }
+
+      const maxPoints = Math.max(...question.options.map(opt => opt.point))
+      const pointsEarned = selectedOption.point
+
+      // 5.4 Create or update response
       await tx.questionResponse.upsert({
         where: {
           testAttemptId_questionId: {
@@ -184,10 +208,14 @@ export async function PATCH(req: Request) {
         create: {
           testAttemptId: attemptId,
           questionId: validation.data.questionId,
-          selectedOptionId: validation.data.selectedOptionId
+          selectedOptionId: validation.data.selectedOptionId,
+          pointsEarned: pointsEarned,
+          maxPoints: maxPoints
         },
         update: {
-          selectedOptionId: validation.data.selectedOptionId
+          selectedOptionId: validation.data.selectedOptionId,
+          pointsEarned: pointsEarned,
+          maxPoints: maxPoints
         }
       })
 
