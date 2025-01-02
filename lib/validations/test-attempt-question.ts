@@ -11,5 +11,11 @@ export const updateQuestionResponseSchema = z.object({
   selectedOptionId: z.string().cuid("Invalid option ID")
 })
 
+export const submitAnswerSchema = z.object({
+  questionId: z.string().cuid("Invalid question ID"),
+  selectedOptionId: z.string().cuid("Invalid option ID")
+})
+
 export type TestAttemptQuestionsQuery = z.infer<typeof testAttemptQuestionsQuerySchema>
 export type UpdateQuestionResponseInput = z.infer<typeof updateQuestionResponseSchema>
+export type SubmitAnswerInput = z.infer<typeof submitAnswerSchema>

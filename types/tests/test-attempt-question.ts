@@ -24,6 +24,14 @@ export interface TestAttemptQuestion {
   updatedAt: Date
 }
 
+export interface SubmitAnswerResponse {
+  success: boolean
+  isCorrect?: boolean
+  pointsEarned?: number
+  maxPoints?: number
+  error?: string
+}
+
 export interface TestAttemptQuestionsResponse {
   questions: TestAttemptQuestion[]
   totalQuestions: number
