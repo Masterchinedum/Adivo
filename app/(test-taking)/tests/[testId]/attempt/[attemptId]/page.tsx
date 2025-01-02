@@ -21,11 +21,13 @@ export default function TestAttemptPage({ params }: TestAttemptPageProps) {
   const [currentQuestionId, setCurrentQuestionId] = useState<string>("")
   const [isLoading, setIsLoading] = useState(true)
   const [attemptId, setAttemptId] = useState<string>("")
+  const [testId, setTestId] = useState<string>("") // Add testId state
 
   useEffect(() => {
     // Resolve params since they're a Promise
     params.then(resolvedParams => {
       setAttemptId(resolvedParams.attemptId)
+      setTestId(resolvedParams.testId) // Set testId from params
     })
   }, [params])
 
