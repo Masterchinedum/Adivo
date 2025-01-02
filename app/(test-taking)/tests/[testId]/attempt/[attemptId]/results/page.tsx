@@ -1,24 +1,24 @@
-// app/(test-taking)/tests/[testId]/attempt/[attemptId]/results/page.tsx
+"use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/router"
+import { useRouter } from "next/navigation"
 import { ResultsSummary } from "./_components/ResultsSummary"
 import { CategoryScores } from "./_components/CategoryScores"
 import type { TestAttemptResult } from "@/types/tests/test-attempt"
 
-export default function ResultsPage() {
-  const router = useRouter()
-  const { attemptId } = router.query
+export default function ResultsPage({ 
+  params 
+}: { 
+  params: { attemptId: string } 
+}) {
   const [results, setResults] = useState<TestAttemptResult | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!attemptId) return
-
     async function fetchResults() {
       try {
-        const response = await fetch(`/api/tests/attempt/${attemptId}/results`)
+        const response = await fetch(`/api/tests/attempt/${params.attemptId}/results`)
         if (!response.ok) {
           throw new Error("Failed to fetch results")
         }
@@ -32,7 +32,7 @@ export default function ResultsPage() {
     }
 
     fetchResults()
-  }, [attemptId])
+  }, [params.attemptId])
 
   if (loading) return <div>Loading results...</div>
   if (error) return <div>Error: {error}</div>
