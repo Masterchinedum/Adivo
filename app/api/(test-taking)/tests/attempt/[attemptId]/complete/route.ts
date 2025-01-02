@@ -5,7 +5,7 @@ import prisma from "@/lib/prisma"
 import { testCompletionSchema } from "@/lib/validations/test-completion"
 import type { TestCompletionResponse } from "@/types/tests/test-attempt"
 
-export async function POST(req: Request) {
+export async function POST(req: Request): Promise<NextResponse<TestCompletionResponse>> {
   try {
     // 1. Get user authentication
     const { userId: clerkUserId } = await auth()
@@ -131,22 +131,32 @@ export async function POST(req: Request) {
         testAttemptId: updatedAttempt.id,
         totalScore,
         percentageScore,
-        categoryScores
+        categoryScores: categoryScores.map(cs => ({
+          categoryId: cs.categoryId,
+          rawScore: cs.rawScore,
+          maxRawScore: cs.maxRawScore,
+          scaledScore: cs.actualScore,
+          maxScale: cs.maxScale
+        }))
       }
     })
 
-    return NextResponse.json({
+    const response: TestCompletionResponse = {
       success: true,
       result: result
-    })
+    }
+
+    return NextResponse.json(response)
 
   } catch (error) {
     console.error("[TEST_COMPLETION]", error)
     
-    return NextResponse.json({ 
-      success: false, 
+    const errorResponse: TestCompletionResponse = {
+      success: false,
       error: error instanceof Error ? error.message : "Internal server error"
-    }, { 
+    }
+    
+    return NextResponse.json(errorResponse, { 
       status: error instanceof Error ? 400 : 500 
     })
   }
