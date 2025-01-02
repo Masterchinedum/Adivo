@@ -6,19 +6,32 @@ import { ResultsSummary } from "./_components/ResultsSummary"
 import { CategoryScores } from "./_components/CategoryScores"
 import type { TestAttemptResult } from "@/types/tests/test-attempt"
 
-export default function ResultsPage({ 
-  params 
-}: { 
-  params: { attemptId: string } 
-}) {
+interface ResultsPageProps {
+  params: Promise<{
+    attemptId: string
+  }>
+}
+
+export default function ResultsPage({ params }: ResultsPageProps) {
   const [results, setResults] = useState<TestAttemptResult | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [attemptId, setAttemptId] = useState<string>("")
 
+  // Handle the Promise params
   useEffect(() => {
+    params.then(resolvedParams => {
+      setAttemptId(resolvedParams.attemptId)
+    })
+  }, [params])
+
+  // Fetch results when attemptId is available
+  useEffect(() => {
+    if (!attemptId) return
+
     async function fetchResults() {
       try {
-        const response = await fetch(`/api/tests/attempt/${params.attemptId}/results`)
+        const response = await fetch(`/api/tests/attempt/${attemptId}/results`)
         if (!response.ok) {
           throw new Error("Failed to fetch results")
         }
@@ -35,7 +48,7 @@ export default function ResultsPage({
     }
 
     fetchResults()
-  }, [params.attemptId])
+  }, [attemptId])
 
   if (loading) {
     return (
