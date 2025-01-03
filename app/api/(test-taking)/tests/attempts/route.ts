@@ -3,7 +3,6 @@
 import { auth } from "@clerk/nextjs/server"
 import { NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
-import type { TestAttemptsResponse } from "@/types/tests/test-attempt"
 
 export async function GET() {
   try {
@@ -12,7 +11,6 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Get user's database ID
     const user = await prisma.user.findUnique({
       where: { clerkUserId },
       select: { id: true }
@@ -22,7 +20,6 @@ export async function GET() {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    // Get attempts with test info
     const attempts = await prisma.testAttempt.findMany({
       where: {
         userId: user.id

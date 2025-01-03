@@ -19,7 +19,7 @@ export function InProgressTests({ attempts }: InProgressTestsProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-xl">Continue Learning</CardTitle>
+        <CardTitle className="text-xl">Continue Test</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-4">
         {attempts.map((attempt) => {
