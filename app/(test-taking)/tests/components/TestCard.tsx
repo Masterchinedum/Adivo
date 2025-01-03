@@ -49,7 +49,7 @@ export function TestCard({ test }: TestCardProps) {
       <CardFooter className="border-t p-4 mt-auto">
         <Button className="w-full" asChild>
           <Link href={`/tests/${test.id}`}>
-            Start Test
+            View Test
             <ArrowRight className="h-4 w-4 ml-2" />
           </Link>
         </Button>

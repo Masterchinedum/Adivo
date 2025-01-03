@@ -7,6 +7,7 @@ import { getPublicTests } from "@/lib/tests"
 import { TestCard } from "./TestCard"
 import { TestsPagination } from "./TestsPagination"
 import type { Test } from "@/types/tests/test"
+import { TestCardSkeleton } from "./TestCardSkeleton"
 
 export function TestList() {
   const [tests, setTests] = useState<Test[]>([])
@@ -33,7 +34,16 @@ export function TestList() {
     void fetchTests()
   }, [currentPage])
 
-  if (isLoading) return <div>Loading tests...</div>
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <TestCardSkeleton key={i} />
+        ))}
+      </div>
+    )
+  }
+
   if (error) return <div>Error: {error}</div>
 
   return (
