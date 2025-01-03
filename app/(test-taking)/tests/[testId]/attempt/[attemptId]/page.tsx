@@ -37,28 +37,49 @@ export default function TestAttemptPage({ params }: TestAttemptPageProps) {
   // Fetch questions when attemptId is available
   useEffect(() => {
     if (!attemptId) return
-
-    const fetchQuestions = async () => {
-      try {
-        const response = await fetch(`/api/tests/attempt/${attemptId}/questions`)
-        const data = await response.json()
-
-        if (!response.ok) throw new Error(data.error || "Failed to fetch questions")
-
-        setQuestions(data.questions)
-        if (data.questions.length > 0) {
-          setCurrentQuestionId(data.questions[0].id)
-          setCurrentCategoryId(data.questions[0].question.categoryId || "uncategorized")
-        }
-      } catch (error) {
-        console.error("Failed to load questions:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
     fetchQuestions()
   }, [attemptId])
+
+  const fetchQuestions = async () => {
+    try {
+      const response = await fetch(`/api/tests/attempt/${attemptId}/questions`)
+      const data = await response.json()
+
+      if (!response.ok) throw new Error(data.error || "Failed to fetch questions")
+
+      setQuestions(data.questions)
+      if (data.questions.length > 0) {
+        setCurrentQuestionId(data.questions[0].id)
+        setCurrentCategoryId(data.questions[0].question.categoryId || "uncategorized")
+      }
+    } catch (error) {
+      console.error("Failed to load questions:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleAnswerSelect = async (questionId: string, optionId: string) => {
+    try {
+      const response = await fetch(`/api/tests/attempt/${attemptId}/questions`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ questionId, selectedOptionId: optionId })
+      })
+
+      if (!response.ok) throw new Error("Failed to save answer")
+
+      // Update questions state immediately for instant feedback
+      setQuestions(prev => prev.map(q => 
+        q.id === questionId 
+          ? { ...q, selectedOptionId: optionId, isAnswered: true }
+          : q
+      ))
+
+    } catch (error) {
+      console.error("Error saving answer:", error)
+    }
+  }
 
   if (isLoading) return <LoadingState />
 
@@ -96,97 +117,81 @@ export default function TestAttemptPage({ params }: TestAttemptPageProps) {
     ? (currentCategory.answeredQuestions / currentCategory.totalQuestions) * 100
     : 0
 
-  const handleNavigateQuestion = (direction: "next" | "previous") => {
-    const currentIndex = questions.findIndex(q => q.id === currentQuestionId)
-    const newIndex = direction === "next" ? currentIndex + 1 : currentIndex - 1
-    
-    if (newIndex >= 0 && newIndex < questions.length) {
-      const newQuestion = questions[newIndex]
-      setCurrentQuestionId(newQuestion.id)
-      setCurrentCategoryId(newQuestion.question.categoryId || "uncategorized")
-    }
-  }
-
-  const handleAnswerSelect = async (questionId: string, optionId: string) => {
-    try {
-      const response = await fetch(`/api/tests/attempt/${attemptId}/questions`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ questionId, selectedOptionId: optionId })
-      })
-
-      if (!response.ok) throw new Error("Failed to save answer")
-
-      // Update questions state to reflect the new answer
-      setQuestions(prev => prev.map(q => 
-        q.id === questionId 
-          ? { ...q, selectedOptionId: optionId, isAnswered: true }
-          : q
-      ))
-    } catch (error) {
-      console.error("Error saving answer:", error)
-    }
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50 pt-[144px]">
-      <TestHeader
-        title="Test Taking"
-        currentCategory={currentCategory?.name || ""}
-        totalQuestions={totalQuestions}
-        answeredQuestions={answeredQuestions}
-        currentCategoryProgress={currentCategoryProgress}
-      />
-
-      <div className="container max-w-7xl mx-auto px-4">
-        <div className="mb-6">
-          <CategoryTabs
-            categories={categories}
-            currentCategoryId={currentCategoryId}
-            onCategoryChange={setCurrentCategoryId}
-          />
-        </div>
-
-        <main className="space-y-6 pb-24">
-          {currentCategory?.questions.map((question, index) => (
-            <QuestionCard
-              key={question.id}
-              question={{
-                id: question.questionId,
-                title: question.question.title,
-                options: question.question.options.map(opt => ({
-                  id: opt.id,
-                  text: opt.text
-                }))
-              }}
-              questionNumber={index + 1}
-              selectedOption={question.selectedOptionId || undefined}
-              isAnswered={question.isAnswered}
-              onAnswerSelect={(optionId) => handleAnswerSelect(question.questionId, optionId)}
-            />
-          ))}
-        </main>
-
-        <NavigationControls
-          testId={testId}
-          attemptId={attemptId}
-          currentQuestionNumber={questions.findIndex(q => q.id === currentQuestionId) + 1}
+    <div className="min-h-screen bg-gray-50">
+      <div className="pt-6 pb-24"> {/* Add padding instead of fixed positioning */}
+        <TestHeader
+          title="Test Taking"
+          currentCategory={currentCategory?.name || ""}
           totalQuestions={totalQuestions}
           answeredQuestions={answeredQuestions}
-          canGoNext={questions.findIndex(q => q.id === currentQuestionId) < questions.length - 1}
-          canGoPrevious={questions.findIndex(q => q.id === currentQuestionId) > 0}
-          onNext={() => handleNavigateQuestion("next")}
-          onPrevious={() => handleNavigateQuestion("previous")}
+          currentCategoryProgress={currentCategoryProgress}
         />
 
-        <CompletionDialog
-          isOpen={showCompletionDialog}
-          onOpenChange={setShowCompletionDialog}
-          testId={testId}
-          attemptId={attemptId}
-          questions={questions}
-        />
+        <div className="container max-w-7xl mx-auto px-4 mt-6">
+          <div className="mb-6">
+            <CategoryTabs
+              categories={categories}
+              currentCategoryId={currentCategoryId}
+              onCategoryChange={setCurrentCategoryId}
+            />
+          </div>
+
+          <main className="space-y-6">
+            {currentCategory?.questions.map((question, index) => (
+              <QuestionCard
+                key={question.id}
+                question={{
+                  id: question.questionId,
+                  title: question.question.title,
+                  options: question.question.options.map(opt => ({
+                    id: opt.id,
+                    text: opt.text
+                  }))
+                }}
+                questionNumber={index + 1}
+                selectedOption={question.selectedOptionId || undefined}
+                isAnswered={question.isAnswered}
+                onAnswerSelect={(optionId) => handleAnswerSelect(question.questionId, optionId)}
+              />
+            ))}
+          </main>
+        </div>
+
+        <div className="mt-6"> {/* Remove fixed positioning */}
+          <NavigationControls
+            testId={testId}
+            attemptId={attemptId}
+            currentQuestionNumber={questions.findIndex(q => q.id === currentQuestionId) + 1}
+            totalQuestions={totalQuestions}
+            answeredQuestions={answeredQuestions}
+            canGoNext={questions.findIndex(q => q.id === currentQuestionId) < questions.length - 1}
+            canGoPrevious={questions.findIndex(q => q.id === currentQuestionId) > 0}
+            onNext={() => {
+              const currentIndex = questions.findIndex(q => q.id === currentQuestionId)
+              if (currentIndex < questions.length - 1) {
+                setCurrentQuestionId(questions[currentIndex + 1].id)
+                setCurrentCategoryId(questions[currentIndex + 1].question.categoryId || "uncategorized")
+              }
+            }}
+            onPrevious={() => {
+              const currentIndex = questions.findIndex(q => q.id === currentQuestionId)
+              if (currentIndex > 0) {
+                setCurrentQuestionId(questions[currentIndex - 1].id)
+                setCurrentCategoryId(questions[currentIndex - 1].question.categoryId || "uncategorized")
+              }
+            }}
+          />
+        </div>
       </div>
+
+      <CompletionDialog
+        isOpen={showCompletionDialog}
+        onOpenChange={setShowCompletionDialog}
+        testId={testId}
+        attemptId={attemptId}
+        questions={questions}
+      />
     </div>
   )
 }
