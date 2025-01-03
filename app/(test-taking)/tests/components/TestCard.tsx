@@ -19,8 +19,8 @@ interface TestCardProps {
 
 export function TestCard({ test, viewType = "grid", attempt }: TestCardProps) {
   const cardClassName = viewType === "grid"
-    ? "flex flex-col h-[280px] transition-all hover:shadow-md"
-    : "flex flex-col transition-all hover:shadow-md sm:flex-row sm:h-[180px]"
+    ? "flex flex-col min-h-[320px] h-full transition-all hover:shadow-md"
+    : "flex flex-col transition-all hover:shadow-md sm:flex-row sm:min-h-[200px]"
 
   const contentClassName = viewType === "grid" 
     ? "flex-1"
@@ -31,46 +31,63 @@ export function TestCard({ test, viewType = "grid", attempt }: TestCardProps) {
   return (
     <Card className={cn(cardClassName)}>
       <Link href={`/tests/${test.id}`} className={contentClassName}>
-        <CardHeader className={viewType === "list" ? "flex-1" : ""}>
-          <CardTitle className="line-clamp-2 text-xl">
+        <CardHeader className={cn(
+          "flex-none", // Prevent header from growing
+          viewType === "list" ? "flex-1" : ""
+        )}>
+          <CardTitle className="line-clamp-2 text-xl leading-tight">
             {test.title}
           </CardTitle>
           {test.description && (
-            <CardDescription className="line-clamp-2 mt-2">
+            <CardDescription className="line-clamp-2 mt-2 text-sm">
               {test.description}
             </CardDescription>
           )}
         </CardHeader>
-        <CardContent className={viewType === "list" ? "w-[280px]" : ""}>
-          <div className="flex flex-wrap gap-2 mb-4">
-            {test.categories?.map((category) => (
-              <Badge 
-                key={category.id} 
-                variant="secondary"
-                className="text-xs truncate max-w-[150px]"
-              >
-                {category.name}
-              </Badge>
-            ))}
-          </div>
-          
-          {attempt && attempt.status === "IN_PROGRESS" && progressInfo && (
-            <div className="mt-4 space-y-2">
-              <Progress 
-                value={progressInfo.progress}
-                className="h-2"
-              />
-              <p className="text-xs text-muted-foreground">
-                {progressInfo.answeredQuestions} of {progressInfo.totalQuestions} questions completed
-              </p>
+
+        <CardContent className={cn(
+          "flex-1 flex flex-col justify-between",
+          viewType === "list" ? "w-[280px]" : ""
+        )}>
+          {/* Categories */}
+          <div className="space-y-4">
+            <div className="flex flex-wrap gap-1.5">
+              {test.categories?.map((category) => (
+                <Badge 
+                  key={category.id} 
+                  variant="secondary"
+                  className="text-xs truncate max-w-[120px] px-2 py-0.5"
+                >
+                  {category.name}
+                </Badge>
+              ))}
             </div>
-          )}
+
+            {/* Progress section */}
+            {attempt && attempt.status === "IN_PROGRESS" && progressInfo && (
+              <div className="space-y-2">
+                <Progress 
+                  value={progressInfo.progress}
+                  className="h-1.5"
+                />
+                <p className="text-xs text-muted-foreground">
+                  {progressInfo.answeredQuestions} of {progressInfo.totalQuestions} questions completed
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Test stats */}
+          <div className="mt-4 text-sm text-muted-foreground">
+            <p>{test._count?.questions || 0} Questions</p>
+            <p>{test.categories?.length || 0} Categories</p>
+          </div>
         </CardContent>
       </Link>
       
       <CardFooter className={cn(
-        "border-t p-4",
-        viewType === "list" ? "sm:w-[200px] sm:border-l sm:border-t-0" : "mt-auto"
+        "flex-none border-t p-4", // Make footer fixed height
+        viewType === "list" ? "sm:w-[200px] sm:border-l sm:border-t-0" : ""
       )}>
         <Button className="w-full" asChild>
           <Link href={attempt ? `/tests/${test.id}/attempt/${attempt.id}` : `/tests/${test.id}`}>
