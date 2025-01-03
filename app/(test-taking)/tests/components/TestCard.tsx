@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button" 
 import { Progress } from "@/components/ui/progress" // Make sure this import is correct
 import { ArrowRight } from "lucide-react"
-import { cn } from "@/lib/utils"
+// import { cn } from "@/lib/utils"
 import type { Test } from "@/types/tests/test"
 import type { TestAttempt } from "@/types/tests/test-attempt"
 import { getAttemptProgress } from "../utils/attempt"
