@@ -17,78 +17,55 @@ interface TestCardProps {
   attempt?: TestAttempt
 }
 
-export function TestCard({ test, viewType = "grid", attempt }: TestCardProps) {
-  const cardClassName = viewType === "grid"
-    ? "flex flex-col min-h-[320px] h-full transition-all hover:shadow-md"
-    : "flex flex-col transition-all hover:shadow-md sm:flex-row sm:min-h-[200px]"
-
-  const contentClassName = viewType === "grid" 
-    ? "flex-1"
-    : "flex-1 flex flex-col sm:flex-row"
-
+export function TestCard({ test, attempt }: TestCardProps) {
   const progressInfo = attempt && getAttemptProgress(attempt)
   
   return (
-    <Card className={cn(cardClassName)}>
-      <Link href={`/tests/${test.id}`} className={contentClassName}>
-        <CardHeader className={cn(
-          "flex-none", // Prevent header from growing
-          viewType === "list" ? "flex-1" : ""
-        )}>
-          <CardTitle className="line-clamp-2 text-xl leading-tight">
+    <Card className="flex flex-col h-full min-h-[400px] transition-all hover:shadow-md">
+      <Link href={`/tests/${test.id}`} className="flex-1">
+        <CardHeader>
+          <CardTitle className="line-clamp-2 text-xl">
             {test.title}
           </CardTitle>
           {test.description && (
-            <CardDescription className="line-clamp-2 mt-2 text-sm">
+            <CardDescription className="line-clamp-2 mt-2">
               {test.description}
             </CardDescription>
           )}
         </CardHeader>
 
-        <CardContent className={cn(
-          "flex-1 flex flex-col justify-between",
-          viewType === "list" ? "w-[280px]" : ""
-        )}>
-          {/* Categories */}
-          <div className="space-y-4">
-            <div className="flex flex-wrap gap-1.5">
+        <CardContent>
+          {/* Categories with scrollable container */}
+          <div className="mb-4">
+            <div className="flex flex-wrap gap-2 max-h-[80px] overflow-y-auto scrollbar-thin">
               {test.categories?.map((category) => (
                 <Badge 
                   key={category.id} 
                   variant="secondary"
-                  className="text-xs truncate max-w-[120px] px-2 py-0.5"
+                  className="text-xs whitespace-nowrap"
                 >
                   {category.name}
                 </Badge>
               ))}
             </div>
-
-            {/* Progress section */}
-            {attempt && attempt.status === "IN_PROGRESS" && progressInfo && (
-              <div className="space-y-2">
-                <Progress 
-                  value={progressInfo.progress}
-                  className="h-1.5"
-                />
-                <p className="text-xs text-muted-foreground">
-                  {progressInfo.answeredQuestions} of {progressInfo.totalQuestions} questions completed
-                </p>
-              </div>
-            )}
           </div>
-
-          {/* Test stats */}
-          <div className="mt-4 text-sm text-muted-foreground">
-            <p>{test._count?.questions || 0} Questions</p>
-            <p>{test.categories?.length || 0} Categories</p>
-          </div>
+          
+          {/* Progress section */}
+          {attempt && attempt.status === "IN_PROGRESS" && progressInfo && (
+            <div className="space-y-2">
+              <Progress 
+                value={progressInfo.progress}
+                className="h-2"
+              />
+              <p className="text-xs text-muted-foreground">
+                {progressInfo.answeredQuestions} of {progressInfo.totalQuestions} questions completed
+              </p>
+            </div>
+          )}
         </CardContent>
       </Link>
       
-      <CardFooter className={cn(
-        "flex-none border-t p-4", // Make footer fixed height
-        viewType === "list" ? "sm:w-[200px] sm:border-l sm:border-t-0" : ""
-      )}>
+      <CardFooter className="border-t p-4 mt-auto">
         <Button className="w-full" asChild>
           <Link href={attempt ? `/tests/${test.id}/attempt/${attempt.id}` : `/tests/${test.id}`}>
             {attempt ? 'Continue Test' : 'Start Test'}
