@@ -1,4 +1,4 @@
-import type { PublicTestQueryParams } from "@/lib/validations/public-test"
+// import type { PublicTestQueryParams } from "@/lib/validations/public-test"
 import type { Test, TestsResponse } from "@/types/tests/test"  // Import Test type
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || ''
