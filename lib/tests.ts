@@ -1,21 +1,34 @@
 import type { PublicTestQueryParams } from "@/lib/validations/public-test"
-import type { TestsResponse } from "@/types/tests/test"
+import type { Test, TestsResponse } from "@/types/tests/test"  // Import Test type
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || ''
 
-export async function getPublicTests(params: Partial<PublicTestQueryParams>): Promise<TestsResponse> {
-  const searchParams = new URLSearchParams()
-  if (params.page) searchParams.set('page', params.page)
-  if (params.limit) searchParams.set('limit', params.limit)
-  if (params.search) searchParams.set('search', params.search)
+interface GetPublicTestsResponse {
+  tests: Test[]
+  totalPages: number
+  totalTests: number
+}
 
-  const url = new URL(`/api/tests?${searchParams.toString()}`, BASE_URL)
-  const response = await fetch(url)
+export async function getPublicTests({ 
+  page = "1", 
+  search = "" 
+}: { 
+  page?: string
+  search?: string 
+}): Promise<GetPublicTestsResponse> {
+  const searchParams = new URLSearchParams({ page, search })
+  const response = await fetch(`${BASE_URL}/api/tests?${searchParams}`)
+  
   if (!response.ok) {
     throw new Error('Failed to fetch tests')
   }
 
-  return response.json()
+  const data = await response.json()
+  return {
+    tests: data.tests,
+    totalPages: data.totalPages,
+    totalTests: data.totalTests
+  }
 }
 
 export async function getPublicTest(testId: string) {

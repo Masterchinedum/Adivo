@@ -2,7 +2,6 @@
 "use client"
 
 import { LayoutGrid, List } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { 
   ToggleGroup, 
   ToggleGroupItem 
