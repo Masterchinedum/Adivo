@@ -9,6 +9,7 @@ import type { Test } from "@/types/tests/test"
 
 interface TestCardProps {
   test: Test
+  viewType?: "grid" | "list"  // Make it optional with a default value
 }
 
 export function TestCard({ test }: TestCardProps) {
