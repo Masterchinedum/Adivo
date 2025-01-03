@@ -20,18 +20,17 @@ export function TestList() {
   const [searchQuery, setSearchQuery] = useState("")
   const [totalTests, setTotalTests] = useState(0)
 
-  async function fetchTests() {
+  const fetchTests = async () => {
     try {
       setIsLoading(true)
       setError(null)
-      // Add searchQuery to the parameters
       const data = await getPublicTests({ 
         page: currentPage.toString(),
         search: searchQuery 
       })
       setTests(data.tests)
       setTotalPages(data.totalPages)
-      setTotalTests(data.totalTests) // Set total tests count
+      setTotalTests(data.totalTests)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load tests')
     } finally {
@@ -39,10 +38,9 @@ export function TestList() {
     }
   }
 
-  // Update useEffect dependencies to include searchQuery
   useEffect(() => {
     void fetchTests()
-  }, [currentPage, searchQuery]) // Add searchQuery as dependency
+  }, [currentPage, searchQuery, fetchTests]) // Added fetchTests as dependency
 
   const handleSearch = (query: string) => {
     setSearchQuery(query)
