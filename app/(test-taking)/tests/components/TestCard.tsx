@@ -1,11 +1,14 @@
-//app/(test-taking)/tests/components/TestCard.tsx
+"use client"
 
 import Link from "next/link"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button" 
+import { Progress } from "@/components/ui/progress" // Make sure this import is correct
 import { ArrowRight } from "lucide-react"
+import { cn } from "@/lib/utils"
 import type { Test } from "@/types/tests/test"
+import type { TestAttempt } from "@/types/tests/test-attempt"
 
 interface TestCardProps {
   test: Test
@@ -15,7 +18,7 @@ interface TestCardProps {
 
 export function TestCard({ test, viewType = "grid", attempt }: TestCardProps) {
   const cardClassName = viewType === "grid"
-    ? "flex flex-col min-h-[320px] h-full transition-all hover:shadow-md"
+    ? "flex flex-col h-[280px] transition-all hover:shadow-md"
     : "flex flex-col transition-all hover:shadow-md sm:flex-row sm:h-[180px]"
 
   const contentClassName = viewType === "grid" 
@@ -23,7 +26,7 @@ export function TestCard({ test, viewType = "grid", attempt }: TestCardProps) {
     : "flex-1 flex flex-col sm:flex-row"
 
   return (
-    <Card className={cardClassName}>
+    <Card className={cn(cardClassName)}>
       <Link href={`/tests/${test.id}`} className={contentClassName}>
         <CardHeader className={viewType === "list" ? "flex-1" : ""}>
           <CardTitle className="line-clamp-2 text-xl">
@@ -39,7 +42,7 @@ export function TestCard({ test, viewType = "grid", attempt }: TestCardProps) {
           <div className="flex flex-wrap gap-2 mb-4">
             {test.categories?.map((category) => (
               <Badge 
-                key={category.name} 
+                key={category.id} 
                 variant="secondary"
                 className="text-xs truncate max-w-[150px]"
               >
@@ -47,15 +50,12 @@ export function TestCard({ test, viewType = "grid", attempt }: TestCardProps) {
               </Badge>
             ))}
           </div>
-          <div className="text-sm text-muted-foreground space-y-1">
-            <p>Questions: {test._count?.questions || 0}</p>
-            <p>Categories: {test.categories?.length || 0}</p>
-          </div>
+          
           {attempt && attempt.status === "IN_PROGRESS" && (
             <div className="mt-4 space-y-2">
               <Progress 
-                value={Math.round((attempt.answeredQuestions / attempt.totalQuestions) * 100)} 
-                className="h-2" 
+                value={Math.round((attempt.answeredQuestions / attempt.totalQuestions) * 100)}
+                className="h-2"
               />
               <p className="text-xs text-muted-foreground">
                 {attempt.answeredQuestions} of {attempt.totalQuestions} questions completed
@@ -64,10 +64,14 @@ export function TestCard({ test, viewType = "grid", attempt }: TestCardProps) {
           )}
         </CardContent>
       </Link>
-      <CardFooter className={`border-t p-4 ${viewType === "list" ? "sm:w-[200px] sm:border-l sm:border-t-0" : "mt-auto"}`}>
+      
+      <CardFooter className={cn(
+        "border-t p-4",
+        viewType === "list" ? "sm:w-[200px] sm:border-l sm:border-t-0" : "mt-auto"
+      )}>
         <Button className="w-full" asChild>
-          <Link href={`/tests/${test.id}`}>
-            View Test
+          <Link href={attempt ? `/tests/${test.id}/attempt/${attempt.id}` : `/tests/${test.id}`}>
+            {attempt ? 'Continue Test' : 'Start Test'}
             <ArrowRight className="h-4 w-4 ml-2" />
           </Link>
         </Button>
