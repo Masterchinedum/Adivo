@@ -23,17 +23,12 @@ export async function getPublicTests({
     throw new Error('Failed to fetch tests')
   }
 
-  const data = await response.json()
-  return {
-    tests: data.tests,
-    totalPages: data.totalPages,
-    totalTests: data.totalTests
-  }
+  return response.json()
 }
 
-export async function getPublicTest(testId: string) {
-  const url = new URL(`/api/tests/${testId}`, BASE_URL)
-  const response = await fetch(url)
+export async function getPublicTest(testId: string): Promise<Test> {
+  const response = await fetch(`${BASE_URL}/api/tests/${testId}`)
+  
   if (!response.ok) {
     throw new Error('Failed to fetch test')
   }
