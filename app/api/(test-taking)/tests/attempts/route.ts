@@ -28,15 +28,9 @@ export async function GET() {
         test: {
           select: {
             id: true,
-            title: true,
-            _count: {
-              select: {
-                questions: true
-              }
-            }
+            title: true
           }
-        },
-        responses: true
+        }
       },
       orderBy: {
         startedAt: 'desc'
@@ -44,7 +38,9 @@ export async function GET() {
     })
 
     const inProgress = attempts.filter(a => a.status === "IN_PROGRESS")
-    const completed = attempts.filter(a => a.status === "COMPLETED").slice(0, 5)
+    const completed = attempts
+      .filter(a => a.status === "COMPLETED")
+      .slice(0, 5)
 
     return NextResponse.json({ inProgress, completed })
 

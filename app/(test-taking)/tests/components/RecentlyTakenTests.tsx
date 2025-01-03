@@ -22,17 +22,25 @@ export function RecentlyTakenTests({ attempts }: RecentlyTakenTestsProps) {
         {attempts.map((attempt) => (
           <div key={attempt.id} className="flex items-center justify-between">
             <div>
-              <h4 className="font-medium">{attempt.test.title}</h4>
+              <h4 className="font-medium">
+                {attempt.test?.title ?? "Untitled Test"}
+              </h4>
               <p className="text-sm text-muted-foreground">
-                Completed {new Date(attempt.completedAt).toLocaleDateString()}
+                {attempt.completedAt && 
+                  `Completed ${new Date(attempt.completedAt).toLocaleDateString()}`
+                }
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <Badge variant={attempt.percentageScore >= 70 ? "success" : "secondary"}>
-                {Math.round(attempt.percentageScore)}%
-              </Badge>
+              {attempt.percentageScore !== null && (
+                <Badge 
+                  variant={attempt.percentageScore >= 70 ? "success" : "secondary"}
+                >
+                  {Math.round(attempt.percentageScore)}%
+                </Badge>
+              )}
               <Link 
-                href={`/tests/${attempt.test.id}/attempt/${attempt.id}/results`}
+                href={`/tests/${attempt.test?.id ?? attempt.testId}/attempt/${attempt.id}/results`}
                 className="text-sm underline"
               >
                 View Results
