@@ -8,6 +8,7 @@ import { TestCard } from "./TestCard"
 import { TestsPagination } from "./TestsPagination"
 import type { Test } from "@/types/tests/test"
 import { TestCardSkeleton } from "./TestCardSkeleton"
+import { TestsPageHeader } from "./TestsPageHeader"
 
 export function TestList() {
   const [tests, setTests] = useState<Test[]>([])
@@ -15,6 +16,9 @@ export function TestList() {
   const [totalPages, setTotalPages] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [view, setView] = useState<"grid" | "list">("grid")
+  const [searchQuery, setSearchQuery] = useState("")
+  const [totalTests, setTotalTests] = useState(0)
 
   useEffect(() => {
     async function fetchTests() {
@@ -34,9 +38,19 @@ export function TestList() {
     void fetchTests()
   }, [currentPage])
 
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+    setCurrentPage(1)
+    // Implement search logic here
+  }
+
+  const listClassName = view === "grid" 
+    ? "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+    : "space-y-4"
+
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className={listClassName}>
         {Array.from({ length: 8 }).map((_, i) => (
           <TestCardSkeleton key={i} />
         ))}
@@ -48,12 +62,30 @@ export function TestList() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {tests.map((test) => (
-          <TestCard key={test.id} test={test} />
-        ))}
+      <TestsPageHeader
+        totalTests={totalTests}
+        onSearch={handleSearch}
+        view={view}
+        onViewChange={setView}
+      />
+
+      <div className={listClassName}>
+        {isLoading ? (
+          Array.from({ length: 8 }).map((_, i) => (
+            <TestCardSkeleton key={i} />
+          ))
+        ) : (
+          tests.map((test) => (
+            <TestCard 
+              key={test.id} 
+              test={test}
+              viewType={view}
+            />
+          ))
+        )}
       </div>
-      <TestsPagination 
+
+      <TestsPagination
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={setCurrentPage}
