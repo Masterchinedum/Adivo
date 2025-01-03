@@ -12,7 +12,6 @@ interface TestHeaderProps {
   totalQuestions: number
   answeredQuestions: number
   currentCategoryProgress: number
-  onBack?: () => void
 }
 
 export function TestHeader({ 
@@ -20,8 +19,7 @@ export function TestHeader({
   currentCategory,
   totalQuestions,
   answeredQuestions,
-  currentCategoryProgress,
-  onBack
+  currentCategoryProgress
 }: TestHeaderProps) {
   const overallProgress = Math.round((answeredQuestions / totalQuestions) * 100)
 

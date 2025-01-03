@@ -39,34 +39,36 @@ export function QuestionPicker({
 }: QuestionPickerProps) {
   const [isOpen, setIsOpen] = React.useState(false)
 
-  const QuestionGrid = React.memo(({ className }: { className?: string }) => (
-    <div className={cn("space-y-6", className)}>
-      {categories.map((category) => (
-        <div key={category.id}>
-          <h3 className="font-medium mb-3">{category.name}</h3>
-          <div className="grid grid-cols-5 gap-2">
-            {category.questions.map((question) => (
-              <button
-                key={question.id}
-                onClick={() => {
-                  onQuestionSelect(question.id)
-                  setIsOpen(false)
-                }}
-                className={cn(
-                  "h-10 text-sm border rounded-md transition-colors",
-                  "hover:bg-accent hover:text-accent-foreground",
-                  question.isAnswered && "bg-primary/10 border-primary/20",
-                  currentQuestionId === question.id && "ring-2 ring-primary",
-                )}
-              >
-                {question.number}
-              </button>
-            ))}
+  const QuestionGrid = React.memo(function QuestionGrid({ className }: { className?: string }) {
+    return (
+      <div className={cn("space-y-6", className)}>
+        {categories.map((category) => (
+          <div key={category.id}>
+            <h3 className="font-medium mb-3">{category.name}</h3>
+            <div className="grid grid-cols-5 gap-2">
+              {category.questions.map((question) => (
+                <button
+                  key={question.id}
+                  onClick={() => {
+                    onQuestionSelect(question.id)
+                    setIsOpen(false)
+                  }}
+                  className={cn(
+                    "h-10 text-sm border rounded-md transition-colors",
+                    "hover:bg-accent hover:text-accent-foreground",
+                    question.isAnswered && "bg-primary/10 border-primary/20",
+                    currentQuestionId === question.id && "ring-2 ring-primary",
+                  )}
+                >
+                  {question.number}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
-    </div>
-  ))
+        ))}
+      </div>
+    )
+  })
 
   return (
     <>
