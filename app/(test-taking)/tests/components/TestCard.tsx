@@ -12,11 +12,19 @@ interface TestCardProps {
   viewType?: "grid" | "list"  // Make it optional with a default value
 }
 
-export function TestCard({ test }: TestCardProps) {
+export function TestCard({ test, viewType = "grid" }: TestCardProps) {
+  const cardClassName = viewType === "grid"
+    ? "flex flex-col min-h-[320px] h-full transition-all hover:shadow-md"
+    : "flex flex-col transition-all hover:shadow-md sm:flex-row sm:h-[180px]"
+
+  const contentClassName = viewType === "grid" 
+    ? "flex-1"
+    : "flex-1 flex flex-col sm:flex-row"
+
   return (
-    <Card className="flex flex-col min-h-[320px] h-full transition-all hover:shadow-md">
-      <Link href={`/tests/${test.id}`} className="flex-1">
-        <CardHeader>
+    <Card className={cardClassName}>
+      <Link href={`/tests/${test.id}`} className={contentClassName}>
+        <CardHeader className={viewType === "list" ? "flex-1" : ""}>
           <CardTitle className="line-clamp-2 text-xl">
             {test.title}
           </CardTitle>
@@ -26,9 +34,8 @@ export function TestCard({ test }: TestCardProps) {
             </CardDescription>
           )}
         </CardHeader>
-        <CardContent>
-          {/* Categories Section */}
-          <div className="flex flex-wrap gap-2 mb-4 max-h-[80px] overflow-y-auto">
+        <CardContent className={viewType === "list" ? "w-[280px]" : ""}>
+          <div className="flex flex-wrap gap-2 mb-4">
             {test.categories?.map((category) => (
               <Badge 
                 key={category.name} 
@@ -39,15 +46,13 @@ export function TestCard({ test }: TestCardProps) {
               </Badge>
             ))}
           </div>
-          
-          {/* Stats Section */}
           <div className="text-sm text-muted-foreground space-y-1">
-            {/* <p>Questions: {test._count?.questions || 0}</p> */}
+            <p>Questions: {test._count?.questions || 0}</p>
             <p>Categories: {test.categories?.length || 0}</p>
           </div>
         </CardContent>
       </Link>
-      <CardFooter className="border-t p-4 mt-auto">
+      <CardFooter className={`border-t p-4 ${viewType === "list" ? "sm:w-[200px] sm:border-l sm:border-t-0" : "mt-auto"}`}>
         <Button className="w-full" asChild>
           <Link href={`/tests/${test.id}`}>
             View Test
