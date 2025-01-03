@@ -3,6 +3,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils";
 import Link from "next/link"
 import type { TestAttempt } from "@/types/tests/test-attempt"
 
