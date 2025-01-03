@@ -1,7 +1,7 @@
 // app/(test-taking)/tests/[testId]/attempt/[attemptId]/page.tsx
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { type TestAttemptQuestion } from "@/types/tests/test-attempt-question"
 import { LoadingState } from "./_components/LoadingState"
 import { TestHeader } from "./_components/TestHeader"
@@ -26,21 +26,9 @@ export default function TestAttemptPage({ params }: TestAttemptPageProps) {
   const [testId, setTestId] = useState<string>("")
   const [showCompletionDialog, setShowCompletionDialog] = useState(false)
 
-  // Resolve params since they're a Promise
-  useEffect(() => {
-    params.then(resolvedParams => {
-      setAttemptId(resolvedParams.attemptId)
-      setTestId(resolvedParams.testId)
-    })
-  }, [params])
-
-  // Fetch questions when attemptId is available
-  useEffect(() => {
+  const fetchQuestions = useCallback(async () => {
     if (!attemptId) return
-    fetchQuestions()
-  }, [attemptId])
 
-  const fetchQuestions = async () => {
     try {
       const response = await fetch(`/api/tests/attempt/${attemptId}/questions`)
       const data = await response.json()
@@ -57,9 +45,9 @@ export default function TestAttemptPage({ params }: TestAttemptPageProps) {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [attemptId])
 
-  const handleAnswerSelect = async (questionId: string, optionId: string) => {
+  const handleAnswerSelect = useCallback(async (questionId: string, optionId: string) => {
     try {
       const response = await fetch(`/api/tests/attempt/${attemptId}/questions`, {
         method: "PATCH",
@@ -69,17 +57,28 @@ export default function TestAttemptPage({ params }: TestAttemptPageProps) {
 
       if (!response.ok) throw new Error("Failed to save answer")
 
-      // Update questions state immediately for instant feedback
       setQuestions(prev => prev.map(q => 
         q.id === questionId 
           ? { ...q, selectedOptionId: optionId, isAnswered: true }
           : q
       ))
-
     } catch (error) {
       console.error("Error saving answer:", error)
     }
-  }
+  }, [attemptId])
+
+  // Resolve params since they're a Promise
+  useEffect(() => {
+    params.then(resolvedParams => {
+      setAttemptId(resolvedParams.attemptId)
+      setTestId(resolvedParams.testId)
+    })
+  }, [params])
+
+  // Fetch questions when attemptId is available
+  useEffect(() => {
+    fetchQuestions()
+  }, [fetchQuestions])
 
   if (isLoading) return <LoadingState />
 
@@ -119,7 +118,7 @@ export default function TestAttemptPage({ params }: TestAttemptPageProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="pt-6 pb-24"> {/* Add padding instead of fixed positioning */}
+      <div className="pt-6 pb-24">
         <TestHeader
           title="Test Taking"
           currentCategory={currentCategory?.name || ""}
@@ -158,7 +157,7 @@ export default function TestAttemptPage({ params }: TestAttemptPageProps) {
           </main>
         </div>
 
-        <div className="mt-6"> {/* Remove fixed positioning */}
+        <div className="mt-6">
           <NavigationControls
             testId={testId}
             attemptId={attemptId}
