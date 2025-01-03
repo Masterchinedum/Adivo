@@ -1,26 +1,24 @@
-//app/(test-taking)/tests/components/TestList.tsx
-
 "use client"
 
-import { useState, useEffect } from "react"
-import { getPublicTests } from "@/lib/tests"
-import { TestCard } from "./TestCard"
-import { TestsPagination } from "./TestsPagination"
-import type { Test } from "@/types/tests/test"
-import { TestCardSkeleton } from "./TestCardSkeleton"
+import { useCallback, useEffect, useState } from "react"
 import { TestsPageHeader } from "./TestsPageHeader"
+import { TestCard } from "./TestCard"
+import { TestCardSkeleton } from "./TestCardSkeleton"
+import { TestsPagination } from "./TestsPagination"
+import { getPublicTests } from "@/lib/tests"
+import type { Test } from "@/types/tests/test"
 
 export function TestList() {
   const [tests, setTests] = useState<Test[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [totalTests, setTotalTests] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [view, setView] = useState<"grid" | "list">("grid")
   const [searchQuery, setSearchQuery] = useState("")
-  const [totalTests, setTotalTests] = useState(0)
+  const [view, setView] = useState<"grid" | "list">("grid")
 
-  const fetchTests = async () => {
+  const fetchTests = useCallback(async () => {
     try {
       setIsLoading(true)
       setError(null)
@@ -36,17 +34,16 @@ export function TestList() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [currentPage, searchQuery]) // Only depend on values needed for the API call
 
   useEffect(() => {
     void fetchTests()
-  }, [currentPage, searchQuery, fetchTests]) // Added fetchTests as dependency
+  }, [fetchTests]) // fetchTests now has stable dependencies
 
-  const handleSearch = (query: string) => {
+  const handleSearch = useCallback((query: string) => {
     setSearchQuery(query)
     setCurrentPage(1)
-    // Implement search logic here
-  }
+  }, [])
 
   const listClassName = view === "grid" 
     ? "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
