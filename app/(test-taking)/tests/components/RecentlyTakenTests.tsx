@@ -34,8 +34,12 @@ export function RecentlyTakenTests({ attempts }: RecentlyTakenTestsProps) {
             <div className="flex items-center gap-4">
               {attempt.percentageScore !== null && (
                 <Badge 
-                  variant={attempt.percentageScore >= 70 ? "success" : "secondary"}
-                  className={attempt.percentageScore >= 70 ? "bg-green-100 text-green-800" : ""}
+                  variant="secondary"
+                  className={cn(
+                    attempt.percentageScore >= 70 
+                      ? "bg-green-100 text-green-800" 
+                      : "bg-secondary text-secondary-foreground"
+                  )}
                 >
                   {Math.round(attempt.percentageScore)}%
                 </Badge>

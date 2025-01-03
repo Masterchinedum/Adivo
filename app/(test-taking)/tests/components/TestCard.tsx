@@ -9,6 +9,7 @@ import { ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { Test } from "@/types/tests/test"
 import type { TestAttempt } from "@/types/tests/test-attempt"
+import { getAttemptProgress } from "../utils/attempt"
 
 interface TestCardProps {
   test: Test
@@ -25,6 +26,8 @@ export function TestCard({ test, viewType = "grid", attempt }: TestCardProps) {
     ? "flex-1"
     : "flex-1 flex flex-col sm:flex-row"
 
+  const progressInfo = attempt && getAttemptProgress(attempt)
+  
   return (
     <Card className={cn(cardClassName)}>
       <Link href={`/tests/${test.id}`} className={contentClassName}>
@@ -51,14 +54,14 @@ export function TestCard({ test, viewType = "grid", attempt }: TestCardProps) {
             ))}
           </div>
           
-          {attempt && attempt.status === "IN_PROGRESS" && (
+          {attempt && attempt.status === "IN_PROGRESS" && progressInfo && (
             <div className="mt-4 space-y-2">
               <Progress 
-                value={Math.round((attempt.answeredQuestions / attempt.totalQuestions) * 100)}
+                value={progressInfo.progress}
                 className="h-2"
               />
               <p className="text-xs text-muted-foreground">
-                {attempt.answeredQuestions} of {attempt.totalQuestions} questions completed
+                {progressInfo.answeredQuestions} of {progressInfo.totalQuestions} questions completed
               </p>
             </div>
           )}
