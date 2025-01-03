@@ -35,6 +35,7 @@ export function RecentlyTakenTests({ attempts }: RecentlyTakenTestsProps) {
               {attempt.percentageScore !== null && (
                 <Badge 
                   variant={attempt.percentageScore >= 70 ? "success" : "secondary"}
+                  className={attempt.percentageScore >= 70 ? "bg-green-100 text-green-800" : ""}
                 >
                   {Math.round(attempt.percentageScore)}%
                 </Badge>
