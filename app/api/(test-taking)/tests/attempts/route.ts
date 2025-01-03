@@ -46,20 +46,10 @@ export async function GET() {
       }
     })
 
-    // Split and format attempts
-    const inProgress = attempts
-      .filter(a => a.status === "IN_PROGRESS")
-      .map(a => ({
-        ...a,
-        answeredQuestions: a.responses.length,
-        totalQuestions: a.test._count.questions
-      }))
+    const inProgress = attempts.filter(a => a.status === "IN_PROGRESS")
+    const completed = attempts.filter(a => a.status === "COMPLETED").slice(0, 5)
 
-    const completed = attempts
-      .filter(a => a.status === "COMPLETED")
-      .slice(0, 5) // Only return last 5 completed attempts
-
-    return NextResponse.json({ inProgress, completed } satisfies TestAttemptsResponse)
+    return NextResponse.json({ inProgress, completed })
 
   } catch (error) {
     console.error("[TEST_ATTEMPTS_GET]", error)

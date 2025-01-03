@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
+import { getAttemptProgress } from "../utils/attempt"
 import type { TestAttempt } from "@/types/tests/test-attempt"
 
 interface InProgressTestsProps {
@@ -22,19 +23,19 @@ export function InProgressTests({ attempts }: InProgressTestsProps) {
       </CardHeader>
       <CardContent className="grid gap-4">
         {attempts.map((attempt) => {
-          const progress = Math.round((attempt.answeredQuestions / attempt.totalQuestions) * 100)
+          const { answeredQuestions, totalQuestions, progress } = getAttemptProgress(attempt)
           
           return (
             <div key={attempt.id} className="space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-medium">{attempt.test.title}</h4>
+                  <h4 className="font-medium">{attempt.test?.title}</h4>
                   <p className="text-sm text-muted-foreground">
-                    {attempt.answeredQuestions} of {attempt.totalQuestions} questions completed
+                    {answeredQuestions} of {totalQuestions} questions completed
                   </p>
                 </div>
                 <Button asChild size="sm">
-                  <Link href={`/tests/${attempt.test.id}/attempt/${attempt.id}`}>
+                  <Link href={`/tests/${attempt.test?.id}/attempt/${attempt.id}`}>
                     Continue <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
