@@ -9,10 +9,11 @@ import type { Test } from "@/types/tests/test"
 
 interface TestCardProps {
   test: Test
-  viewType?: "grid" | "list"  // Make it optional with a default value
+  viewType?: "grid" | "list"
+  attempt?: TestAttempt
 }
 
-export function TestCard({ test, viewType = "grid" }: TestCardProps) {
+export function TestCard({ test, viewType = "grid", attempt }: TestCardProps) {
   const cardClassName = viewType === "grid"
     ? "flex flex-col min-h-[320px] h-full transition-all hover:shadow-md"
     : "flex flex-col transition-all hover:shadow-md sm:flex-row sm:h-[180px]"
@@ -50,6 +51,17 @@ export function TestCard({ test, viewType = "grid" }: TestCardProps) {
             <p>Questions: {test._count?.questions || 0}</p>
             <p>Categories: {test.categories?.length || 0}</p>
           </div>
+          {attempt && attempt.status === "IN_PROGRESS" && (
+            <div className="mt-4 space-y-2">
+              <Progress 
+                value={Math.round((attempt.answeredQuestions / attempt.totalQuestions) * 100)} 
+                className="h-2" 
+              />
+              <p className="text-xs text-muted-foreground">
+                {attempt.answeredQuestions} of {attempt.totalQuestions} questions completed
+              </p>
+            </div>
+          )}
         </CardContent>
       </Link>
       <CardFooter className={`border-t p-4 ${viewType === "list" ? "sm:w-[200px] sm:border-l sm:border-t-0" : "mt-auto"}`}>

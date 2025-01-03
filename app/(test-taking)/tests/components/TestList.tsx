@@ -5,8 +5,11 @@ import { TestsPageHeader } from "./TestsPageHeader"
 import { TestCard } from "./TestCard"
 import { TestCardSkeleton } from "./TestCardSkeleton"
 import { TestsPagination } from "./TestsPagination"
+import { InProgressTests } from "./InProgressTests"
+import { RecentlyTakenTests } from "./RecentlyTakenTests"
 import { getPublicTests } from "@/lib/tests"
 import type { Test } from "@/types/tests/test"
+import type { TestAttempt } from "@/types/tests/test-attempt"
 
 export function TestList() {
   const [tests, setTests] = useState<Test[]>([])
@@ -17,6 +20,8 @@ export function TestList() {
   const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [view, setView] = useState<"grid" | "list">("grid")
+  const [inProgressAttempts, setInProgressAttempts] = useState<TestAttempt[]>([])
+  const [recentAttempts, setRecentAttempts] = useState<TestAttempt[]>([])
 
   const fetchTests = useCallback(async () => {
     try {
@@ -36,9 +41,26 @@ export function TestList() {
     }
   }, [currentPage, searchQuery]) // Only depend on values needed for the API call
 
+  const fetchUserAttempts = useCallback(async () => {
+    try {
+      const response = await fetch('/api/tests/attempts')
+      if (!response.ok) throw new Error('Failed to fetch attempts')
+      const data = await response.json()
+      
+      setInProgressAttempts(data.inProgress)
+      setRecentAttempts(data.completed)
+    } catch (error) {
+      console.error('Failed to fetch user attempts:', error)
+    }
+  }, [])
+
   useEffect(() => {
     void fetchTests()
   }, [fetchTests]) // fetchTests now has stable dependencies
+
+  useEffect(() => {
+    void fetchUserAttempts()
+  }, [fetchUserAttempts])
 
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query)
@@ -62,7 +84,7 @@ export function TestList() {
   if (error) return <div>Error: {error}</div>
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <TestsPageHeader
         totalTests={totalTests}
         onSearch={handleSearch}
@@ -70,6 +92,13 @@ export function TestList() {
         onViewChange={setView}
       />
 
+      {/* Progress Sections */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <InProgressTests attempts={inProgressAttempts} />
+        <RecentlyTakenTests attempts={recentAttempts} />
+      </div>
+
+      {/* Existing Tests Grid */}
       <div className={listClassName}>
         {isLoading ? (
           Array.from({ length: 8 }).map((_, i) => (
@@ -81,6 +110,7 @@ export function TestList() {
               key={test.id} 
               test={test}
               viewType={view}
+              attempt={inProgressAttempts.find(a => a.testId === test.id)}
             />
           ))
         )}
