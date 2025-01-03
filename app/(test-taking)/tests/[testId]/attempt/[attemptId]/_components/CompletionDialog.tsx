@@ -60,13 +60,11 @@ export function CompletionDialog({
         method: "POST",
       })
 
-      if (!response.ok) {
-        throw new Error("Failed to complete test")
-      }
+      if (!response.ok) throw new Error("Failed to complete test")
 
       toast.success("Test completed successfully!")
       router.push(`/tests/${testId}/attempt/${attemptId}/results`)
-    } catch (error) {
+    } catch {
       toast.error("Failed to complete test. Please try again.")
     } finally {
       setIsSubmitting(false)
