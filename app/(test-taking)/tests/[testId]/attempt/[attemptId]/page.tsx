@@ -118,16 +118,21 @@ export default function TestAttemptPage({ params }: TestAttemptPageProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="pt-6 pb-24">
-        <TestHeader
-          title="Test Taking"
-          currentCategory={currentCategory?.name || ""}
-          totalQuestions={totalQuestions}
-          answeredQuestions={answeredQuestions}
-          currentCategoryProgress={currentCategoryProgress}
-        />
+      {/* Remove pt-6 and add padding-top to account for the sticky header */}
+      <div className="pb-24">
+        {/* Change TestHeader from fixed to sticky */}
+        <div className="sticky top-16 z-40 bg-gray-50">
+          <TestHeader
+            title="Test Taking"
+            currentCategory={currentCategory?.name || ""}
+            totalQuestions={totalQuestions}
+            answeredQuestions={answeredQuestions}
+            currentCategoryProgress={currentCategoryProgress}
+          />
+        </div>
 
         <div className="container max-w-7xl mx-auto px-4 mt-6">
+          {/* Rest of the content remains the same */}
           <div className="mb-6">
             <CategoryTabs
               categories={categories}
@@ -136,7 +141,7 @@ export default function TestAttemptPage({ params }: TestAttemptPageProps) {
             />
           </div>
 
-          <main className="space-y-6">
+          <main className="space-y-6 mb-20"> {/* Add margin-bottom for navigation */}
             {currentCategory?.questions.map((question, index) => (
               <QuestionCard
                 key={question.id}
@@ -157,7 +162,8 @@ export default function TestAttemptPage({ params }: TestAttemptPageProps) {
           </main>
         </div>
 
-        <div className="mt-6">
+        {/* Change NavigationControls from fixed to sticky */}
+        <div className="sticky bottom-0 mt-6 bg-background border-t">
           <NavigationControls
             testId={testId}
             attemptId={attemptId}

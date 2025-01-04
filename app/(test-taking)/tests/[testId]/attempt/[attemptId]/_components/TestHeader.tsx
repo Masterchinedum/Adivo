@@ -24,7 +24,7 @@ export function TestHeader({
   const overallProgress = Math.round((answeredQuestions / totalQuestions) * 100)
 
   return (
-    <header className="fixed top-0 left-0 right-0 bg-white border-b z-50">
+    <header className="bg-white border-b">
       <div className="container max-w-7xl mx-auto">
         <div className="flex items-center h-16 px-4">
           <Button

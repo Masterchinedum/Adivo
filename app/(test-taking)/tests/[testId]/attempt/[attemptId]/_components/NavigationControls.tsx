@@ -56,7 +56,7 @@ export function NavigationControls({
 
   return (
     <>
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t py-4 px-4 md:px-6">
+      <div className="bg-white py-4 px-4 md:px-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button 
