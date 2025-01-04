@@ -58,7 +58,7 @@ export default function TestAttemptPage({ params }: TestAttemptPageProps) {
       if (!response.ok) throw new Error("Failed to save answer")
 
       setQuestions(prev => prev.map(q => 
-        q.id === questionId 
+        q.questionId === questionId  // Change this line from q.id to q.questionId
           ? { ...q, selectedOptionId: optionId, isAnswered: true }
           : q
       ))
@@ -156,7 +156,7 @@ export default function TestAttemptPage({ params }: TestAttemptPageProps) {
                 questionNumber={index + 1}
                 selectedOption={question.selectedOptionId || undefined}
                 isAnswered={question.isAnswered}
-                onAnswerSelect={(optionId) => handleAnswerSelect(question.questionId, optionId)}
+                onAnswerSelect={(optionId) => handleAnswerSelect(question.questionId, optionId)} // Keep using question.questionId
               />
             ))}
           </main>

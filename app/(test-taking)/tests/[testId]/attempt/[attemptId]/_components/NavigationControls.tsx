@@ -54,6 +54,41 @@ export function NavigationControls({
     }
   }
 
+  const scrollToCurrentQuestion = () => {
+    const questionElement = document.getElementById(`question-${currentQuestionNumber}`)
+    if (questionElement) {
+      // Add offset for the sticky header height
+      const headerOffset = 140 // Adjust this value based on your header height
+      const elementPosition = questionElement.getBoundingClientRect().top
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      })
+    }
+  }
+
+  const handleNext = () => {
+    onNext()
+    // Wait for state update and DOM to reflect changes
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        scrollToCurrentQuestion()
+      })
+    })
+  }
+
+  const handlePrevious = () => {
+    onPrevious()
+    // Wait for state update and DOM to reflect changes
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        scrollToCurrentQuestion()
+      })
+    })
+  }
+
   return (
     <>
       <div className="bg-white py-4 px-4 md:px-6">
@@ -61,14 +96,14 @@ export function NavigationControls({
           <div className="flex items-center gap-4">
             <Button 
               variant="outline"
-              onClick={onPrevious}
+              onClick={handlePrevious}
               disabled={!canGoPrevious}
             >
               Previous
             </Button>
             <Button
               variant="outline"
-              onClick={onNext}
+              onClick={handleNext}
               disabled={!canGoNext}
             >
               Next

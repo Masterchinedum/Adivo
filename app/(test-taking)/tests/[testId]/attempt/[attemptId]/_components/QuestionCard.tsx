@@ -47,10 +47,13 @@ export function QuestionCard({
   }
 
   return (
-    <Card className={cn(
-      "transition-all duration-200",
-      isAnswered && "ring-2 ring-primary/10",
-    )}>
+    <Card 
+      id={`question-${questionNumber}`} // Add this ID
+      className={cn(
+        "transition-all duration-200",
+        isAnswered && "ring-2 ring-primary/10",
+      )}
+    >
       <CardHeader className="border-b bg-muted/40">
         <div className="flex items-center gap-2">
           <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-sm font-medium">
