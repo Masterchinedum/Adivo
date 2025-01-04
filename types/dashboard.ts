@@ -1,35 +1,46 @@
-export interface Stats {
+export interface DashboardStats {
   totalTests: number
   averageScore: number
   availableTests: number
+  trend?: {
+    change: number
+    timeframe: string
+  }
 }
 
-export interface TestProgress {
+export interface InProgressTest {
   id: string
   title: string
   progress: number
   lastAccessed: Date
+  categoryName: string
+  totalQuestions: number
+  answeredQuestions: number
 }
 
 export interface RecentActivity {
   id: string
-  type: 'completion' | 'start'
+  type: 'completed' | 'started'
   testTitle: string
-  date: Date
+  timestamp: Date
   score?: number
+  categoryName?: string
 }
 
-export interface TestResult {
-  testId: string
-  testTitle: string
+export interface TestPerformance {
+  date: string
   score: number
-  date: Date
+  testTitle?: string
+  categoryName?: string
 }
 
 export interface NewTest {
   id: string
   title: string
-  description?: string
-  createdAt: Date
+  description: string
+  categories: {
+    id: string
+    name: string
+  }[]
   updatedAt: Date
 }
