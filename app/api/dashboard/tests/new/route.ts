@@ -26,7 +26,7 @@ export async function GET() {
         isPublished: true,
         // Exclude tests the user has already completed
         NOT: {
-          attempts: {
+          testAttempt: { // Change from 'attempts' to 'TestAttempt'
             some: {
               userId: user.id,
               status: "COMPLETED"

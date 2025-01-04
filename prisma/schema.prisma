@@ -34,7 +34,7 @@ model Test {
   user         User          @relation(fields: [createdBy], references: [id])
   questions    Question[]
   categories   Category[]
-  testAttempts TestAttempt[] // Added this relation
+  testAttempts TestAttempt[] 
 
   @@index([createdBy])
 }

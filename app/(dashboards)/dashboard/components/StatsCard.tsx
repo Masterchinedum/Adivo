@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { StatsCardSkeleton } from "./loading-states"
 
 interface DashboardStats {
   totalTests: number
@@ -43,7 +44,23 @@ export function StatsCard() {
         </CardContent>
       </Card>
 
-      {/* Similar cards for other stats */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Average Score</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{stats.averageScore}%</div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Available Tests</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{stats.totalTests}</div>
+        </CardContent>
+      </Card>
     </div>
   )
 }
