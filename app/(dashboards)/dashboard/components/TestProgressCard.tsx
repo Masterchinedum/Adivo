@@ -1,40 +1,52 @@
-// app/(dashboards)/dashboard/components/TestProgressCard.tsx
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+"use client"
+
+import { useEffect, useState } from "react"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { Button } from "@/components/ui/button"
 
 interface TestProgress {
-  id: string
-  name: string
+  testId: string
+  testTitle: string
   progress: number
-  lastAccessed: string
+  startedAt: string
 }
 
-interface TestProgressCardProps {
-  inProgressTests: TestProgress[]
-}
+export function TestProgressCard() {
+  const [inProgress, setInProgress] = useState<TestProgress[]>([])
+  const [error, setError] = useState<string | null>(null)
 
-export function TestProgressCard({ inProgressTests }: TestProgressCardProps) {
+  useEffect(() => {
+    async function fetchInProgressTests() {
+      try {
+        const response = await fetch('/api/dashboard/tests/in-progress')
+        if (!response.ok) throw new Error('Failed to fetch in-progress tests')
+        const data = await response.json()
+        setInProgress(data)
+      } catch (error) {
+        setError(error instanceof Error ? error.message : 'Error fetching tests')
+        console.error('Error fetching in-progress tests:', error)
+      }
+    }
+
+    fetchInProgressTests()
+  }, [])
+
+  if (error) return <div>Error loading progress: {error}</div>
+  if (!inProgress.length) return <div>No tests in progress</div>
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>In Progress Tests</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-8">
-        {inProgressTests.map((test) => (
-          <div key={test.id} className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium leading-none">
-                  {test.name}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Last accessed: {test.lastAccessed}
-                </p>
-              </div>
-              <Button size="sm">Continue</Button>
+      <CardContent className="space-y-4">
+        {inProgress.map((test) => (
+          <div key={test.testId} className="space-y-2">
+            <div className="flex justify-between">
+              <span>{test.testTitle}</span>
+              <span>{test.progress}%</span>
             </div>
-            <Progress value={test.progress} className="h-2" />
+            <Progress value={test.progress} />
           </div>
         ))}
       </CardContent>

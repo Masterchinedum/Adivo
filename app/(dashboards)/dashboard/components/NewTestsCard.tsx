@@ -6,20 +6,42 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
+import { useState, useEffect } from "react"
 
 interface Test {
   id: string
   title: string
   description: string
-  categories: { id: string; name: string }[]
+  categories: {
+    id: string
+    name: string
+  }[]
   updatedAt: string
 }
 
-interface NewTestsCardProps {
-  tests: Test[]
-}
+export function NewTestsCard() {
+  const [tests, setTests] = useState<Test[]>([])
+  const [error, setError] = useState<string | null>(null)
 
-export function NewTestsCard({ tests }: NewTestsCardProps) {
+  useEffect(() => {
+    async function fetchNewTests() {
+      try {
+        const response = await fetch('/api/dashboard/tests/new')
+        if (!response.ok) throw new Error('Failed to fetch new tests')
+        const data = await response.json()
+        setTests(data)
+      } catch (error) {
+        setError(error instanceof Error ? error.message : 'Error fetching tests')
+        console.error('Error fetching new tests:', error)
+      }
+    }
+
+    fetchNewTests()
+  }, [])
+
+  if (error) return <div>Error loading new tests: {error}</div>
+  if (!tests.length) return <div>No new tests available</div>
+
   return (
     <Card>
       <CardHeader>
