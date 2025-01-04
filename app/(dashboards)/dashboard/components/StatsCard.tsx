@@ -1,61 +1,29 @@
-import { Card, CardContent } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
+// app/(dashboards)/dashboard/components/StatsCard.tsx
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 interface StatsCardProps {
   title: string
   value: string | number
   description?: string
   trend?: string
-  loading?: boolean
-  error?: boolean
 }
 
-export function StatsCard({
-  title,
-  value,
-  description,
-  trend,
-  loading = false,
-  error = false
-}: StatsCardProps) {
-  if (loading) {
-    return <StatsCardSkeleton />
-  }
-
-  if (error) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <p className="text-sm text-red-500">Failed to load data</p>
-        </CardContent>
-      </Card>
-    )
-  }
-
+export function StatsCard({ title, value, description, trend }: StatsCardProps) {
   return (
     <Card>
-      <CardContent className="p-6">
-        <p className="text-sm font-medium text-muted-foreground">{title}</p>
-        <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-bold">{value}</h2>
-          {trend && <span className="text-sm text-muted-foreground">{trend}</span>}
-        </div>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">
+          {title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">{value}</div>
         {description && (
           <p className="text-xs text-muted-foreground">{description}</p>
         )}
-      </CardContent>
-    </Card>
-  )
-}
-
-function StatsCardSkeleton() {
-  return (
-    <Card>
-      <CardContent className="p-6">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-8 w-16 mt-2" />
-        <Skeleton className="h-4 w-32 mt-2" />
+        {trend && (
+          <p className="text-xs text-muted-foreground mt-1">{trend}</p>
+        )}
       </CardContent>
     </Card>
   )
