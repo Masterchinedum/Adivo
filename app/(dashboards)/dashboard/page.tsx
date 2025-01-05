@@ -3,11 +3,18 @@
 import { StatsCard } from "./components/StatsCard"
 import { TestProgressCard } from "./components/TestProgressCard"
 import { RecentActivityCard } from "./components/RecentActivityCard"
-import { TestResultsChart } from "./components/TestResultsChart"
 import { NewTestsCard } from "./components/NewTestsCard"
 import DashboardHeader from "./components/DashboardHeader"
+import { RecentlyTakenTests } from "@/app/(test-taking)/tests/components/RecentlyTakenTests"
 
 export default async function DashboardPage() {
+  // Fetch test attempts data from API
+  const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/tests/attempts`, {
+    cache: 'no-store'
+  })
+  const data = await response.json()
+  const recentAttempts = data.completed
+
   return (
     <div className="min-h-screen">
       {/* Header */}
@@ -28,7 +35,7 @@ export default async function DashboardPage() {
 
           {/* Right Column */}
           <div className="space-y-6">
-            <TestResultsChart />
+            <RecentlyTakenTests attempts={recentAttempts} />
             <NewTestsCard />
           </div>
         </div>
