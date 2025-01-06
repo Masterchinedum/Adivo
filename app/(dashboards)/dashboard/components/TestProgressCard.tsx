@@ -4,15 +4,16 @@ import { useEffect, useState } from "react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 
-interface TestProgress {
+interface InProgressTest {
   testId: string
   testTitle: string
   progress: number
-  startedAt: string
+  answeredQuestions: number
+  totalQuestions: number
 }
 
 export function TestProgressCard() {
-  const [inProgress, setInProgress] = useState<TestProgress[]>([])
+  const [inProgress, setInProgress] = useState<InProgressTest[]>([])
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -46,7 +47,12 @@ export function TestProgressCard() {
               <span>{test.testTitle}</span>
               <span>{test.progress}%</span>
             </div>
-            <Progress value={test.progress} />
+            <div className="space-y-1">
+              <Progress value={test.progress} />
+              <p className="text-sm text-muted-foreground">
+                {test.answeredQuestions} of {test.totalQuestions} questions completed
+              </p>
+            </div>
           </div>
         ))}
       </CardContent>

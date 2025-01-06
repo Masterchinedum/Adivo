@@ -28,9 +28,15 @@ export async function GET() {
       include: {
         test: {
           select: {
-            title: true
+            title: true,
+            _count: {
+              select: {
+                questions: true
+              }
+            }
           }
-        }
+        },
+        responses: true // Include responses to calculate progress
       },
       orderBy: {
         startedAt: 'desc'
@@ -38,13 +44,18 @@ export async function GET() {
       take: 5
     })
 
-    return NextResponse.json(inProgressTests)
+    // Calculate progress for each test
+    const testsWithProgress = inProgressTests.map(attempt => ({
+      testId: attempt.testId,
+      testTitle: attempt.test.title,
+      progress: Math.round((attempt.responses.length / attempt.test._count.questions) * 100),
+      answeredQuestions: attempt.responses.length,
+      totalQuestions: attempt.test._count.questions
+    }))
 
+    return NextResponse.json(testsWithProgress)
   } catch (error) {
     console.error("[IN_PROGRESS_TESTS_GET]", error)
-    return NextResponse.json(
-      { error: "Internal server error" }, 
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
