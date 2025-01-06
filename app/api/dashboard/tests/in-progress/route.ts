@@ -29,31 +29,34 @@ export async function GET() {
         test: {
           select: {
             title: true,
-            _count: {
+            questions: {
               select: {
-                questions: true
+                id: true
               }
             }
           }
         },
-        responses: true // Include responses to calculate progress
+        responses: {
+          select: {
+            id: true
+          }
+        }
       },
       orderBy: {
         startedAt: 'desc'
-      },
-      take: 5
+      }
     })
 
-    // Calculate progress for each test
     const testsWithProgress = inProgressTests.map(attempt => ({
       testId: attempt.testId,
       testTitle: attempt.test.title,
-      progress: Math.round((attempt.responses.length / attempt.test._count.questions) * 100),
+      totalQuestions: attempt.test.questions.length,
       answeredQuestions: attempt.responses.length,
-      totalQuestions: attempt.test._count.questions
+      progress: Math.round((attempt.responses.length / attempt.test.questions.length) * 100)
     }))
 
     return NextResponse.json(testsWithProgress)
+
   } catch (error) {
     console.error("[IN_PROGRESS_TESTS_GET]", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })

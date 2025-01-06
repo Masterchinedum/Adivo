@@ -14,6 +14,7 @@ interface InProgressTest {
 
 export function TestProgressCard() {
   const [inProgress, setInProgress] = useState<InProgressTest[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -26,12 +27,15 @@ export function TestProgressCard() {
       } catch (error) {
         setError(error instanceof Error ? error.message : 'Error fetching tests')
         console.error('Error fetching in-progress tests:', error)
+      } finally {
+        setIsLoading(false)
       }
     }
 
     fetchInProgressTests()
   }, [])
 
+  if (isLoading) return <div>Loading in-progress tests...</div>
   if (error) return <div>Error loading progress: {error}</div>
   if (!inProgress.length) return <div>No tests in progress</div>
 
@@ -43,14 +47,14 @@ export function TestProgressCard() {
       <CardContent className="space-y-4">
         {inProgress.map((test) => (
           <div key={test.testId} className="space-y-2">
-            <div className="flex justify-between">
-              <span>{test.testTitle}</span>
+            <div className="flex justify-between items-center text-sm">
+              <span className="font-medium">{test.testTitle}</span>
               <span>{test.progress}%</span>
             </div>
             <div className="space-y-1">
-              <Progress value={test.progress} />
-              <p className="text-sm text-muted-foreground">
-                {test.answeredQuestions} of {test.totalQuestions} questions completed
+              <Progress value={test.progress} className="h-2" />
+              <p className="text-xs text-muted-foreground">
+                {test.answeredQuestions} of {test.totalQuestions} questions answered
               </p>
             </div>
           </div>
