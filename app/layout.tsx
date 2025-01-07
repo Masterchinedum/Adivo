@@ -5,6 +5,8 @@ import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import { ThemeProvider } from "@/components/theme-provider"
 import { ProfileCompletionProvider } from '@/lib/contexts/ProfileCompletionContext'
+import { ProfileCompletionDialog } from '@/components/profile/ProfileCompletionDialog'
+import { Toaster } from "@/components/ui/toaster"
 import "./globals.css"
 import { Inter } from "next/font/google"
 
@@ -36,6 +38,8 @@ export default function RootLayout({
                 {children}
               </main>
               <Footer />
+              <ProfileCompletionDialog />
+              <Toaster />
             </ProfileCompletionProvider>
           </ThemeProvider>
         </body>
