@@ -40,14 +40,20 @@ export function ProfileForm({ profile }: ProfileFormProps) {
     setIsLoading(true)
     try {
       const method = profile ? "PATCH" : "POST"
+      const formattedData = {
+        ...data,
+        dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth).toISOString() : null,
+      }
+
       const response = await fetch("/api/dashboard/profile", {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(formattedData),
       })
 
       if (!response.ok) {
-        throw new Error("Failed to save profile")
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to save profile")
       }
 
       toast.success("Profile saved successfully")
