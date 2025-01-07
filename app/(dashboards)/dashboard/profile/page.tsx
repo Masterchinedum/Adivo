@@ -4,8 +4,6 @@
 
 import * as React from "react"
 import { useState, useEffect } from "react"
-// import { useRouter } from "next/navigation"
-// import { toast } from "sonner"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ProfileForm } from "./components/ProfileForm"
 import { ProfileSkeleton } from "./components/ProfileSkeleton"

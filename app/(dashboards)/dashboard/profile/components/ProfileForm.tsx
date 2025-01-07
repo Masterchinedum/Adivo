@@ -14,6 +14,10 @@ import { RelationshipStatusSelect } from "./RelationshipStatusSelect"
 import { CountrySelect } from "./CountrySelect"
 import { BioTextarea } from "./BioTextarea"
 
+interface ProfileFormProps {
+  profile: UserProfileFormValues | null
+}
+
 const defaultValues: UserProfileFormValues = {
   dateOfBirth: null,
   gender: null,
@@ -22,41 +26,18 @@ const defaultValues: UserProfileFormValues = {
   bio: null,
 }
 
-export function ProfileForm() {
+export function ProfileForm({ profile }: ProfileFormProps) {
   const [isLoading, setIsLoading] = React.useState(false)
-  const [isProfileLoaded, setIsProfileLoaded] = React.useState(false)
 
   const form = useForm<UserProfileFormValues>({
     resolver: zodResolver(userProfileSchema),
-    defaultValues: async () => {
-      try {
-        const response = await fetch("/api/dashboard/profile")
-        if (!response.ok) {
-          toast.error("Failed to load profile")
-          return defaultValues
-        }
-        const data = await response.json()
-        
-        setIsProfileLoaded(true)
-        return {
-          dateOfBirth: data?.dateOfBirth ? new Date(data.dateOfBirth) : null,
-          gender: data?.gender as UserProfileFormValues['gender'],
-          relationshipStatus: data?.relationshipStatus as UserProfileFormValues['relationshipStatus'],
-          countryOfOrigin: data?.countryOfOrigin || null,
-          bio: data?.bio || null,
-        }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (error) {
-        toast.error("Failed to load profile")
-        return defaultValues
-      }
-    }
+    defaultValues: profile || defaultValues,
   })
 
   async function onSubmit(data: UserProfileFormValues) {
     setIsLoading(true)
     try {
-      const method = isProfileLoaded ? "PATCH" : "POST"
+      const method = profile ? "PATCH" : "POST"
       const response = await fetch("/api/dashboard/profile", {
         method,
         headers: { "Content-Type": "application/json" },
