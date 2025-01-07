@@ -1,9 +1,8 @@
-//app/(dashboards)/dashboard/profile/components/CountrySelect.tsx
-
 "use client"
 
 import * as React from "react"
 import countries from "world-countries"
+import ReactCountryFlag from "react-country-flag"
 import {
   FormControl,
   FormField,
@@ -48,8 +47,21 @@ export function CountrySelect({ form }: CountrySelectProps) {
             <SelectContent>
               <ScrollArea className="h-80">
                 {sortedCountries.map((country) => (
-                  <SelectItem key={country.cca2} value={country.name.common}>
-                    {country.flag} {country.name.common}
+                  <SelectItem 
+                    key={country.cca2} 
+                    value={country.name.common}
+                    className="flex items-center justify-between"
+                  >
+                    {country.name.common}
+                    <span>  </span>
+                    <ReactCountryFlag
+                      countryCode={country.cca2}
+                      svg
+                      style={{
+                        width: '1.1em',
+                        height: '1.1em',
+                      }}
+                    />
                   </SelectItem>
                 ))}
               </ScrollArea>
