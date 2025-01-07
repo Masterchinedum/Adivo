@@ -18,7 +18,8 @@ model User {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   Test         Test[]
-  testAttempts TestAttempt[] // Added this relation
+  testAttempts TestAttempt[]
+  profile      UserProfile?  // Keep only this one
 
   @@index([clerkUserId])
 }
@@ -29,7 +30,7 @@ model Test {
   description  String?
   isPublished  Boolean       @default(false)
   createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  updatedAt    DateTime      @default(now())
   createdBy    String
   user         User          @relation(fields: [createdBy], references: [id])
   questions    Question[]
@@ -49,7 +50,7 @@ model Category {
   questions     Question[]
   categoryScores CategoryScore[] // Added this relation
   createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  updatedAt     DateTime        @default(now())
 
   @@index([testId])
 }
@@ -64,7 +65,7 @@ model Question {
   options          Option[]
   questionResponses QuestionResponse[] // Added this relation
   createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  updatedAt        DateTime          @default(now())
 
   @@index([testId])
   @@index([categoryId])
@@ -78,7 +79,7 @@ model Option {
   question         Question          @relation(fields: [questionId], references: [id], onDelete: Cascade)
   questionResponses QuestionResponse[] // Added this relation
   createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  updatedAt        DateTime          @default(now())
 
   @@index([questionId])
 }
@@ -99,7 +100,7 @@ model TestAttempt {
   responses       QuestionResponse[]
   categoryScores  CategoryScore[]
   createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  updatedAt       DateTime          @default(now())
 
   @@index([userId])
   @@index([testId])
@@ -117,7 +118,7 @@ model QuestionResponse {
   question       Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
   selectedOption Option      @relation(fields: [selectedOptionId], references: [id], onDelete: Cascade)
   createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
+  updatedAt      DateTime    @default(now())
 
   @@unique([testAttemptId, questionId])
   @@index([testAttemptId])
@@ -136,10 +137,25 @@ model CategoryScore {
   testAttempt   TestAttempt @relation(fields: [testAttemptId], references: [id], onDelete: Cascade)
   category      Category    @relation(fields: [categoryId], references: [id])
   createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  updatedAt     DateTime    @default(now())
 
   @@index([testAttemptId])
   @@index([categoryId])
+}
+
+model UserProfile {
+  id                String    @id @default(uuid()) @map("_id")
+  dateOfBirth       DateTime?
+  gender            String?    // "male" or "female"
+  relationshipStatus String?  // "Single", "Married", "It's Complicated"
+  countryOfOrigin   String?
+  bio               String?   @db.String(500)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  // Relation fields
+  userId           String    @unique  // Foreign key
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum TestStatus {
