@@ -1,12 +1,12 @@
 //@/app/layout.tsx
 
 import { ClerkProvider } from '@clerk/nextjs'
-import Navbar from "@/components/navbar"
-import Footer from "@/components/footer"
 import { ThemeProvider } from "@/components/theme-provider"
 import { ProfileCompletionProvider } from '@/lib/contexts/ProfileCompletionContext'
 import { ProfileCompletionDialog } from '@/components/profile/ProfileCompletionDialog'
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "@/components/ui/sonner"
+import Navbar from "@/components/navbar"
+import Footer from "@/components/footer"
 import "./globals.css"
 import { Inter } from "next/font/google"
 

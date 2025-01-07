@@ -13,6 +13,7 @@ import {
 import { ProfileCompletionForm } from "./ProfileCompletionForm"
 import { useProfileCompletion } from "@/lib/contexts/ProfileCompletionContext"
 import { Progress } from "@/components/ui/progress"
+import { getProfileCompletionPercentage } from "@/lib/utils/profile" // Add this import
 
 export function ProfileCompletionDialog() {
   const { 
