@@ -24,11 +24,9 @@ export async function GET(): Promise<NextResponse<ProfileCompletionStatus | { er
     // Transform the profile data to match UserProfile type
     const userProfile: UserProfile | null = user.profile ? {
       ...user.profile,
-      dateOfBirth: user.profile.dateOfBirth || null, // Changed from undefined to null
+      dateOfBirth: user.profile.dateOfBirth || null,
       gender: user.profile.gender as UserProfile['gender'],
-      relationshipStatus: user.profile.relationshipStatus as UserProfile['relationshipStatus'],
-      countryOfOrigin: user.profile.countryOfOrigin,
-      bio: user.profile.bio
+      relationshipStatus: user.profile.relationshipStatus as UserProfile['relationshipStatus']
     } : null
 
     // Check profile completion status
