@@ -13,7 +13,7 @@ import {
 import { ProfileCompletionForm } from "./ProfileCompletionForm"
 import { useProfileCompletion } from "@/lib/contexts/ProfileCompletionContext"
 import { Progress } from "@/components/ui/progress"
-import { getProfileCompletionPercentage } from "@/lib/utils/profile" // Add this import
+import { getProfileCompletionPercentage } from "@/lib/utils/profile"
 
 export function ProfileCompletionDialog() {
   const { 
@@ -32,7 +32,10 @@ export function ProfileCompletionDialog() {
 
   return (
     <Dialog open={showProfileDialog} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[425px]" showClose={false}>
+      <DialogContent 
+        className="sm:max-w-[425px]"
+        // Remove showClose prop as it's not supported
+      >
         <DialogHeader>
           <DialogTitle>Complete Your Profile</DialogTitle>
           <DialogDescription>
