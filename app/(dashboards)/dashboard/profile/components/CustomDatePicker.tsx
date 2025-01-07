@@ -56,8 +56,8 @@ export function CustomDatePicker({ form }: CustomDatePickerProps) {
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
-                selected={field.value}
-                onSelect={field.onChange}
+                selected={field.value || undefined}
+                onSelect={(date: Date | undefined) => field.onChange(date || null)}
                 disabled={(date) =>
                   date > new Date() || date < new Date("1900-01-01")
                 }
