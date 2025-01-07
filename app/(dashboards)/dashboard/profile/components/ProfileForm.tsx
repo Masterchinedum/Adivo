@@ -7,12 +7,20 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { userProfileSchema, UserProfileFormValues } from "@/lib/validations/user-profile"
+import { userProfileSchema, type UserProfileFormValues } from "@/lib/validations/user-profile"
 import { DatePickerField } from "./DatePickerField"
 import { GenderSelect } from "./GenderSelect"
 import { RelationshipStatusSelect } from "./RelationshipStatusSelect"
 import { CountrySelect } from "./CountrySelect"
 import { BioTextarea } from "./BioTextarea"
+
+const defaultValues: UserProfileFormValues = {
+  dateOfBirth: null,
+  gender: null,
+  relationshipStatus: null,
+  countryOfOrigin: null,
+  bio: null,
+}
 
 export function ProfileForm() {
   const [isLoading, setIsLoading] = React.useState(false)
@@ -20,18 +28,25 @@ export function ProfileForm() {
   const form = useForm<UserProfileFormValues>({
     resolver: zodResolver(userProfileSchema),
     defaultValues: async () => {
-      const response = await fetch("/api/dashboard/profile")
-      if (!response.ok) {
+      try {
+        const response = await fetch("/api/dashboard/profile")
+        if (!response.ok) {
+          toast.error("Failed to load profile")
+          return defaultValues
+        }
+        const data = await response.json()
+        
+        return {
+          dateOfBirth: data?.dateOfBirth ? new Date(data.dateOfBirth) : null,
+          gender: data?.gender as UserProfileFormValues['gender'],
+          relationshipStatus: data?.relationshipStatus as UserProfileFormValues['relationshipStatus'],
+          countryOfOrigin: data?.countryOfOrigin || null,
+          bio: data?.bio || null,
+        }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (error) {
         toast.error("Failed to load profile")
-        return {}
-      }
-      const data = await response.json()
-      return {
-        dateOfBirth: data?.dateOfBirth ? new Date(data.dateOfBirth) : null,
-        gender: data?.gender || null,
-        relationshipStatus: data?.relationshipStatus || null,
-        countryOfOrigin: data?.countryOfOrigin || null,
-        bio: data?.bio || null,
+        return defaultValues
       }
     }
   })
