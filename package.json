@@ -45,6 +45,7 @@
     "svix": "^1.44.0",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
+    "world-countries": "^5.0.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {
