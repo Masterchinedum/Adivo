@@ -24,6 +24,7 @@ const defaultValues: UserProfileFormValues = {
 
 export function ProfileForm() {
   const [isLoading, setIsLoading] = React.useState(false)
+  const [isProfileLoaded, setIsProfileLoaded] = React.useState(false)
 
   const form = useForm<UserProfileFormValues>({
     resolver: zodResolver(userProfileSchema),
@@ -36,6 +37,7 @@ export function ProfileForm() {
         }
         const data = await response.json()
         
+        setIsProfileLoaded(true)
         return {
           dateOfBirth: data?.dateOfBirth ? new Date(data.dateOfBirth) : null,
           gender: data?.gender as UserProfileFormValues['gender'],
@@ -54,7 +56,7 @@ export function ProfileForm() {
   async function onSubmit(data: UserProfileFormValues) {
     setIsLoading(true)
     try {
-      const method = form.getValues("id") ? "PATCH" : "POST"
+      const method = isProfileLoaded ? "PATCH" : "POST"
       const response = await fetch("/api/dashboard/profile", {
         method,
         headers: { "Content-Type": "application/json" },
