@@ -28,6 +28,14 @@ interface DatePickerFieldProps {
 }
 
 export function DatePickerField({ form }: DatePickerFieldProps) {
+  const [selectedDate, setSelectedDate] = React.useState<Date | null>(null)
+
+  React.useEffect(() => {
+    if (form.getValues("dateOfBirth")) {
+      setSelectedDate(form.getValues("dateOfBirth"))
+    }
+  }, [form])
+
   return (
     <FormField
       control={form.control}
@@ -42,11 +50,11 @@ export function DatePickerField({ form }: DatePickerFieldProps) {
                   variant="outline"
                   className={cn(
                     "w-full pl-3 text-left font-normal",
-                    !field.value && "text-muted-foreground"
+                    !selectedDate && "text-muted-foreground"
                   )}
                 >
-                  {field.value ? (
-                    format(field.value, "PPP")
+                  {selectedDate ? (
+                    format(selectedDate, "PPP")
                   ) : (
                     <span>Pick a date</span>
                   )}
@@ -56,12 +64,20 @@ export function DatePickerField({ form }: DatePickerFieldProps) {
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
-                selected={field.value || undefined} // Convert null to undefined
-                onSelect={field.onChange}
+                mode="single"
+                selected={selectedDate}
+                onSelect={(date) => {
+                  setSelectedDate(date)
+                  field.onChange(date)
+                }}
                 disabled={(date) =>
                   date > new Date() || date < new Date("1900-01-01")
                 }
                 initialFocus
+                showOutsideDays
+                fromYear={1900}
+                toYear={new Date().getFullYear()}
+                captionLayout="dropdown"
               />
             </PopoverContent>
           </Popover>
