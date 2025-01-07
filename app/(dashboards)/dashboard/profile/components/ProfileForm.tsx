@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { userProfileSchema, type UserProfileFormValues } from "@/lib/validations/user-profile"
 import { CustomDatePicker } from "./CustomDatePicker"
 import { GenderSelect } from "./GenderSelect"
@@ -67,7 +67,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Profile Information</CardTitle>
+        {/* <CardTitle>Profile Information</CardTitle> */}
       </CardHeader>
       <CardContent>
         <Form {...form}>
