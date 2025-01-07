@@ -62,9 +62,18 @@ export async function POST(req: Request): Promise<APIResponse<UserProfile>> {
       return NextResponse.json({ error: "Profile already exists" }, { status: 400 })
     }
 
+    const data = {
+      ...validationResult.data,
+      // Ensure dateOfBirth is properly formatted for the database
+      dateOfBirth: validationResult.data.dateOfBirth 
+        ? new Date(validationResult.data.dateOfBirth) 
+        : null,
+      // ... other fields
+    }
+
     const profile = await prisma.userProfile.create({
       data: {
-        ...validationResult.data,
+        ...data,
         userId: user.id
       }
     })
@@ -107,9 +116,18 @@ export async function PATCH(req: Request): Promise<APIResponse<UserProfile>> {
       return NextResponse.json({ error: "Profile not found" }, { status: 404 })
     }
 
+    const data = {
+      ...validationResult.data,
+      // Ensure dateOfBirth is properly formatted for the database
+      dateOfBirth: validationResult.data.dateOfBirth 
+        ? new Date(validationResult.data.dateOfBirth) 
+        : null,
+      // ... other fields
+    }
+
     const updatedProfile = await prisma.userProfile.update({
       where: { id: user.profile.id },
-      data: validationResult.data
+      data: data
     })
 
     // Add type assertion to ensure the profile matches our UserProfile type

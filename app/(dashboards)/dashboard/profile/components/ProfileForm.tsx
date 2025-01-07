@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { userProfileSchema, type UserProfileFormValues } from "@/lib/validations/user-profile"
-// import { DatePickerField } from "./DatePickerField"
+import { CustomDatePicker } from "./CustomDatePicker"
 import { GenderSelect } from "./GenderSelect"
 import { RelationshipStatusSelect } from "./RelationshipStatusSelect"
 import { CountrySelect } from "./CountrySelect"
@@ -66,7 +66,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* <DatePickerField form={form} /> */}
+            <CustomDatePicker form={form} />
             <GenderSelect form={form} />
             <RelationshipStatusSelect form={form} />
             <CountrySelect form={form} />
