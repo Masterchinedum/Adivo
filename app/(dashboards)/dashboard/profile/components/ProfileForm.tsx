@@ -21,7 +21,7 @@ interface ProfileFormProps {
 }
 
 const defaultValues: UserProfileFormValues = {
-  dateOfBirth: undefined,
+  dateOfBirth: null, // Changed from undefined to null
   gender: null,
   relationshipStatus: null,
   countryOfOrigin: null,

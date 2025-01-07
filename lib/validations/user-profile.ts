@@ -3,7 +3,7 @@
 import * as z from "zod"
 
 export const userProfileSchema = z.object({
-  dateOfBirth: z.date().nullable(), // Change to nullable instead of optional
+  dateOfBirth: z.date().nullable(), // This ensures Date | null type
   gender: z.enum(['male', 'female']).nullable(),
   relationshipStatus: z.enum(['Single', 'Married', "It's Complicated"]).nullable(),
   countryOfOrigin: z.string().min(2).max(100).nullable(),
