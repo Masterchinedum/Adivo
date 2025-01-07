@@ -21,46 +21,30 @@ function isOldEnough(dateStr: string | Date): boolean {
 
 export const userProfileSchema = z.object({
   dateOfBirth: z
-    .union([z.string(), z.date(), z.null()])
+    .date()
     .nullable()
     .refine((date) => !date || isOldEnough(date), {
       message: `You must be at least ${MIN_AGE} years old to use this service.`
-    })
-    .transform((val) => {
-      if (!val) return null
-      return new Date(val)
     }),
 
   gender: z
     .enum(['male', 'female'])
-    .nullable()
-    .refine((val) => val !== null, {
-      message: "Please select your gender"
-    }),
+    .nullable(),
 
   relationshipStatus: z
     .enum(['Single', 'Married', "It's Complicated"])
-    .nullable()
-    .refine((val) => val !== null, {
-      message: "Please select your relationship status"
-    }),
+    .nullable(),
 
   countryOfOrigin: z
     .string()
     .min(2, "Country name must be at least 2 characters")
     .max(100, "Country name cannot exceed 100 characters")
-    .nullable()
-    .refine((val) => val !== null && val.trim().length > 0, {
-      message: "Please enter your country of origin"
-    }),
+    .nullable(),
 
   bio: z
     .string()
     .max(MAX_BIO_LENGTH, `Bio cannot exceed ${MAX_BIO_LENGTH} characters`)
     .nullable()
-    .refine((val) => val !== null && val.trim().length > 0, {
-      message: "Please write a short bio about yourself"
-    })
 })
 
 // For partial updates

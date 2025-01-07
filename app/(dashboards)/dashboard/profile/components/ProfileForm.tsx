@@ -20,8 +20,8 @@ interface ProfileFormProps {
   profile: UserProfileFormValues | null
 }
 
-const defaultValues: UserProfileFormValues = {
-  dateOfBirth: null, // Changed from undefined to null
+const defaultValues: Partial<UserProfileFormValues> = {
+  dateOfBirth: null,
   gender: null,
   relationshipStatus: null,
   countryOfOrigin: null,

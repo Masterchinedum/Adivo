@@ -20,7 +20,7 @@ interface ProfileCompletionFormProps {
   onSuccess: () => Promise<void>
 }
 
-const defaultValues: UserProfileFormValues = {
+const defaultValues: Partial<UserProfileFormValues> = {
   dateOfBirth: null,
   gender: null,
   relationshipStatus: null,
