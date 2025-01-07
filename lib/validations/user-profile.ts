@@ -1,7 +1,9 @@
+//lib/validations/user-profile.ts
+
 import * as z from "zod"
 
 export const userProfileSchema = z.object({
-  dateOfBirth: z.date().nullable(),
+  dateOfBirth: z.date().optional(),
   gender: z.enum(['male', 'female']).nullable(),
   relationshipStatus: z.enum(['Single', 'Married', "It's Complicated"]).nullable(),
   countryOfOrigin: z.string().min(2).max(100).nullable(),

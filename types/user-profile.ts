@@ -1,6 +1,8 @@
+//types/user-profile.ts
+
 export interface UserProfile {
   id: string
-  dateOfBirth: Date | null
+  dateOfBirth: Date | undefined
   gender: 'male' | 'female' | null
   relationshipStatus: 'Single' | 'Married' | "It's Complicated" | null
   countryOfOrigin: string | null

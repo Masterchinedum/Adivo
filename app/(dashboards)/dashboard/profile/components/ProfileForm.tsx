@@ -1,3 +1,5 @@
+//app/(dashboards)/dashboard/profile/components/ProfileForm.tsx
+
 "use client"
 
 import * as React from "react"
@@ -8,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { userProfileSchema, type UserProfileFormValues } from "@/lib/validations/user-profile"
-import { DatePickerField } from "./DatePickerField"
+// import { DatePickerField } from "./DatePickerField"
 import { GenderSelect } from "./GenderSelect"
 import { RelationshipStatusSelect } from "./RelationshipStatusSelect"
 import { CountrySelect } from "./CountrySelect"
@@ -19,7 +21,7 @@ interface ProfileFormProps {
 }
 
 const defaultValues: UserProfileFormValues = {
-  dateOfBirth: null,
+  dateOfBirth: undefined,
   gender: null,
   relationshipStatus: null,
   countryOfOrigin: null,
@@ -64,7 +66,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <DatePickerField form={form} />
+            {/* <DatePickerField form={form} /> */}
             <GenderSelect form={form} />
             <RelationshipStatusSelect form={form} />
             <CountrySelect form={form} />
