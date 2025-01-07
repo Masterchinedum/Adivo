@@ -33,6 +33,7 @@ export function BioTextarea({ form }: BioTextareaProps) {
             <div className="space-y-2">
               <Textarea
                 {...field}
+                value={field.value ?? ''} // Convert null to empty string
                 placeholder="Tell us about yourself..."
                 className="resize-none"
                 rows={5}
