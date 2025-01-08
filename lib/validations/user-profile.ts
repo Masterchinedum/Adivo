@@ -19,15 +19,13 @@ function isOldEnough(dateStr: string | Date): boolean {
   return age >= MIN_AGE
 }
 
-export const userProfileSchema = z.object({
+export const profileCompletionSchema = z.object({
   dateOfBirth: z
     .union([z.string(), z.date(), z.null()])
     .nullable()
     .transform((val) => {
       if (!val) return null;
-      // If it's already a Date object, return it
       if (val instanceof Date) return val;
-      // If it's a string, convert it to Date
       return new Date(val);
     })
     .refine((date) => !date || isOldEnough(date), {
@@ -47,28 +45,16 @@ export const userProfileSchema = z.object({
     .min(2, "Country name must be at least 2 characters")
     .max(100, "Country name cannot exceed 100 characters")
     .nullable(),
+})
 
+// Full profile schema including optional bio
+export const userProfileSchema = profileCompletionSchema.extend({
   bio: z
     .string()
     .max(MAX_BIO_LENGTH, `Bio cannot exceed ${MAX_BIO_LENGTH} characters`)
     .nullable()
+    .optional(),
 })
 
-// For partial updates
-export const updateUserProfileSchema = userProfileSchema.partial()
-
-// Types
+export type ProfileCompletionFormValues = z.infer<typeof profileCompletionSchema>
 export type UserProfileFormValues = z.infer<typeof userProfileSchema>
-export type UpdateUserProfileFormValues = z.infer<typeof updateUserProfileSchema>
-
-// Validation helper
-export function validateProfileCompletion(profile: UserProfileFormValues | null): boolean {
-  if (!profile) return false
-  
-  try {
-    userProfileSchema.parse(profile)
-    return true
-  } catch {
-    return false
-  }
-}

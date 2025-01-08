@@ -15,10 +15,6 @@ import { RelationshipStatusSelect } from "@/app/(dashboards)/dashboard/profile/c
 import { CountrySelect } from "@/app/(dashboards)/dashboard/profile/components/CountrySelect"
 import { useProfileCompletion } from "@/lib/contexts/ProfileCompletionContext"
 
-interface ProfileCompletionFormProps {
-  profile: UserProfileFormValues | null
-}
-
 const defaultValues: Partial<UserProfileFormValues> = {
   dateOfBirth: null,
   gender: null,
@@ -26,26 +22,37 @@ const defaultValues: Partial<UserProfileFormValues> = {
   countryOfOrigin: null,
 }
 
-export function ProfileCompletionForm({ profile }: ProfileCompletionFormProps) {
+export function ProfileCompletionForm() {
   const [isLoading, setIsLoading] = React.useState(false)
-  const { setShowProfileDialog, refreshProfile } = useProfileCompletion()
+  const { setShowProfileDialog, refreshProfile, userProfile } = useProfileCompletion()
 
   const form = useForm<UserProfileFormValues>({
     resolver: zodResolver(userProfileSchema),
-    defaultValues: profile || defaultValues,
+    defaultValues: userProfile || defaultValues,
+    mode: "onChange" // Enable real-time validation
   })
 
-  const onSubmit = async (data: UserProfileFormValues) => {
+  // Debug form state
+  React.useEffect(() => {
+    console.log('Form State:', {
+      values: form.getValues(),
+      errors: form.formState.errors,
+      isValid: form.formState.isValid,
+      isDirty: form.formState.isDirty
+    })
+  }, [form.formState])
+
+  async function onSubmit(data: UserProfileFormValues) {
     setIsLoading(true)
+    
     try {
-      const method = profile ? "PATCH" : "POST"
       const formattedData = {
         ...data,
         dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth).toISOString() : null,
       }
 
       const response = await fetch("/api/dashboard/profile", {
-        method,
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formattedData),
       })
@@ -59,6 +66,7 @@ export function ProfileCompletionForm({ profile }: ProfileCompletionFormProps) {
       toast.success("Profile saved successfully")
       setShowProfileDialog(false)
     } catch (error) {
+      console.error('Form submission error:', error)
       toast.error(error instanceof Error ? error.message : "Something went wrong")
     } finally {
       setIsLoading(false)
@@ -67,26 +75,23 @@ export function ProfileCompletionForm({ profile }: ProfileCompletionFormProps) {
 
   return (
     <Form {...form}>
-      <form 
-        onSubmit={form.handleSubmit(onSubmit)} 
-        className="space-y-6"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <CustomDatePicker form={form} />
         <GenderSelect form={form} />
         <RelationshipStatusSelect form={form} />
         <CountrySelect form={form} />
         
         <Button 
-          type="submit"
-          className="w-full transition-all duration-200 flex items-center justify-center min-h-[2.5rem] text-base font-medium
-            hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed sm:text-sm"
-          disabled={isLoading || !form.formState.isDirty}
-          variant="default"
+          type="submit" 
+          className="w-full transition-all duration-200 flex items-center justify-center min-h-[2.5rem]
+            text-base font-medium hover:opacity-90 active:scale-[0.98]
+            disabled:opacity-50 disabled:cursor-not-allowed sm:text-sm"
+          disabled={isLoading}
         >
           {isLoading ? (
             <>
               <svg
-                className="animate-spin -ml-1 mr-3 h-4 w-4 text-white"
+                className="animate-spin -ml-1 mr-3 h-4 w-4"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -111,6 +116,17 @@ export function ProfileCompletionForm({ profile }: ProfileCompletionFormProps) {
             'Complete Profile'
           )}
         </Button>
+
+        {/* Debug information */}
+        {process.env.NODE_ENV === 'development' && (
+          <pre className="text-xs mt-4 p-2 bg-gray-100 rounded">
+            {JSON.stringify({
+              values: form.getValues(),
+              errors: form.formState.errors,
+              isValid: form.formState.isValid,
+            }, null, 2)}
+          </pre>
+        )}
       </form>
     </Form>
   )
