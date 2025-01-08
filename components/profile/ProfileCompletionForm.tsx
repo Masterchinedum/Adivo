@@ -13,7 +13,6 @@ import { CustomDatePicker } from "@/app/(dashboards)/dashboard/profile/component
 import { GenderSelect } from "@/app/(dashboards)/dashboard/profile/components/GenderSelect"
 import { RelationshipStatusSelect } from "@/app/(dashboards)/dashboard/profile/components/RelationshipStatusSelect"
 import { CountrySelect } from "@/app/(dashboards)/dashboard/profile/components/CountrySelect"
-import { BioTextarea } from "@/app/(dashboards)/dashboard/profile/components/BioTextarea"
 
 interface ProfileCompletionFormProps {
   profile: UserProfileFormValues | null
@@ -25,7 +24,6 @@ const defaultValues: Partial<UserProfileFormValues> = {
   gender: null,
   relationshipStatus: null,
   countryOfOrigin: null,
-  bio: null,
 }
 
 export function ProfileCompletionForm({ profile, onSuccess }: ProfileCompletionFormProps) {
@@ -72,7 +70,6 @@ export function ProfileCompletionForm({ profile, onSuccess }: ProfileCompletionF
         <GenderSelect form={form} />
         <RelationshipStatusSelect form={form} />
         <CountrySelect form={form} />
-        <BioTextarea form={form} />
         
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading ? "Saving..." : "Save Profile"}

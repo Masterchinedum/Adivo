@@ -38,8 +38,7 @@ export function ProfileCompletionProvider({
         profile?.dateOfBirth &&
         profile?.gender &&
         profile?.relationshipStatus &&
-        profile?.countryOfOrigin &&
-        profile?.bio
+        profile?.countryOfOrigin 
       )
       
       setIsProfileComplete(isComplete)

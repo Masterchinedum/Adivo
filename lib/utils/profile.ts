@@ -1,4 +1,4 @@
-//lib/utils/profile.ts
+// lib/utils/profile.ts
 
 import type { UserProfile } from "@/types/user-profile"
 
@@ -13,8 +13,7 @@ const REQUIRED_FIELDS = {
   dateOfBirth: "Date of Birth",
   gender: "Gender",
   relationshipStatus: "Relationship Status",
-  countryOfOrigin: "Country of Origin",
-  bio: "Bio"
+  countryOfOrigin: "Country of Origin"
 } as const
 
 export function isProfileComplete(profile: UserProfile | null): ProfileCompletionStatus {
@@ -47,7 +46,7 @@ export function isProfileComplete(profile: UserProfile | null): ProfileCompletio
 export function getProfileCompletionPercentage(profile: UserProfile | null): number {
   if (!profile) return 0
 
-  const requiredFields = ['dateOfBirth', 'gender', 'relationshipStatus', 'countryOfOrigin', 'bio']
+  const requiredFields = ['dateOfBirth', 'gender', 'relationshipStatus', 'countryOfOrigin']
   const filledFields = requiredFields.filter(field => Boolean(profile[field as keyof UserProfile]))
   
   return Math.round((filledFields.length / requiredFields.length) * 100)
