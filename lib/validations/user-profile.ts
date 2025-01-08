@@ -32,7 +32,7 @@ export const userProfileSchema = z.object({
     .nullable(),
 
   relationshipStatus: z
-    .enum(['Single', 'Married', "It's Complicated"])
+    .enum(['Single', 'Married', "In a relationship" ,"It's Complicated"])
     .nullable(),
 
   countryOfOrigin: z

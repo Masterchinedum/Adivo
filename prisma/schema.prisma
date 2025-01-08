@@ -147,7 +147,7 @@ model UserProfile {
   id                String    @id @default(uuid()) @map("_id")
   dateOfBirth       DateTime?
   gender            String?    // "male" or "female"
-  relationshipStatus String?  // "Single", "Married", "It's Complicated"
+  relationshipStatus String?  // "Single", "Married", "In a relationship" , "It's Complicated"
   countryOfOrigin   String?
   bio               String?   @db.String(500)
   createdAt         DateTime  @default(now())

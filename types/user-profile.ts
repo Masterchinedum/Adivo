@@ -4,7 +4,7 @@ export interface UserProfile {
   id: string;
   dateOfBirth: Date | null;
   gender: 'male' | 'female' | null;
-  relationshipStatus: 'Single' | 'Married' | "It's Complicated" | null;
+  relationshipStatus: 'Single' | 'Married'  | "In a relationship" | "It's Complicated" | null;
   countryOfOrigin: string | null;
   bio: string | null;
   createdAt: Date;

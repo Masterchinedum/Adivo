@@ -27,6 +27,7 @@ interface RelationshipStatusSelectProps {
 const RELATIONSHIP_STATUSES = [
   "Single",
   "Married",
+  "In a relationship",
   "It's Complicated"
 ] as const
 
