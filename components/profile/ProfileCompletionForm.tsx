@@ -8,14 +8,14 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
-import { userProfileSchema, type UserProfileFormValues } from "@/lib/validations/user-profile"
+import { profileCompletionSchema, type ProfileCompletionFormValues } from "@/lib/validations/user-profile"
 import { CustomDatePicker } from "@/app/(dashboards)/dashboard/profile/components/CustomDatePicker"
 import { GenderSelect } from "@/app/(dashboards)/dashboard/profile/components/GenderSelect"
 import { RelationshipStatusSelect } from "@/app/(dashboards)/dashboard/profile/components/RelationshipStatusSelect"
 import { CountrySelect } from "@/app/(dashboards)/dashboard/profile/components/CountrySelect"
 import { useProfileCompletion } from "@/lib/contexts/ProfileCompletionContext"
 
-const defaultValues: Partial<UserProfileFormValues> = {
+const defaultValues: Partial<ProfileCompletionFormValues> = {
   dateOfBirth: null,
   gender: null,
   relationshipStatus: null,
@@ -26,8 +26,8 @@ export function ProfileCompletionForm() {
   const [isLoading, setIsLoading] = React.useState(false)
   const { setShowProfileDialog, refreshProfile, userProfile } = useProfileCompletion()
 
-  const form = useForm<UserProfileFormValues>({
-    resolver: zodResolver(userProfileSchema),
+  const form = useForm<ProfileCompletionFormValues>({
+    resolver: zodResolver(profileCompletionSchema),
     defaultValues: userProfile || defaultValues,
     mode: "onChange" // Enable real-time validation
   })
@@ -42,7 +42,7 @@ export function ProfileCompletionForm() {
     })
   }, [form.formState])
 
-  async function onSubmit(data: UserProfileFormValues) {
+  async function onSubmit(data: ProfileCompletionFormValues) {
     setIsLoading(true)
     
     try {
