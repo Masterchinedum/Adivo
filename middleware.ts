@@ -1,5 +1,6 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
-import { NextResponse } from 'next/server'
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
+import { analytics } from '@/utils/analytics'
 
 const isPublicRoute = createRouteMatcher([
   '/sign-in(.*)', 
@@ -16,6 +17,21 @@ const isPublicRoute = createRouteMatcher([
 const isAdminRoute = createRouteMatcher(['/admindash(.*)'])
 
 export default clerkMiddleware(async (auth, req) => {
+
+  if (req.nextUrl.pathname === '/') {
+    try {
+      await analytics.track('pageview', {
+        page: '/',
+        country: req.geo?.country,
+      })
+    } catch (err) {
+      // fail silently to not affect request
+      console.error(err)
+    }
+  }
+
+  return NextResponse.next()
+}
 
   if (isPublicRoute(req)) {
       return NextResponse.next()
