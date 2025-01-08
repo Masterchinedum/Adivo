@@ -12,8 +12,9 @@ import {
 } from "@/components/ui/dialog"
 import { ProfileCompletionForm } from "./ProfileCompletionForm"
 import { useProfileCompletion } from "@/lib/contexts/ProfileCompletionContext"
-import { Progress } from "@/components/ui/progress"
-import { getProfileCompletionPercentage } from "@/lib/utils/profile"
+// Remove this import as it's no longer needed
+// import { Progress } from "@/components/ui/progress"
+// import { getProfileCompletionPercentage } from "@/lib/utils/profile"
 
 export function ProfileCompletionDialog() {
   const { 
@@ -62,16 +63,7 @@ export function ProfileCompletionDialog() {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="my-4">
-          <div className="flex justify-between text-sm mb-2">
-            <span>Profile Completion</span>
-            <span>{getProfileCompletionPercentage(userProfile)}%</span>
-          </div>
-          <Progress 
-            value={getProfileCompletionPercentage(userProfile)} 
-            className="h-2"
-          />
-        </div>
+        {/* Remove the progress tracking div */}
 
         <div className="mt-4">
           <ProfileCompletionForm profile={userProfile} />

@@ -1,4 +1,4 @@
-//components/profile/ProfileCompletionForm.tsx
+// components/profile/ProfileCompletionForm.tsx
 
 "use client"
 
@@ -8,51 +8,46 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
-import { profileCompletionSchema, type ProfileCompletionFormValues } from "@/lib/validations/user-profile"
+import { userProfileSchema, type UserProfileFormValues } from "@/lib/validations/user-profile"
 import { CustomDatePicker } from "@/app/(dashboards)/dashboard/profile/components/CustomDatePicker"
 import { GenderSelect } from "@/app/(dashboards)/dashboard/profile/components/GenderSelect"
 import { RelationshipStatusSelect } from "@/app/(dashboards)/dashboard/profile/components/RelationshipStatusSelect"
 import { CountrySelect } from "@/app/(dashboards)/dashboard/profile/components/CountrySelect"
 import { useProfileCompletion } from "@/lib/contexts/ProfileCompletionContext"
 
-const defaultValues: Partial<ProfileCompletionFormValues> = {
+interface ProfileCompletionFormProps {
+  profile: UserProfileFormValues | null
+}
+
+const defaultValues: Partial<UserProfileFormValues> = {
   dateOfBirth: null,
   gender: null,
   relationshipStatus: null,
   countryOfOrigin: null,
 }
 
-export function ProfileCompletionForm() {
+export function ProfileCompletionForm({ profile }: ProfileCompletionFormProps) {
   const [isLoading, setIsLoading] = React.useState(false)
-  const { setShowProfileDialog, refreshProfile, userProfile } = useProfileCompletion()
+  const { setShowProfileDialog, refreshProfile } = useProfileCompletion()
 
-  const form = useForm<ProfileCompletionFormValues>({
-    resolver: zodResolver(profileCompletionSchema),
-    defaultValues: userProfile || defaultValues,
-    mode: "onChange" // Enable real-time validation
+  const form = useForm<UserProfileFormValues>({
+    resolver: zodResolver(userProfileSchema),
+    defaultValues: profile || defaultValues,
+    mode: "all" // Important: This enables real-time validation
   })
 
-  // Debug form state
-  React.useEffect(() => {
-    console.log('Form State:', {
-      values: form.getValues(),
-      errors: form.formState.errors,
-      isValid: form.formState.isValid,
-      isDirty: form.formState.isDirty
-    })
-  }, [form.formState])
-
-  async function onSubmit(data: ProfileCompletionFormValues) {
+  const onSubmit = async (data: UserProfileFormValues) => {
     setIsLoading(true)
     
     try {
+      const method = profile ? "PATCH" : "POST"
       const formattedData = {
         ...data,
         dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth).toISOString() : null,
       }
 
       const response = await fetch("/api/dashboard/profile", {
-        method: "POST",
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formattedData),
       })
@@ -82,11 +77,13 @@ export function ProfileCompletionForm() {
         <CountrySelect form={form} />
         
         <Button 
-          type="submit" 
+          type="submit"
           className="w-full transition-all duration-200 flex items-center justify-center min-h-[2.5rem]
             text-base font-medium hover:opacity-90 active:scale-[0.98]
-            disabled:opacity-50 disabled:cursor-not-allowed sm:text-sm"
-          disabled={isLoading}
+            disabled:opacity-50 disabled:cursor-not-allowed
+            sm:text-sm"
+          disabled={isLoading || !form.formState.isValid}
+          variant="default"
         >
           {isLoading ? (
             <>
@@ -116,17 +113,6 @@ export function ProfileCompletionForm() {
             'Complete Profile'
           )}
         </Button>
-
-        {/* Debug information */}
-        {process.env.NODE_ENV === 'development' && (
-          <pre className="text-xs mt-4 p-2 bg-gray-100 rounded">
-            {JSON.stringify({
-              values: form.getValues(),
-              errors: form.formState.errors,
-              isValid: form.formState.isValid,
-            }, null, 2)}
-          </pre>
-        )}
       </form>
     </Form>
   )
