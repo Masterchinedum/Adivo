@@ -21,8 +21,15 @@ function isOldEnough(dateStr: string | Date): boolean {
 
 export const userProfileSchema = z.object({
   dateOfBirth: z
-    .date()
+    .union([z.string(), z.date(), z.null()])
     .nullable()
+    .transform((val) => {
+      if (!val) return null;
+      // If it's already a Date object, return it
+      if (val instanceof Date) return val;
+      // If it's a string, convert it to Date
+      return new Date(val);
+    })
     .refine((date) => !date || isOldEnough(date), {
       message: `You must be at least ${MIN_AGE} years old to use this service.`
     }),
@@ -32,7 +39,7 @@ export const userProfileSchema = z.object({
     .nullable(),
 
   relationshipStatus: z
-    .enum(['Single', 'Married', "In a relationship" ,"It's Complicated"])
+    .enum(['Single', 'Married', "In a relationship", "It's Complicated"])
     .nullable(),
 
   countryOfOrigin: z
