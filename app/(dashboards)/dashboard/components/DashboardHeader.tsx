@@ -9,6 +9,7 @@ import {
   // PlusCircle,
   BookOpen
 } from "lucide-react";
+import Link from 'next/link';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -55,17 +56,21 @@ export default function DashboardHeader() {
         </div>
 
         <div className="ml-auto flex items-center gap-4">
-          <Button variant="ghost" size="sm">
-            <BookOpen className="h-4 w-4 mr-2" />
-            Tests
-          </Button>
+          <Link href="/tests">
+            <Button variant="ghost" size="sm">
+              <BookOpen className="h-4 w-4 mr-2" />
+              Tests
+            </Button>
+          </Link>
           <Button variant="ghost" size="sm">
             <CalendarDays className="h-4 w-4 mr-2" />
             Calendar
           </Button>
+          <Link href="/dashboard/profile">
           <Button variant="ghost" size="sm">
             <Settings className="h-4 w-4" />
           </Button>
+          </Link>
           <UserButton />
         </div>
       </div>
