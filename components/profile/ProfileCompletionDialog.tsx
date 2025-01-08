@@ -18,9 +18,9 @@ import { getProfileCompletionPercentage } from "@/lib/utils/profile"
 export function ProfileCompletionDialog() {
   const { 
     showProfileDialog, 
+    setShowProfileDialog,
     isProfileComplete,
-    userProfile,
-    refreshProfile 
+    userProfile
   } = useProfileCompletion()
 
   // Prevent closing if profile is incomplete
@@ -28,14 +28,12 @@ export function ProfileCompletionDialog() {
     if (!isProfileComplete && !open) {
       return // Prevent closing
     }
+    setShowProfileDialog(open)
   }
 
   return (
     <Dialog open={showProfileDialog} onOpenChange={handleOpenChange}>
-      <DialogContent 
-        className="sm:max-w-[425px]"
-        // Remove showClose prop as it's not supported
-      >
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Complete Your Profile</DialogTitle>
           <DialogDescription>
@@ -55,10 +53,7 @@ export function ProfileCompletionDialog() {
           />
         </div>
 
-        <ProfileCompletionForm 
-          profile={userProfile}
-          onSuccess={refreshProfile}
-        />
+        <ProfileCompletionForm profile={userProfile} />
       </DialogContent>
     </Dialog>
   )

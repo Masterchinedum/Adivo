@@ -13,10 +13,10 @@ import { CustomDatePicker } from "@/app/(dashboards)/dashboard/profile/component
 import { GenderSelect } from "@/app/(dashboards)/dashboard/profile/components/GenderSelect"
 import { RelationshipStatusSelect } from "@/app/(dashboards)/dashboard/profile/components/RelationshipStatusSelect"
 import { CountrySelect } from "@/app/(dashboards)/dashboard/profile/components/CountrySelect"
+import { useProfileCompletion } from "@/lib/contexts/ProfileCompletionContext"
 
 interface ProfileCompletionFormProps {
   profile: UserProfileFormValues | null
-  onSuccess: () => Promise<void>
 }
 
 const defaultValues: Partial<UserProfileFormValues> = {
@@ -26,8 +26,9 @@ const defaultValues: Partial<UserProfileFormValues> = {
   countryOfOrigin: null,
 }
 
-export function ProfileCompletionForm({ profile, onSuccess }: ProfileCompletionFormProps) {
+export function ProfileCompletionForm({ profile }: ProfileCompletionFormProps) {
   const [isLoading, setIsLoading] = React.useState(false)
+  const { setShowProfileDialog, refreshProfile } = useProfileCompletion()
 
   const form = useForm<UserProfileFormValues>({
     resolver: zodResolver(userProfileSchema),
@@ -54,8 +55,14 @@ export function ProfileCompletionForm({ profile, onSuccess }: ProfileCompletionF
         throw new Error(errorData.error || "Failed to save profile")
       }
 
-      await onSuccess()
+      // Refresh profile data in context
+      await refreshProfile()
+      
+      // Show success message
       toast.success("Profile saved successfully")
+      
+      // Close the dialog
+      setShowProfileDialog(false)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong")
     } finally {
@@ -71,8 +78,13 @@ export function ProfileCompletionForm({ profile, onSuccess }: ProfileCompletionF
         <RelationshipStatusSelect form={form} />
         <CountrySelect form={form} />
         
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Saving..." : "Save Profile"}
+        <Button 
+          type="submit" 
+          className="w-full" 
+          disabled={isLoading}
+          variant="default"
+        >
+          {isLoading ? "Saving..." : "Complete Profile"}
         </Button>
       </form>
     </Form>
