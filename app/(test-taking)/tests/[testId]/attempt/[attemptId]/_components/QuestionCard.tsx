@@ -35,7 +35,6 @@ export function QuestionCard({
   const handleOptionSelect = async (optionId: string) => {
     if (isSubmitting) return
     setIsSubmitting(true)
-    
     try {
       await onAnswerSelect(optionId)
     } finally {
@@ -79,9 +78,12 @@ export function QuestionCard({
           <div className="flex items-center justify-center w-full gap-8">
             {/* Left Group (Agree) */}
             <div className="flex items-center gap-4">
-              {leftGroup.map((option) => (
+              {leftGroup.map((option, index) => (
                 <OptionCircle
                   key={option.id}
+                  position={index + 1}
+                  totalInGroup={leftGroup.length}
+                  groupType="left"
                   size={getOptionSize(option, 'left', leftGroup.length)}
                   selected={selectedOption === option.id}
                   groupColor={OPTION_COLORS.agree}
@@ -95,6 +97,9 @@ export function QuestionCard({
             {middleOption && (
               <OptionCircle
                 key={middleOption.id}
+                position={1}
+                totalInGroup={1}
+                groupType="middle"
                 size="sm"
                 selected={selectedOption === middleOption.id}
                 groupColor={OPTION_COLORS.neutral}
@@ -105,9 +110,12 @@ export function QuestionCard({
 
             {/* Right Group (Disagree) */}
             <div className="flex items-center gap-4">
-              {rightGroup.map((option) => (
+              {rightGroup.map((option, index) => (
                 <OptionCircle
                   key={option.id}
+                  position={index + 1}
+                  totalInGroup={rightGroup.length}
+                  groupType="right"
                   size={getOptionSize(option, 'right', rightGroup.length)}
                   selected={selectedOption === option.id}
                   groupColor={OPTION_COLORS.disagree}

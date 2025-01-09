@@ -6,26 +6,46 @@ import { cn } from "@/lib/utils"
 import { Check } from "lucide-react"
 
 interface OptionCircleProps extends React.HTMLAttributes<HTMLDivElement> {
-  size?: "sm" | "md" | "lg"
+  size: 'lg' | 'md' | 'sm'  // Changed from default 'md'
+  position: number
+  totalInGroup: number
+  groupType: 'left' | 'middle' | 'right'
   selected?: boolean
   groupColor?: string
   disabled?: boolean
 }
 
+// Size mapping with larger differences between sizes
 const sizeMap = {
-  sm: "h-10 w-10",
-  md: "h-12 w-12",
-  lg: "h-14 w-14"
+  lg: "h-16 w-16", // Largest size
+  md: "h-12 w-12", // Medium size
+  sm: "h-8 w-8"    // Smallest size
 }
 
 export function OptionCircle({
-  size = "md",
+  position,
+  totalInGroup,
+  groupType,
   selected = false,
-  groupColor = "#2563eb", // Default blue color
+  groupColor = "#2563eb",
   disabled = false,
   className,
   ...props
 }: OptionCircleProps) {
+  // Calculate size based on position and group type
+  let size: 'lg' | 'md' | 'sm'
+  
+  if (groupType === 'middle') {
+    size = 'sm'
+  } else if (groupType === 'left') {
+    // For left group, size decreases from left to right
+    size = position === 1 ? 'lg' : position === 2 ? 'md' : 'sm'
+  } else {
+    // For right group, size increases from left to right
+    const reversedPosition = totalInGroup - position + 1
+    size = reversedPosition === 1 ? 'lg' : reversedPosition === 2 ? 'md' : 'sm'
+  }
+
   return (
     <div
       className={cn(
