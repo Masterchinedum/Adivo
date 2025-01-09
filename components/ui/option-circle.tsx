@@ -17,10 +17,10 @@ interface OptionCircleProps extends React.HTMLAttributes<HTMLDivElement> {
 
 // Size mapping with larger differences between sizes
 const sizeMap = {
-  lg: "h-16 w-16", // Largest size
-  md: "h-12 w-12", // Medium size
-  sm: "h-8 w-8"    // Smallest size
-}
+  lg: "h-8 w-8 md:h-12 md:h-12 lg:h-16 lg:w-16", // Largest
+  md: "h-6 w-6 md:h-10 md:w-10 lg:h-12 lg:w-12", // Medium
+  sm: "h-4 w-4 md:h-8 md:w-8 lg:h-8 lg:w-8",     // Smallest
+} as const;
 
 export function OptionCircle({
   position,
