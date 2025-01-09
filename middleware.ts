@@ -1,6 +1,6 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
-import { NextResponse } from 'next/server';
-import { analytics } from '@/utils/analytics'
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { NextResponse } from 'next/server'
+import { analytics } from './utils/analytics'
 
 const isPublicRoute = createRouteMatcher([
   '/sign-in(.*)', 
@@ -17,27 +17,24 @@ const isPublicRoute = createRouteMatcher([
 const isAdminRoute = createRouteMatcher(['/admindash(.*)'])
 
 export default clerkMiddleware(async (auth, req) => {
-
+  // Track page views for analytics
   if (req.nextUrl.pathname === '/') {
     try {
       await analytics.track('pageview', {
         page: '/',
-        country: req.geo?.country,
+        country: req.headers.get('x-vercel-ip-country') || 'unknown',
       })
     } catch (err) {
-      // fail silently to not affect request
+      // Fail silently to not affect request
       console.error(err)
     }
   }
 
-  return NextResponse.next()
-}
-
   if (isPublicRoute(req)) {
-      return NextResponse.next()
-    }
+    return NextResponse.next()
+  }
 
-    const { userId, redirectToSignIn } = await auth()
+  const { userId, redirectToSignIn } = await auth()
 
   // Protect all routes starting with `/admin`
   if (isAdminRoute(req) && (await auth()).sessionClaims?.metadata?.role !== 'admin') {
