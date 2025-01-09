@@ -3,23 +3,20 @@
 
 import { useState } from "react"
 import { Card, CardHeader, CardContent } from "@/components/ui/card"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Label } from "@/components/ui/label"
+import { OptionCircle } from "@/components/ui/option-circle"
 import { cn } from "@/lib/utils"
-
-interface Option {
-  id: string
-  text: string
-}
-
-interface Question {
-  id: string
-  title: string
-  options: Option[]
-}
+import { groupOptions, getOptionSize } from "@/lib/utils/option-grouping"
+import { OPTION_COLORS, OPTION_LABELS } from "@/lib/constants/option-labels"
 
 interface QuestionCardProps {
-  question: Question
+  question: {
+    id: string
+    title: string
+    options: {
+      id: string
+      text: string
+    }[]
+  }
   questionNumber: number
   selectedOption?: string
   isAnswered: boolean
@@ -46,12 +43,15 @@ export function QuestionCard({
     }
   }
 
+  // Group options using the utility function
+  const { leftGroup, middleOption, rightGroup } = groupOptions(question.options)
+
   return (
     <Card 
-      id={`question-${questionNumber}`} // Add this ID
+      id={`question-${questionNumber}`}
       className={cn(
         "transition-all duration-200",
-        isAnswered && "ring-2 ring-primary/10",
+        isAnswered && "ring-2 ring-primary/10"
       )}
     >
       <CardHeader className="border-b bg-muted/40">
@@ -64,37 +64,60 @@ export function QuestionCard({
           </span>
         </div>
       </CardHeader>
+      
       <CardContent className="p-6">
-        <p className="text-base font-medium mb-4">{question.title}</p>
+        <p className="text-base font-medium mb-8">{question.title}</p>
         
-        <RadioGroup
-          value={selectedOption}
-          onValueChange={handleOptionSelect}
-          className="space-y-3"
-          disabled={isSubmitting}
-        >
-          {question.options.map((option) => (
-            <div
-              key={option.id}
-              className={cn(
-                "flex items-center space-x-2 rounded-lg border p-4 transition-colors",
-                selectedOption === option.id && "border-primary bg-primary/5",
-              )}
-            >
-              <RadioGroupItem
-                value={option.id}
-                id={option.id}
-                className="mt-0"
-              />
-              <Label
-                htmlFor={option.id}
-                className="flex-1 cursor-pointer text-base"
-              >
-                {option.text}
-              </Label>
+        <div className="flex flex-col items-center space-y-8">
+          {/* Labels */}
+          <div className="flex justify-between w-full text-sm text-muted-foreground">
+            <span>{OPTION_LABELS.agree[0]}</span>
+            <span>{OPTION_LABELS.disagree[0]}</span>
+          </div>
+          
+          {/* Options Display */}
+          <div className="flex items-center justify-center w-full gap-8">
+            {/* Left Group (Agree) */}
+            <div className="flex items-center gap-4">
+              {leftGroup.map((option) => (
+                <OptionCircle
+                  key={option.id}
+                  size={getOptionSize(option, 'left', leftGroup.length)}
+                  selected={selectedOption === option.id}
+                  groupColor={OPTION_COLORS.agree}
+                  onClick={() => handleOptionSelect(option.id)}
+                  disabled={isSubmitting}
+                />
+              ))}
             </div>
-          ))}
-        </RadioGroup>
+
+            {/* Middle Option (if exists) */}
+            {middleOption && (
+              <OptionCircle
+                key={middleOption.id}
+                size="sm"
+                selected={selectedOption === middleOption.id}
+                groupColor={OPTION_COLORS.neutral}
+                onClick={() => handleOptionSelect(middleOption.id)}
+                disabled={isSubmitting}
+              />
+            )}
+
+            {/* Right Group (Disagree) */}
+            <div className="flex items-center gap-4">
+              {rightGroup.map((option) => (
+                <OptionCircle
+                  key={option.id}
+                  size={getOptionSize(option, 'right', rightGroup.length)}
+                  selected={selectedOption === option.id}
+                  groupColor={OPTION_COLORS.disagree}
+                  onClick={() => handleOptionSelect(option.id)}
+                  disabled={isSubmitting}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
       </CardContent>
     </Card>
   )
