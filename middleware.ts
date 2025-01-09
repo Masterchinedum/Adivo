@@ -22,7 +22,7 @@ export default clerkMiddleware(async (auth, req) => {
     try {
       await analytics.track('pageview', {
         page: '/',
-        country: req.geo?.country || 'unknown',
+        country: req.headers.get('x-vercel-ip-country') || 'unknown',
       })
     } catch (err) {
       // Fail silently to not affect request
