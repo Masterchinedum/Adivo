@@ -35,32 +35,31 @@ export const getOptionSize = (
   groupType: 'left' | 'middle' | 'right', 
   position: number,
   totalInGroup: number
-): 'sm' | 'md' | 'lg' => {
+): 'xl' | 'lg' | 'md' | 'sm' => {
   if (groupType === 'middle') return 'sm';
 
-  // Handle larger groups (more than 3 options per side)
-  if (totalInGroup > 3) {
-    // For groups with more than 3 options, create a gradual size decrease
-    const sizeRatio = position / totalInGroup;
-    
+  // Handle larger groups (4 or more options per side)
+  if (totalInGroup >= 4) {
     if (groupType === 'left') {
-      if (sizeRatio <= 0.33) return 'lg';
-      if (sizeRatio <= 0.66) return 'md';
+      if (position === 1) return 'xl';
+      if (position === 2) return 'lg';
+      if (position === 3) return 'md';
       return 'sm';
     } else {
-      // For right group, reverse the ratio
-      const reversedRatio = 1 - sizeRatio;
-      if (reversedRatio <= 0.33) return 'lg';
-      if (reversedRatio <= 0.66) return 'md';
+      // For right group, reverse the positions
+      const reversedPosition = totalInGroup - position + 1;
+      if (reversedPosition === 1) return 'xl';
+      if (reversedPosition === 2) return 'lg';
+      if (reversedPosition === 3) return 'md';
       return 'sm';
     }
   }
 
-  // Original logic for 3 or fewer options per side
+  // For 3 or fewer options per side
   if (groupType === 'left') {
-    return position === 1 ? 'lg' : position === 2 ? 'md' : 'sm';
+    return position === 1 ? 'xl' : position === 2 ? 'lg' : 'md';
   } else {
     const reversedPosition = totalInGroup - position + 1;
-    return reversedPosition === 1 ? 'lg' : reversedPosition === 2 ? 'md' : 'sm';
+    return reversedPosition === 1 ? 'xl' : reversedPosition === 2 ? 'lg' : 'md';
   }
 };

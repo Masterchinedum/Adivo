@@ -64,12 +64,12 @@ export function QuestionCard({
         </div>
       </CardHeader>
       
-      <CardContent className="p-6">
-        <p className="text-base font-medium mb-8">{question.title}</p>
+      <CardContent className="p-2 sm:p-4 md:p-6"> {/* Reduced padding on mobile */}
+        <p className="text-base font-medium mb-4 md:mb-8">{question.title}</p>
         
-        <div className="flex flex-col items-center space-y-8">
+        <div className="flex flex-col items-center space-y-4 md:space-y-8">
           {/* Labels */}
-          <div className="flex justify-between w-full text-xs md:text-sm text-muted-foreground px-2">
+          <div className="flex justify-between w-full text-xs md:text-sm text-muted-foreground px-1 md:px-2">
             <span>{OPTION_LABELS.agree[0]}</span>
             <span>{OPTION_LABELS.disagree[0]}</span>
           </div>
@@ -77,7 +77,7 @@ export function QuestionCard({
           {/* Options Display */}
           <div className="flex items-center justify-center w-full">
             {/* Left Group (Agree) */}
-            <div className="flex items-center gap-1 md:gap-2 lg:gap-4">
+            <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
               {leftGroup.map((option, index) => (
                 <OptionCircle
                   key={option.id}
@@ -93,9 +93,12 @@ export function QuestionCard({
               ))}
             </div>
 
+            {/* Spacing between groups */}
+            <div className="w-1 sm:w-2 md:w-3" /> {/* Added consistent spacing */}
+
             {/* Middle Option (if exists) */}
             {middleOption && (
-              <div className="mx-1 md:mx-2 lg:mx-4">
+              <div className="mx-1 sm:mx-2 md:mx-3">
                 <OptionCircle
                   key={middleOption.id}
                   position={1}
@@ -110,8 +113,11 @@ export function QuestionCard({
               </div>
             )}
 
+            {/* Spacing between groups */}
+            <div className="w-1 sm:w-2 md:w-3" /> {/* Added consistent spacing */}
+
             {/* Right Group (Disagree) */}
-            <div className="flex items-center gap-1 md:gap-2 lg:gap-4">
+            <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
               {rightGroup.map((option, index) => (
                 <OptionCircle
                   key={option.id}
