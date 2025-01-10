@@ -2,10 +2,10 @@
 
 import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
-import { Prisma } from '@prisma/client'
+// import { Prisma } from '@prisma/client'
 import prisma from '@/lib/prisma'
 import { updateTestSchema } from '@/lib/validations/tests'
-import type { TestError } from '@/types/tests/test'
+// import type { TestError } from '@/types/tests/test'
 
 export async function GET(req: Request) {
   try {
