@@ -1,6 +1,7 @@
 // app/(test-taking)/tests/[testId]/attempt/[attemptId]/results/_components/CategoryScores.tsx
 
 import { CategoryScore } from "@/types/tests/test-attempt"
+import { Progress } from "@/components/ui/progress"
 
 interface CategoryScoresProps {
   categoryScores: CategoryScore[]
@@ -19,11 +20,11 @@ export function CategoryScores({ categoryScores }: CategoryScoresProps) {
             <div className="flex justify-between items-center">
               <div>
                 <h3 className="font-semibold text-lg">{score.category.name}</h3>
-                {/* {score.category.description && (
+                {score.category.description && (
                   <p className="text-sm text-muted-foreground mt-1">
                     {score.category.description}
                   </p>
-                )} */}
+                )}
               </div>
               <div className="text-right">
                 <span className="text-2xl font-bold text-primary">
@@ -31,32 +32,11 @@ export function CategoryScores({ categoryScores }: CategoryScoresProps) {
                 </span>
               </div>
             </div>
-{/* 
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="p-2 rounded bg-secondary/20">
-                <span className="text-muted-foreground">Raw Score</span>
-                <p className="font-medium mt-1">
-                  {score.rawScore} / {score.maxRawScore}
-                </p>
-              </div>
-              <div className="p-2 rounded bg-secondary/20">
-                <span className="text-muted-foreground">Scaled Score</span>
-                <p className="font-medium mt-1">
-                  {score.actualScore} / {score.maxScale}
-                </p>
-              </div>
-            </div> */}
 
-            <div className="relative pt-2">
-              <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
-                <div 
-                  className="bg-primary h-full transition-all duration-500 ease-in-out"
-                  style={{ 
-                    width: `${(score.actualScore / score.maxScale * 100)}%`
-                  }}
-                />
-              </div>
-            </div>
+            <Progress 
+              value={(score.actualScore / score.maxScale * 100)} 
+              className="h-2"
+            />
           </div>
         ))}
       </div>
