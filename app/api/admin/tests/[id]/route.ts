@@ -50,121 +50,202 @@ export async function GET(req: Request) {
 
 export async function PATCH(req: Request) {
   try {
+    console.log('[TEST_PATCH] Starting PATCH request')
     const id = req.url.split('/tests/')[1].split('/')[0]
+    console.log('[TEST_PATCH] Extracted ID:', id)
+
     const { userId } = await auth()
     if (!userId) {
-      return new NextResponse('Unauthorized', { status: 401 })
-    }
-
-    if (!id) {
-      return new NextResponse('Bad Request: Missing test ID', { status: 400 })
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
 
     const json = await req.json()
+    console.log('[TEST_PATCH] Request body:', json)
+
     const validationResult = updateTestSchema.safeParse({
       ...json,
       id
     })
 
     if (!validationResult.success) {
-      const errorResponse: TestError = {
+      return NextResponse.json({
         message: 'Invalid request data',
         errors: validationResult.error.flatten().fieldErrors
-      }
-      return NextResponse.json(errorResponse, { status: 400 })
+      }, { status: 400 })
     }
 
     const { categories, ...testData } = validationResult.data
 
-    // Update test with categories and their questions in a transaction
-    try {
-      const test = await prisma.$transaction(async (tx) => {
-        // Verify test exists and user has access
-        const existingTest = await tx.test.findUnique({
-          where: { id }
-        });
-
-        if (!existingTest) {
-          throw new Error('Test not found');
+    // Wrap everything in a transaction
+    const updatedTest = await prisma.$transaction(async (tx) => {
+      // 1. Verify test exists
+      const existingTest = await tx.test.findUnique({
+        where: { id },
+        include: {
+          categories: {
+            include: {
+              questions: {
+                include: {
+                  options: true
+                }
+              }
+            }
+          }
         }
+      })
 
-        // Delete existing categories (cascade deletes questions and options)
-        await tx.category.deleteMany({
-          where: { testId: id }
-        })
+      if (!existingTest) {
+        throw new Error('Test not found')
+      }
 
-        // Update test with new data
-        const updatedTest = await tx.test.update({
-          where: { id },
-          data: {
-            ...testData,
-            categories: {
-              create: categories?.map(category => ({
+      // 2. Update test basic info
+      await tx.test.update({
+        where: { id },
+        data: testData
+      })
+
+      // 3. Process categories
+      if (categories) {
+        for (const category of categories) {
+          if (category.id) {
+            // Update existing category
+            const existingCategory = existingTest.categories.find(c => c.id === category.id)
+            if (existingCategory) {
+              await tx.category.update({
+                where: { id: category.id },
+                data: {
+                  name: category.name,
+                  description: category.description,
+                  scale: category.scale
+                }
+              })
+
+              // Process questions for existing category
+              if (category.questions) {
+                for (const question of category.questions) {
+                  if (question.id) {
+                    // Update existing question
+                    await tx.question.update({
+                      where: { id: question.id },
+                      data: {
+                        title: question.title
+                      }
+                    })
+
+                    // Process options - Fix type error by filtering out undefined
+                    if (question.options) {
+                      const existingOptions = existingCategory.questions
+                        .find(q => q.id === question.id)?.options || []
+                      const newOptionIds = question.options
+                        .map(o => o.id)
+                        .filter((id): id is string => id !== undefined) // Type guard
+
+                      await tx.option.deleteMany({
+                        where: {
+                          questionId: question.id,
+                          id: { notIn: newOptionIds }
+                        }
+                      })
+
+                      // Update or create options
+                      for (const option of question.options) {
+                        if (option.id) {
+                          await tx.option.update({
+                            where: { id: option.id },
+                            data: {
+                              text: option.text,
+                              point: option.point
+                            }
+                          })
+                        } else {
+                          await tx.option.create({
+                            data: {
+                              text: option.text,
+                              point: option.point,
+                              questionId: question.id
+                            }
+                          })
+                        }
+                      }
+                    }
+                  } else {
+                    // Create new question with options
+                    await tx.question.create({
+                      data: {
+                        title: question.title,
+                        categoryId: category.id,
+                        testId: id,
+                        options: {
+                          create: question.options
+                        }
+                      }
+                    })
+                  }
+                }
+              }
+            }
+          } else {
+            // Create new category with questions and options
+            await tx.category.create({
+              data: {
                 name: category.name,
                 description: category.description,
                 scale: category.scale,
+                testId: id,
                 questions: {
                   create: category.questions?.map(question => ({
                     title: question.title,
                     testId: id,
                     options: {
-                      create: question.options?.map(option => ({
-                        text: option.text,
-                        point: option.point
-                      })) || []
+                      create: question.options
                     }
-                  })) || []
+                  }))
                 }
-              })) || []
-            }
-          },
-          include: {
-            categories: {
-              include: {
-                questions: {
-                  include: {
-                    options: true
-                  }
+              }
+            })
+          }
+        }
+
+        // Delete removed categories - Fix type error
+        const newCategoryIds = categories
+          .map(c => c.id)
+          .filter((id): id is string => id !== undefined) // Type guard
+
+        await tx.category.deleteMany({
+          where: {
+            testId: id,
+            id: { notIn: newCategoryIds }
+          }
+        })
+      }
+
+      // 4. Return updated test
+      return await tx.test.findUnique({
+        where: { id },
+        include: {
+          categories: {
+            include: {
+              questions: {
+                include: {
+                  options: true
                 }
               }
             }
           }
-        })
-
-        return updatedTest
-      })
-
-      if (!test) {
-        return NextResponse.json(
-          { message: 'Failed to update test' },
-          { status: 500 }
-        )
-      }
-
-      return NextResponse.json(test)
-    } catch (txError) {
-      if (txError instanceof Error) {
-        if (txError.message === 'Test not found or access denied') {
-          return NextResponse.json(
-            { message: txError.message },
-            { status: 404 }
-          )
         }
-      }
-      throw txError // Re-throw to be caught by outer catch
+      })
+    })
+
+    if (!updatedTest) {
+      return NextResponse.json({ message: 'Failed to update test' }, { status: 500 })
     }
+
+    return NextResponse.json(updatedTest)
+
   } catch (error) {
-    console.error('[TEST_PATCH]', error)
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      return NextResponse.json(
-        { message: 'Database error: ' + error.message },
-        { status: 400 }
-      )
-    }
-    return NextResponse.json(
-      { message: 'Internal Server Error' },
-      { status: 500 }
-    )
+    console.error('[TEST_PATCH] Error:', error)
+    const message = error instanceof Error ? error.message : 'Internal Server Error'
+    return NextResponse.json({ message }, { status: 500 })
   }
 }
 

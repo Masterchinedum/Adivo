@@ -52,7 +52,7 @@ export const testSchema = z.object({
 
 // Schema for updating a test
 export const updateTestSchema = z.object({
-  id: z.string().min(1, "Test ID is required"),
+  id: z.string().uuid("Invalid test ID"), // Changed to uuid to match Prisma
   title: z
     .string()
     .min(1, "Title is required")
@@ -61,41 +61,25 @@ export const updateTestSchema = z.object({
   description: z
     .string()
     .max(500, "Description must be less than 500 characters")
+    .nullable() // Changed to nullable to match Prisma
     .optional(),
   isPublished: z.boolean().optional(),
   categories: z.array(
     z.object({
       id: z.string().cuid("Invalid category ID").optional(),
-      name: z
-        .string()
-        .min(1, "Category name is required")
-        .max(100, "Category name must be less than 100 characters"),
-      description: z
-        .string()
-        .max(500, "Description must be less than 500 characters")
-        .optional(),
-      scale: z
-        .number()
-        .int("Scale must be an integer")
-        .min(0, "Scale must be a non-negative number"),
+      name: z.string().min(1, "Category name is required"),
+      description: z.string().max(500).nullable().optional(),
+      scale: z.number().int().min(0),
       questions: z.array(
         z.object({
           id: z.string().cuid("Invalid question ID").optional(),
-          title: z
-            .string()
-            .min(1, "Question title is required")
-            .max(1000, "Question title must be less than 1000 characters"),
+          title: z.string().min(1, "Question title is required"),
+          categoryId: z.string().cuid("Invalid category ID").optional(),
           options: z.array(
             z.object({
               id: z.string().cuid("Invalid option ID").optional(),
-              text: z
-                .string()
-                .min(1, "Option text is required")
-                .max(500, "Option text must be less than 500 characters"),
-              point: z
-                .number()
-                .int("Point must be an integer")
-                .min(0, "Point must be a non-negative number")
+              text: z.string().min(1, "Option text is required"),
+              point: z.number().int().min(0)
             })
           ).optional()
         })

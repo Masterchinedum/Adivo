@@ -52,10 +52,11 @@ export interface UpdateTestInput {
     id?: string;
     name: string;
     description?: string | null;
-    scale: number; // Add scale field
+    scale: number;
     questions?: Array<{
       id?: string;
       title: string;
+      categoryId?: string;
       options?: Array<{
         id?: string;
         text: string;
