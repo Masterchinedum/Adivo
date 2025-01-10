@@ -57,7 +57,7 @@ export function GreekTempleResults({
       <div className="absolute bottom-[12%] w-[95%] left-[2.5%] h-[6%] bg-gradient-to-b from-stone-100 to-stone-200 rounded-t-sm shadow-md marble-texture" />
       <div className="absolute bottom-[18%] w-[90%] left-[5%] h-[6%] bg-gradient-to-b from-stone-50 to-stone-100 rounded-t-sm shadow-md marble-texture" />
 
-      {/* Pillars */}
+      {/* Pillars Section */}
       <div 
         className="absolute bottom-[24%] w-full h-[56%] flex justify-center items-end gap-4 px-12"
         style={{ maxWidth: `${templeWidth}px`, left: '50%', transform: 'translateX(-50%)' }}
@@ -70,27 +70,10 @@ export function GreekTempleResults({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
           >
-            {/* Category Score - Adjusted position and styling */}
-            <motion.div 
-              className="absolute top-[-3.5rem] text-center w-full"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: index * 0.1 + 0.5 }}
-            >
-              <div className="flex flex-col items-center gap-1">
-                <span className="bg-white/90 px-3 py-1.5 rounded-md shadow-md font-bold text-lg">
-                  {((score.actualScore / score.maxScale) * 100).toFixed(1)}%
-                </span>
-                <span className="text-xs text-stone-600 bg-white/80 px-2 py-0.5 rounded">
-                  {score.actualScore.toFixed(1)} / {score.maxScale}
-                </span>
-              </div>
-            </motion.div>
-
             {/* Pillar Capital */}
             <div className="w-full h-[10%] bg-gradient-to-b from-stone-100 to-stone-200 rounded-t-sm shadow-md marble-texture" />
             
-            {/* Pillar Body with Score Fill */}
+            {/* Pillar Body */}
             <div className="relative w-full h-[80%] bg-gradient-to-b from-stone-50 to-stone-100 rounded-sm overflow-hidden pillar-texture">
               <motion.div 
                 className="absolute bottom-0 w-full rounded-sm"
@@ -105,6 +88,20 @@ export function GreekTempleResults({
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-black/10 via-transparent to-black/10" />
               </motion.div>
+
+              {/* Centered Percentage Score */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 1 + index * 0.1 }}
+                  className="bg-white/80 px-3 py-1.5 rounded-full shadow-lg"
+                >
+                  <span className="text-xl font-bold text-stone-800">
+                    {((score.actualScore / score.maxScale) * 100).toFixed(1)}%
+                  </span>
+                </motion.div>
+              </div>
             </div>
             
             {/* Pillar Base */}
