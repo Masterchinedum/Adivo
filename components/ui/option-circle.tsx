@@ -4,9 +4,9 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Check } from "lucide-react"
+import { getOptionSize } from "@/lib/utils/option-grouping"
 
 interface OptionCircleProps extends React.HTMLAttributes<HTMLDivElement> {
-  size: 'xl' | 'lg' | 'md' | 'sm'
   position: number
   totalInGroup: number
   groupType: 'left' | 'middle' | 'right'
