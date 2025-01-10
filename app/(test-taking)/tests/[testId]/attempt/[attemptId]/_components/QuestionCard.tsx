@@ -69,22 +69,22 @@ export function QuestionCard({
         
         <div className="flex flex-col items-center space-y-8">
           {/* Labels */}
-          <div className="flex justify-between w-full text-sm text-muted-foreground">
+          <div className="flex justify-between w-full text-xs md:text-sm text-muted-foreground px-2">
             <span>{OPTION_LABELS.agree[0]}</span>
             <span>{OPTION_LABELS.disagree[0]}</span>
           </div>
           
           {/* Options Display */}
-          <div className="flex items-center justify-center w-full gap-8">
+          <div className="flex items-center justify-center w-full">
             {/* Left Group (Agree) */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1 md:gap-2 lg:gap-4">
               {leftGroup.map((option, index) => (
                 <OptionCircle
                   key={option.id}
                   position={index + 1}
                   totalInGroup={leftGroup.length}
                   groupType="left"
-                  size={getOptionSize(option, 'left', leftGroup.length)}
+                  size={getOptionSize(option, 'left', index + 1, leftGroup.length)}
                   selected={selectedOption === option.id}
                   groupColor={OPTION_COLORS.agree}
                   onClick={() => handleOptionSelect(option.id)}
@@ -95,28 +95,30 @@ export function QuestionCard({
 
             {/* Middle Option (if exists) */}
             {middleOption && (
-              <OptionCircle
-                key={middleOption.id}
-                position={1}
-                totalInGroup={1}
-                groupType="middle"
-                size="sm"
-                selected={selectedOption === middleOption.id}
-                groupColor={OPTION_COLORS.neutral}
-                onClick={() => handleOptionSelect(middleOption.id)}
-                disabled={isSubmitting}
-              />
+              <div className="mx-1 md:mx-2 lg:mx-4">
+                <OptionCircle
+                  key={middleOption.id}
+                  position={1}
+                  totalInGroup={1}
+                  groupType="middle"
+                  size="sm"
+                  selected={selectedOption === middleOption.id}
+                  groupColor={OPTION_COLORS.neutral}
+                  onClick={() => handleOptionSelect(middleOption.id)}
+                  disabled={isSubmitting}
+                />
+              </div>
             )}
 
             {/* Right Group (Disagree) */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1 md:gap-2 lg:gap-4">
               {rightGroup.map((option, index) => (
                 <OptionCircle
                   key={option.id}
                   position={index + 1}
                   totalInGroup={rightGroup.length}
                   groupType="right"
-                  size={getOptionSize(option, 'right', rightGroup.length)}
+                  size={getOptionSize(option, 'right', index + 1, rightGroup.length)}
                   selected={selectedOption === option.id}
                   groupColor={OPTION_COLORS.disagree}
                   onClick={() => handleOptionSelect(option.id)}
