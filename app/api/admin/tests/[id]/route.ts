@@ -134,16 +134,24 @@ export async function PATCH(req: Request) {
 
                     // Process options - Fix type error by filtering out undefined
                     if (question.options) {
-                      const existingOptions = existingCategory.questions
-                        .find(q => q.id === question.id)?.options || []
+                      // Get existing option IDs to check which ones to delete
+                      const existingOptionIds = existingCategory.questions
+                        .find(q => q.id === question.id)
+                        ?.options.map(o => o.id) || []
+
+                      // Get new option IDs from the update payload
                       const newOptionIds = question.options
                         .map(o => o.id)
                         .filter((id): id is string => id !== undefined) // Type guard
 
+                      // Delete options that are no longer in the updated list
                       await tx.option.deleteMany({
                         where: {
                           questionId: question.id,
-                          id: { notIn: newOptionIds }
+                          id: { 
+                            notIn: newOptionIds,
+                            in: existingOptionIds // Only delete from existing options
+                          }
                         }
                       })
 
