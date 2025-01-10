@@ -39,26 +39,25 @@ export function GreekTempleResults({
 
   return (
     <div className="w-full aspect-[16/9] relative">
-      {/* Temple Base - More realistic with marble texture */}
+      {/* Temple Base with Total Score */}
       <div className="absolute bottom-0 w-full h-[12%] bg-gradient-to-b from-stone-200 to-stone-300 rounded-md shadow-lg marble-texture">
-        {/* Total Score Display */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center">
             <div className="text-2xl font-bold text-stone-800">
-              {percentageScore.toFixed(1)}%
+              Overall: {percentageScore.toFixed(1)}%
             </div>
             <div className="text-sm text-stone-600">
-              Total Score: {totalScore.toFixed(1)} / {maxScore}
+              Score: {totalScore.toFixed(1)} / {maxScore}
             </div>
           </div>
         </div>
       </div>
-      
-      {/* Temple Steps - Add depth and texture */}
+
+      {/* Temple Steps */}
       <div className="absolute bottom-[12%] w-[95%] left-[2.5%] h-[6%] bg-gradient-to-b from-stone-100 to-stone-200 rounded-t-sm shadow-md marble-texture" />
       <div className="absolute bottom-[18%] w-[90%] left-[5%] h-[6%] bg-gradient-to-b from-stone-50 to-stone-100 rounded-t-sm shadow-md marble-texture" />
 
-      {/* Pillars Section */}
+      {/* Pillars */}
       <div 
         className="absolute bottom-[24%] w-full h-[56%] flex justify-center items-end gap-4 px-12"
         style={{ maxWidth: `${templeWidth}px`, left: '50%', transform: 'translateX(-50%)' }}
@@ -71,10 +70,27 @@ export function GreekTempleResults({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
           >
-            {/* Pillar Capital - More ornate */}
+            {/* Category Score - Adjusted position and styling */}
+            <motion.div 
+              className="absolute top-[-3.5rem] text-center w-full"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: index * 0.1 + 0.5 }}
+            >
+              <div className="flex flex-col items-center gap-1">
+                <span className="bg-white/90 px-3 py-1.5 rounded-md shadow-md font-bold text-lg">
+                  {((score.actualScore / score.maxScale) * 100).toFixed(1)}%
+                </span>
+                <span className="text-xs text-stone-600 bg-white/80 px-2 py-0.5 rounded">
+                  {score.actualScore.toFixed(1)} / {score.maxScale}
+                </span>
+              </div>
+            </motion.div>
+
+            {/* Pillar Capital */}
             <div className="w-full h-[10%] bg-gradient-to-b from-stone-100 to-stone-200 rounded-t-sm shadow-md marble-texture" />
             
-            {/* Pillar Body - With fluting effect */}
+            {/* Pillar Body with Score Fill */}
             <div className="relative w-full h-[80%] bg-gradient-to-b from-stone-50 to-stone-100 rounded-sm overflow-hidden pillar-texture">
               <motion.div 
                 className="absolute bottom-0 w-full rounded-sm"
@@ -87,31 +103,24 @@ export function GreekTempleResults({
                 animate={{ height: `${(score.actualScore / score.maxScale) * 100}%` }}
                 transition={{ duration: 1, delay: 0.5 + index * 0.1 }}
               >
-                {/* Add pillar shading */}
                 <div className="absolute inset-0 bg-gradient-to-r from-black/10 via-transparent to-black/10" />
               </motion.div>
             </div>
             
-            {/* Pillar Base - More detailed */}
+            {/* Pillar Base */}
             <div className="w-full h-[10%] bg-gradient-to-b from-stone-200 to-stone-300 rounded-b-sm shadow-md marble-texture" />
 
-            {/* Labels */}
+            {/* Category Name */}
             <div className="absolute bottom-[-2.5rem] text-center text-sm font-medium w-full px-1">
               <span className="bg-white/80 px-2 py-1 rounded shadow-sm">
                 {score.category.name}
-              </span>
-            </div>
-            
-            <div className="absolute top-[-2.5rem] text-center font-bold w-full px-1">
-              <span className="bg-white/80 px-2 py-1 rounded shadow-sm">
-                {((score.actualScore / score.maxScale) * 100).toFixed(1)}%
               </span>
             </div>
           </motion.div>
         ))}
       </div>
 
-      {/* Temple Roof - More elaborate */}
+      {/* Temple Roof with Test Title */}
       <motion.div 
         className="absolute top-[5%] w-[95%] left-[2.5%] h-[15%]"
         initial={{ opacity: 0, y: -50 }}
@@ -119,7 +128,6 @@ export function GreekTempleResults({
         transition={{ duration: 0.5 }}
       >
         <div className="relative w-full h-full bg-gradient-to-b from-stone-100 to-stone-200 clip-triangle shadow-lg marble-texture">
-          {/* Roof decoration */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/5 to-black/10" />
           <h2 className="absolute inset-0 flex items-center justify-center text-xl font-bold text-stone-800 px-4 text-center">
             {title}
