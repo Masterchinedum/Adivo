@@ -1,9 +1,9 @@
-// app/(test-taking)/tests/[testId]/attempt/[attemptId]/results/page.tsx
 "use client"
 
 import { useEffect, useState } from "react"
 import { ResultsSummary } from "./_components/ResultsSummary"
 import { CategoryScores } from "./_components/CategoryScores"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import type { TestAttemptResult } from "@/types/tests/test-attempt"
 
 interface ResultsPageProps {
@@ -59,22 +59,30 @@ export default function ResultsPage({ params }: ResultsPageProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <h2 className="text-lg font-semibold">Loading Results...</h2>
-          <p className="text-muted-foreground">Please wait while we calculate your scores.</p>
-        </div>
+      <div className="container flex items-center justify-center min-h-[90vh]">
+        <Card className="w-full max-w-[600px] shadow-lg">
+          <CardContent className="p-6">
+            <div className="text-center py-8">
+              <h2 className="text-lg font-semibold">Loading Results...</h2>
+              <p className="text-muted-foreground mt-2">Please wait while we calculate your scores.</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <h2 className="text-lg font-semibold text-destructive">Error</h2>
-          <p className="text-muted-foreground">{error}</p>
-        </div>
+      <div className="container flex items-center justify-center min-h-[90vh]">
+        <Card className="w-full max-w-[600px] shadow-lg">
+          <CardContent className="p-6">
+            <div className="text-center py-8">
+              <h2 className="text-lg font-semibold text-destructive">Error</h2>
+              <p className="text-muted-foreground mt-2">{error}</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     )
   }
@@ -82,14 +90,28 @@ export default function ResultsPage({ params }: ResultsPageProps) {
   if (!results) return null
 
   return (
-    <div className="container max-w-4xl py-8 space-y-6">
-      <h1 className="text-2xl font-bold text-center mb-8">Test Results</h1>
-      <ResultsSummary 
-        totalScore={results.totalScore} 
-        maxScore={results.maxScore} 
-        percentageScore={results.percentageScore} 
-      />
-      <CategoryScores categoryScores={results.categoryScores} />
+    <div className="container space-y-6 py-8">
+      <h1 className="text-3xl font-bold text-center">
+        {results.test.name}
+      </h1>
+
+      <div className="flex justify-center items-start">
+        <Card className="w-full max-w-[800px] shadow-lg">
+          <CardHeader className="text-center border-b pb-4">
+            <h2 className="text-2xl font-bold">Test Results</h2>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="space-y-8">
+              <ResultsSummary 
+                totalScore={results.totalScore} 
+                maxScore={results.maxScore} 
+                percentageScore={results.percentageScore} 
+              />
+              <CategoryScores categoryScores={results.categoryScores} />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

@@ -51,6 +51,9 @@ export interface TestAttempt {
 }
 
 export interface TestAttemptResult {
+  test: {
+    name: string   // Add this field
+  }
   totalScore: number
   maxScore: number
   percentageScore: number

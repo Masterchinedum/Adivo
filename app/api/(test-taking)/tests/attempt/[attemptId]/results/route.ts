@@ -89,7 +89,11 @@ export async function GET(req: Request): Promise<NextResponse<TestAttemptResult 
     const maxScore = attempt.categoryScores.reduce((sum, cs) => sum + cs.maxScale, 0)
     const percentageScore = (totalScore / maxScore) * 100
 
+    // Update the result construction to include test name
     const result: TestAttemptResult = {
+      test: {
+        name: attempt.test.title // Add this line - assuming the test title is stored in test.title
+      },
       totalScore,
       maxScore,
       percentageScore,
