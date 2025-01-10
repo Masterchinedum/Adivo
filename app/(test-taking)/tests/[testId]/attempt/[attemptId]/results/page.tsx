@@ -2,8 +2,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { ResultsSummary } from "./_components/ResultsSummary"
-import { CategoryScores } from "./_components/CategoryScores"
+import { GreekTempleResults } from './_components/GreekTempleResults'
 import type { TestAttemptResult } from "@/types/tests/test-attempt"
 
 interface ResultsPageProps {
@@ -82,14 +81,15 @@ export default function ResultsPage({ params }: ResultsPageProps) {
   if (!results) return null
 
   return (
-    <div className="container max-w-4xl py-8 space-y-6">
+    <div className="container max-w-6xl py-8 space-y-8">
       <h1 className="text-2xl font-bold text-center mb-8">Test Results</h1>
-      <ResultsSummary 
-        totalScore={results.totalScore} 
-        maxScore={results.maxScore} 
-        percentageScore={results.percentageScore} 
+      <GreekTempleResults
+        title="Test Results"
+        categoryScores={results.categoryScores}
+        totalScore={results.totalScore}
+        maxScore={results.maxScore}
+        percentageScore={results.percentageScore}
       />
-      <CategoryScores categoryScores={results.categoryScores} />
     </div>
   )
 }
