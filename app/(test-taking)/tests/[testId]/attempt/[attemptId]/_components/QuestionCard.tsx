@@ -21,6 +21,7 @@ interface QuestionCardProps {
   selectedOption?: string
   isAnswered: boolean
   onAnswerSelect: (optionId: string) => void
+  className?: string // Add this
 }
 
 export function QuestionCard({
@@ -28,7 +29,8 @@ export function QuestionCard({
   questionNumber,
   selectedOption,
   isAnswered,
-  onAnswerSelect
+  onAnswerSelect,
+  className // Add this
 }: QuestionCardProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -50,7 +52,8 @@ export function QuestionCard({
       id={`question-${questionNumber}`}
       className={cn(
         "transition-all duration-200",
-        isAnswered && "ring-2 ring-primary/10"
+        isAnswered && "ring-2 ring-primary/10",
+        className // Add this
       )}
     >
       <CardHeader className="border-b bg-muted/40">

@@ -2,6 +2,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { cn } from "@/lib/utils"
 import { type TestAttemptQuestion } from "@/types/tests/test-attempt-question"
 import { LoadingState } from "./_components/LoadingState"
 import { TestHeader } from "./_components/TestHeader"
@@ -9,6 +10,7 @@ import { CategoryTabs } from "./_components/CategoryTabs"
 import { QuestionCard } from "./_components/QuestionCard"
 import { NavigationControls } from "./_components/NavigationControls"
 import { CompletionDialog } from "./_components/CompletionDialog"
+
 
 interface TestAttemptPageProps {
   params: Promise<{
@@ -58,14 +60,37 @@ export default function TestAttemptPage({ params }: TestAttemptPageProps) {
       if (!response.ok) throw new Error("Failed to save answer")
 
       setQuestions(prev => prev.map(q => 
-        q.questionId === questionId  // Change this line from q.id to q.questionId
+        q.questionId === questionId
           ? { ...q, selectedOptionId: optionId, isAnswered: true }
           : q
       ))
+
+      // Auto-advance to next question
+      const currentIndex = questions.findIndex(q => q.questionId === questionId)
+      if (currentIndex < questions.length - 1) {
+        const nextQuestion = questions[currentIndex + 1]
+        setCurrentQuestionId(nextQuestion.id)
+        setCurrentCategoryId(nextQuestion.question.categoryId || "uncategorized")
+        
+        // Scroll to next question after state updates
+        requestAnimationFrame(() => {
+          const nextQuestionElement = document.getElementById(`question-${currentIndex + 2}`)
+          if (nextQuestionElement) {
+            const headerOffset = 140 // Adjust based on your header height
+            const elementPosition = nextQuestionElement.getBoundingClientRect().top
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+            
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: 'smooth'
+            })
+          }
+        })
+      }
     } catch (error) {
       console.error("Error saving answer:", error)
     }
-  }, [attemptId])
+  }, [attemptId, questions])
 
   // Resolve params since they're a Promise
   useEffect(() => {
@@ -157,6 +182,12 @@ export default function TestAttemptPage({ params }: TestAttemptPageProps) {
                 selectedOption={question.selectedOptionId || undefined}
                 isAnswered={question.isAnswered}
                 onAnswerSelect={(optionId) => handleAnswerSelect(question.questionId, optionId)} // Keep using question.questionId
+                className={cn(
+                  "transition-all duration-200",
+                  question.id === currentQuestionId 
+                    ? "opacity-100 ring-2 ring-primary" 
+                    : "opacity-70 hover:opacity-90"
+                )}
               />
             ))}
           </main>
