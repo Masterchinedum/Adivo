@@ -84,7 +84,7 @@ export default function ResultsPage({ params }: ResultsPageProps) {
     <div className="container max-w-6xl py-8 space-y-8">
       <h1 className="text-2xl font-bold text-center mb-8">Test Results</h1>
       <GreekTempleResults
-        title="Test Results"
+        title={results.test?.name} // Use the actual test name
         categoryScores={results.categoryScores}
         totalScore={results.totalScore}
         maxScore={results.maxScore}
