@@ -20,11 +20,11 @@ interface GreekTempleResultsProps {
 }
 
 const PILLAR_COLORS = [
-  "hsl(var(--primary))",
-  "hsl(var(--secondary))",
-  "hsl(var(--accent))",
-  "hsl(var(--muted))",
-  "hsl(var(--card))"
+  "hsl(var(--chart-1))",
+  "hsl(var(--chart-2))",
+  "hsl(var(--chart-3))",
+  "hsl(var(--chart-4))",
+  "hsl(var(--chart-5))"
 ]
 
 export function GreekTempleResults({ 
@@ -39,16 +39,28 @@ export function GreekTempleResults({
 
   return (
     <div className="w-full aspect-[16/9] relative">
-      {/* Temple Base */}
-      <div className="absolute bottom-0 w-full h-[10%] bg-gradient-to-b from-stone-300 to-stone-400 rounded-md shadow-lg" />
+      {/* Temple Base - More realistic with marble texture */}
+      <div className="absolute bottom-0 w-full h-[12%] bg-gradient-to-b from-stone-200 to-stone-300 rounded-md shadow-lg marble-texture">
+        {/* Total Score Display */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-stone-800">
+              {percentageScore.toFixed(1)}%
+            </div>
+            <div className="text-sm text-stone-600">
+              Total Score: {totalScore.toFixed(1)} / {maxScore}
+            </div>
+          </div>
+        </div>
+      </div>
       
-      {/* Temple Steps */}
-      <div className="absolute bottom-[10%] w-[95%] left-[2.5%] h-[5%] bg-stone-200 rounded-t-sm shadow-md" />
-      <div className="absolute bottom-[15%] w-[90%] left-[5%] h-[5%] bg-stone-300 rounded-t-sm shadow-md" />
+      {/* Temple Steps - Add depth and texture */}
+      <div className="absolute bottom-[12%] w-[95%] left-[2.5%] h-[6%] bg-gradient-to-b from-stone-100 to-stone-200 rounded-t-sm shadow-md marble-texture" />
+      <div className="absolute bottom-[18%] w-[90%] left-[5%] h-[6%] bg-gradient-to-b from-stone-50 to-stone-100 rounded-t-sm shadow-md marble-texture" />
 
-      {/* Pillars */}
+      {/* Pillars Section */}
       <div 
-        className="absolute bottom-[20%] w-full h-[60%] flex justify-center items-end gap-4 px-12"
+        className="absolute bottom-[24%] w-full h-[56%] flex justify-center items-end gap-4 px-12"
         style={{ maxWidth: `${templeWidth}px`, left: '50%', transform: 'translateX(-50%)' }}
       >
         {categoryScores.map((score, index) => (
@@ -59,49 +71,57 @@ export function GreekTempleResults({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
           >
-            {/* Pillar Cap */}
-            <div className="w-full h-[8%] bg-stone-200 rounded-t-sm shadow-md" />
+            {/* Pillar Capital - More ornate */}
+            <div className="w-full h-[10%] bg-gradient-to-b from-stone-100 to-stone-200 rounded-t-sm shadow-md marble-texture" />
             
-            {/* Pillar Body */}
-            <div className="relative w-full h-[84%] bg-stone-100 rounded-sm overflow-hidden">
+            {/* Pillar Body - With fluting effect */}
+            <div className="relative w-full h-[80%] bg-gradient-to-b from-stone-50 to-stone-100 rounded-sm overflow-hidden pillar-texture">
               <motion.div 
                 className="absolute bottom-0 w-full rounded-sm"
                 style={{ 
                   backgroundColor: PILLAR_COLORS[index % PILLAR_COLORS.length],
-                  height: `${(score.actualScore / score.maxScale) * 100}%`
+                  height: `${(score.actualScore / score.maxScale) * 100}%`,
+                  opacity: 0.85
                 }}
                 initial={{ height: 0 }}
                 animate={{ height: `${(score.actualScore / score.maxScale) * 100}%` }}
                 transition={{ duration: 1, delay: 0.5 + index * 0.1 }}
-              />
+              >
+                {/* Add pillar shading */}
+                <div className="absolute inset-0 bg-gradient-to-r from-black/10 via-transparent to-black/10" />
+              </motion.div>
             </div>
             
-            {/* Pillar Base */}
-            <div className="w-full h-[8%] bg-stone-300 rounded-b-sm shadow-md" />
+            {/* Pillar Base - More detailed */}
+            <div className="w-full h-[10%] bg-gradient-to-b from-stone-200 to-stone-300 rounded-b-sm shadow-md marble-texture" />
 
-            {/* Category Name */}
-            <div className="absolute bottom-[-2rem] text-center text-sm font-medium w-full px-1">
-              {score.category.name}
+            {/* Labels */}
+            <div className="absolute bottom-[-2.5rem] text-center text-sm font-medium w-full px-1">
+              <span className="bg-white/80 px-2 py-1 rounded shadow-sm">
+                {score.category.name}
+              </span>
             </div>
             
-            {/* Score Percentage */}
-            <div className="absolute top-[-2rem] text-center font-bold w-full px-1">
-              {((score.actualScore / score.maxScale) * 100).toFixed(1)}%
+            <div className="absolute top-[-2.5rem] text-center font-bold w-full px-1">
+              <span className="bg-white/80 px-2 py-1 rounded shadow-sm">
+                {((score.actualScore / score.maxScale) * 100).toFixed(1)}%
+              </span>
             </div>
           </motion.div>
         ))}
       </div>
 
-      {/* Temple Roof */}
+      {/* Temple Roof - More elaborate */}
       <motion.div 
         className="absolute top-[5%] w-[95%] left-[2.5%] h-[15%]"
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        {/* Roof Triangle */}
-        <div className="relative w-full h-full bg-gradient-to-b from-stone-200 to-stone-300 clip-triangle shadow-lg flex items-center justify-center">
-          <h2 className="text-xl font-bold text-stone-700 px-4 text-center">
+        <div className="relative w-full h-full bg-gradient-to-b from-stone-100 to-stone-200 clip-triangle shadow-lg marble-texture">
+          {/* Roof decoration */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/5 to-black/10" />
+          <h2 className="absolute inset-0 flex items-center justify-center text-xl font-bold text-stone-800 px-4 text-center">
             {title}
           </h2>
         </div>
