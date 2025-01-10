@@ -32,7 +32,7 @@ export function OptionCircle({
   className,
   ...props
 }: OptionCircleProps) {
-  const size = getOptionSize(null, groupType, position, totalInGroup);
+  const size = getOptionSize(groupType, position, totalInGroup);
 
   return (
     <div
