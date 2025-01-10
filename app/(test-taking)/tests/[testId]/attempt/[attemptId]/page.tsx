@@ -65,18 +65,27 @@ export default function TestAttemptPage({ params }: TestAttemptPageProps) {
           : q
       ))
 
-      // Auto-advance to next question
-      const currentIndex = questions.findIndex(q => q.questionId === questionId)
-      if (currentIndex < questions.length - 1) {
-        const nextQuestion = questions[currentIndex + 1]
+      // Find the current category's questions
+      const currentCategoryQuestions = questions.filter(
+        q => (q.question.categoryId || "uncategorized") === currentCategoryId
+      )
+      
+      // Find the index within the current category
+      const currentIndexInCategory = currentCategoryQuestions.findIndex(
+        q => q.questionId === questionId
+      )
+
+      // Check if there's a next question in this category
+      if (currentIndexInCategory < currentCategoryQuestions.length - 1) {
+        const nextQuestion = currentCategoryQuestions[currentIndexInCategory + 1]
         setCurrentQuestionId(nextQuestion.id)
-        setCurrentCategoryId(nextQuestion.question.categoryId || "uncategorized")
         
         // Scroll to next question after state updates
         requestAnimationFrame(() => {
-          const nextQuestionElement = document.getElementById(`question-${currentIndex + 2}`)
+          const questionNumber = questions.findIndex(q => q.id === nextQuestion.id) + 1
+          const nextQuestionElement = document.getElementById(`question-${questionNumber}`)
           if (nextQuestionElement) {
-            const headerOffset = 140 // Adjust based on your header height
+            const headerOffset = 140
             const elementPosition = nextQuestionElement.getBoundingClientRect().top
             const offsetPosition = elementPosition + window.pageYOffset - headerOffset
             
@@ -90,7 +99,7 @@ export default function TestAttemptPage({ params }: TestAttemptPageProps) {
     } catch (error) {
       console.error("Error saving answer:", error)
     }
-  }, [attemptId, questions])
+  }, [attemptId, questions, currentCategoryId])
 
   // Resolve params since they're a Promise
   useEffect(() => {
