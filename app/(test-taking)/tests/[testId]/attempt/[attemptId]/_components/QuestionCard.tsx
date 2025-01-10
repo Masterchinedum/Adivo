@@ -5,7 +5,7 @@ import { useState } from "react"
 import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import { OptionCircle } from "@/components/ui/option-circle"
 import { cn } from "@/lib/utils"
-import { groupOptions, getOptionSize } from "@/lib/utils/option-grouping"
+import { groupOptions } from "@/lib/utils/option-grouping"
 import { OPTION_COLORS, OPTION_LABELS } from "@/lib/constants/option-labels"
 
 interface QuestionCardProps {
@@ -64,7 +64,7 @@ export function QuestionCard({
         </div>
       </CardHeader>
       
-      <CardContent className="p-2 sm:p-4 md:p-6"> {/* Reduced padding on mobile */}
+      <CardContent className="p-2 sm:p-4 md:p-6">
         <p className="text-base font-medium mb-4 md:mb-8">{question.title}</p>
         
         <div className="flex flex-col items-center space-y-4 md:space-y-8">
@@ -84,7 +84,6 @@ export function QuestionCard({
                   position={index + 1}
                   totalInGroup={leftGroup.length}
                   groupType="left"
-                  size={getOptionSize(option, 'left', index + 1, leftGroup.length)}
                   selected={selectedOption === option.id}
                   groupColor={OPTION_COLORS.agree}
                   onClick={() => handleOptionSelect(option.id)}
@@ -94,7 +93,7 @@ export function QuestionCard({
             </div>
 
             {/* Spacing between groups */}
-            <div className="w-1 sm:w-2 md:w-3" /> {/* Added consistent spacing */}
+            <div className="w-1 sm:w-2 md:w-3" />
 
             {/* Middle Option (if exists) */}
             {middleOption && (
@@ -104,7 +103,6 @@ export function QuestionCard({
                   position={1}
                   totalInGroup={1}
                   groupType="middle"
-                  size="sm"
                   selected={selectedOption === middleOption.id}
                   groupColor={OPTION_COLORS.neutral}
                   onClick={() => handleOptionSelect(middleOption.id)}
@@ -114,7 +112,7 @@ export function QuestionCard({
             )}
 
             {/* Spacing between groups */}
-            <div className="w-1 sm:w-2 md:w-3" /> {/* Added consistent spacing */}
+            <div className="w-1 sm:w-2 md:w-3" />
 
             {/* Right Group (Disagree) */}
             <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
@@ -124,7 +122,6 @@ export function QuestionCard({
                   position={index + 1}
                   totalInGroup={rightGroup.length}
                   groupType="right"
-                  size={getOptionSize(option, 'right', index + 1, rightGroup.length)}
                   selected={selectedOption === option.id}
                   groupColor={OPTION_COLORS.disagree}
                   onClick={() => handleOptionSelect(option.id)}
