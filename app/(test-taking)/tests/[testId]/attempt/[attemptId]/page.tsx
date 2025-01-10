@@ -75,15 +75,56 @@ export default function TestAttemptPage({ params }: TestAttemptPageProps) {
         q => q.questionId === questionId
       )
 
-      // Check if there's a next question in this category
-      if (currentIndexInCategory < currentCategoryQuestions.length - 1) {
+      // Check if this was the last question in the current category
+      if (currentIndexInCategory === currentCategoryQuestions.length - 1) {
+        // Find the next category that has unanswered questions
+        const categoryIds = Array.from(new Set(questions.map(q => q.question.categoryId || "uncategorized")))
+        const currentCategoryIndex = categoryIds.indexOf(currentCategoryId)
+        
+        // Look for next category with unanswered questions
+        for (let i = currentCategoryIndex + 1; i < categoryIds.length; i++) {
+          const nextCategoryQuestions = questions.filter(
+            q => (q.question.categoryId || "uncategorized") === categoryIds[i]
+          )
+          const hasUnansweredQuestions = nextCategoryQuestions.some(q => !q.isAnswered)
+          
+          if (hasUnansweredQuestions) {
+            // Switch to next category and set first unanswered question as current
+            const nextQuestion = nextCategoryQuestions.find(q => !q.isAnswered)
+            if (nextQuestion) {
+              setCurrentCategoryId(categoryIds[i])
+              setCurrentQuestionId(nextQuestion.id)
+              
+              // Scroll to the next question after state updates
+              requestAnimationFrame(() => {
+                const questionNumber = questions.findIndex(q => q.id === nextQuestion.id) + 1
+                const nextQuestionElement = document.getElementById(`question-${questionNumber}`)
+                
+                if (nextQuestionElement) {
+                  const headerOffset = 140
+                  const elementPosition = nextQuestionElement.getBoundingClientRect().top
+                  const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+                  
+                  window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                  })
+                }
+              })
+            }
+            return
+          }
+        }
+      } else if (currentIndexInCategory < currentCategoryQuestions.length - 1) {
+        // If not the last question in category, move to next question in same category
         const nextQuestion = currentCategoryQuestions[currentIndexInCategory + 1]
         setCurrentQuestionId(nextQuestion.id)
         
-        // Scroll to next question after state updates
+        // Scroll to next question
         requestAnimationFrame(() => {
           const questionNumber = questions.findIndex(q => q.id === nextQuestion.id) + 1
           const nextQuestionElement = document.getElementById(`question-${questionNumber}`)
+          
           if (nextQuestionElement) {
             const headerOffset = 140
             const elementPosition = nextQuestionElement.getBoundingClientRect().top
