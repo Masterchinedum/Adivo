@@ -1,11 +1,19 @@
-// components/newsletter.tsx
 "use client"
 
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Mail, Send, ArrowRight, Mail as MailIcon } from "lucide-react"
+import { 
+  Mail, 
+  Send, 
+  ArrowRight, 
+  Mail as MailIcon,
+  Twitter,
+  Linkedin,
+  Facebook,
+  Instagram 
+} from "lucide-react"
 import { toast } from "sonner"
 
 export function Newsletter() {
@@ -132,21 +140,21 @@ const socialLinks = [
   {
     name: 'Twitter',
     href: '#',
-    icon: Twitter,
+    icon: Twitter
   },
   {
     name: 'LinkedIn',
     href: '#',
-    icon: Linkedin,
+    icon: Linkedin
   },
   {
     name: 'Facebook',
     href: '#',
-    icon: Facebook,
+    icon: Facebook
   },
   {
     name: 'Instagram',
     href: '#',
-    icon: Instagram,
-  },
+    icon: Instagram
+  }
 ]
