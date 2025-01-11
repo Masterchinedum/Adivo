@@ -28,7 +28,7 @@ export function Newsletter() {
       await new Promise(resolve => setTimeout(resolve, 1000))
       toast.success("Thank you for subscribing!")
       setEmail("")
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong. Please try again.")
     } finally {
       setIsLoading(false)
@@ -37,7 +37,6 @@ export function Newsletter() {
 
   return (
     <section className="relative py-20 overflow-hidden bg-background">
-      {/* Update the background pattern with better dark mode visibility */}
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] dark:bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)]" />
 
       <div className="container px-4 md:px-6">
@@ -101,7 +100,7 @@ export function Newsletter() {
             </div>
             <h2 className="text-3xl font-bold tracking-tighter text-foreground">Contact Us</h2>
             <p className="text-muted-foreground text-lg">
-              Have questions or feedback? We'd love to hear from you.
+              Have questions or feedback? We&apos;d love to hear from you.
             </p>
             <div className="space-y-4 pt-4">
               <Button variant="outline" className="w-full justify-start gap-2" asChild>
