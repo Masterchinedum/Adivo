@@ -5,7 +5,7 @@ import { HowItWorks } from "@/components/how-it-works"
 
 export const metadata: Metadata = {
   title: "Sociolytics | Relationship Psychology Tests & Analysis",
-  description: "Discovering insights about your relationships through scientifically-designed psychological tests. Get personalized analysis and improve your connections with others.",
+  description: "Discover insights about your relationships through scientifically-designed psychological tests. Get personalized analysis and improve your connections with others.",
 }
 
 export default function HomePage() {
