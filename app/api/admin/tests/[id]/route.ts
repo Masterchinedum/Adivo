@@ -76,173 +76,161 @@ export async function PATCH(req: Request) {
 
     const { categories, ...testData } = validationResult.data
 
-    // Wrap everything in a transaction
-    const updatedTest = await prisma.$transaction(async (tx) => {
-      // 1. Verify test exists
-      const existingTest = await tx.test.findUnique({
-        where: { id },
-        include: {
-          categories: {
+    // Add retries for transaction
+    const maxRetries = 3
+    let retryCount = 0
+    let updatedTest = null
+
+    while (retryCount < maxRetries && !updatedTest) {
+      try {
+        updatedTest = await prisma.$transaction(async (tx) => {
+          // 1. Verify test exists
+          const existingTest = await tx.test.findUnique({
+            where: { id },
             include: {
-              questions: {
+              categories: {
                 include: {
-                  options: true
-                }
-              }
-            }
-          }
-        }
-      })
-
-      if (!existingTest) {
-        throw new Error('Test not found')
-      }
-
-      // 2. Update test basic info
-      await tx.test.update({
-        where: { id },
-        data: testData
-      })
-
-      // 3. Process categories
-      if (categories) {
-        for (const category of categories) {
-          if (category.id) {
-            // Update existing category
-            const existingCategory = existingTest.categories.find(c => c.id === category.id)
-            if (existingCategory) {
-              await tx.category.update({
-                where: { id: category.id },
-                data: {
-                  name: category.name,
-                  description: category.description,
-                  scale: category.scale
-                }
-              })
-
-              // Process questions for existing category
-              if (category.questions) {
-                for (const question of category.questions) {
-                  if (question.id) {
-                    // Update existing question
-                    await tx.question.update({
-                      where: { id: question.id },
-                      data: {
-                        title: question.title
-                      }
-                    })
-
-                    // Process options - Fix type error by filtering out undefined
-                    if (question.options) {
-                      // Get existing option IDs to check which ones to delete
-                      const existingOptionIds = existingCategory.questions
-                        .find(q => q.id === question.id)
-                        ?.options.map(o => o.id) || []
-
-                      // Get new option IDs from the update payload
-                      const newOptionIds = question.options
-                        .map(o => o.id)
-                        .filter((id): id is string => id !== undefined) // Type guard
-
-                      // Delete options that are no longer in the updated list
-                      await tx.option.deleteMany({
-                        where: {
-                          questionId: question.id,
-                          id: { 
-                            notIn: newOptionIds,
-                            in: existingOptionIds // Only delete from existing options
-                          }
-                        }
-                      })
-
-                      // Update or create options
-                      for (const option of question.options) {
-                        if (option.id) {
-                          await tx.option.update({
-                            where: { id: option.id },
-                            data: {
-                              text: option.text,
-                              point: option.point
-                            }
-                          })
-                        } else {
-                          await tx.option.create({
-                            data: {
-                              text: option.text,
-                              point: option.point,
-                              questionId: question.id
-                            }
-                          })
-                        }
-                      }
+                  questions: {
+                    include: {
+                      options: true
                     }
-                  } else {
-                    // Create new question with options
-                    await tx.question.create({
-                      data: {
-                        title: question.title,
-                        categoryId: category.id,
-                        testId: id,
-                        options: {
-                          create: question.options
-                        }
-                      }
-                    })
                   }
                 }
               }
             }
-          } else {
-            // Create new category with questions and options
-            await tx.category.create({
-              data: {
-                name: category.name,
-                description: category.description,
-                scale: category.scale,
-                testId: id,
-                questions: {
-                  create: category.questions?.map(question => ({
-                    title: question.title,
-                    testId: id,
-                    options: {
-                      create: question.options
+          })
+
+          if (!existingTest) {
+            throw new Error('Test not found')
+          }
+
+          // 2. Update test basic info first
+          await tx.test.update({
+            where: { id },
+            data: testData
+          })
+
+          // 3. Process categories in smaller chunks
+          if (categories) {
+            // Update or create categories
+            for (const category of categories) {
+              if (category.id) {
+                // Update existing category
+                await tx.category.upsert({
+                  where: { id: category.id },
+                  update: {
+                    name: category.name,
+                    description: category.description,
+                    scale: category.scale
+                  },
+                  create: {
+                    id: category.id,
+                    name: category.name,
+                    description: category.description,
+                    scale: category.scale,
+                    testId: id
+                  }
+                })
+
+                // Process questions
+                if (category.questions) {
+                  for (const question of category.questions) {
+                    // Update or create question
+                    const upsertedQuestion = await tx.question.upsert({
+                      where: { id: question.id || 'temp-id' },
+                      update: {
+                        title: question.title
+                      },
+                      create: {
+                        title: question.title,
+                        categoryId: category.id,
+                        testId: id
+                      }
+                    })
+
+                    // Process options
+                    if (question.options) {
+                      // Delete old options
+                      if (question.id) {
+                        await tx.option.deleteMany({
+                          where: { questionId: question.id }
+                        })
+                      }
+
+                      // Create new options
+                      await tx.option.createMany({
+                        data: question.options.map(opt => ({
+                          text: opt.text,
+                          point: opt.point,
+                          questionId: upsertedQuestion.id
+                        }))
+                      })
                     }
-                  }))
+                  }
                 }
+              } else {
+                // Create new category with questions and options
+                await tx.category.create({
+                  data: {
+                    name: category.name,
+                    description: category.description,
+                    scale: category.scale,
+                    testId: id,
+                    questions: {
+                      create: category.questions?.map(question => ({
+                        title: question.title,
+                        testId: id,
+                        options: {
+                          create: question.options
+                        }
+                      }))
+                    }
+                  }
+                })
+              }
+            }
+
+            // Delete removed categories
+            const newCategoryIds = categories
+              .map(c => c.id)
+              .filter((id): id is string => id !== undefined)
+
+            await tx.category.deleteMany({
+              where: {
+                testId: id,
+                id: { notIn: newCategoryIds }
               }
             })
           }
-        }
 
-        // Delete removed categories - Fix type error
-        const newCategoryIds = categories
-          .map(c => c.id)
-          .filter((id): id is string => id !== undefined) // Type guard
-
-        await tx.category.deleteMany({
-          where: {
-            testId: id,
-            id: { notIn: newCategoryIds }
-          }
-        })
-      }
-
-      // 4. Return updated test
-      return await tx.test.findUnique({
-        where: { id },
-        include: {
-          categories: {
+          // 4. Return updated test
+          return await tx.test.findUnique({
+            where: { id },
             include: {
-              questions: {
+              categories: {
                 include: {
-                  options: true
+                  questions: {
+                    include: {
+                      options: true
+                    }
+                  }
                 }
               }
             }
-          }
-        }
-      })
-    })
+          })
+        }, {
+          maxWait: 5000, // 5s maximum waiting time
+          timeout: 10000 // 10s timeout
+        })
+
+        break // Exit loop if successful
+      } catch (err) {
+        retryCount++
+        console.error(`[TEST_PATCH] Transaction attempt ${retryCount} failed:`, err)
+        if (retryCount === maxRetries) throw err
+        await new Promise(resolve => setTimeout(resolve, 1000 * retryCount)) // Exponential backoff
+      }
+    }
 
     if (!updatedTest) {
       return NextResponse.json({ message: 'Failed to update test' }, { status: 500 })
