@@ -3,6 +3,7 @@ import { Metadata } from "next"
 import { FeaturesGrid } from "@/components/features-grid"
 import { HowItWorks } from "@/components/how-it-works"
 import { CallToAction } from "@/components/call-to-action"
+import { Newsletter } from "@/components/newsletter"
 
 export const metadata: Metadata = {
   title: "Sociolytics | Relationship Psychology Tests & Analysis",
@@ -16,7 +17,7 @@ export default function HomePage() {
       <FeaturesGrid />
       <HowItWorks />
       <CallToAction />
-      {/* Other sections will be added here */}
+      <Newsletter />
     </main>
   )
 }
