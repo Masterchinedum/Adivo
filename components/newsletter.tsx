@@ -25,8 +25,7 @@ export function Newsletter() {
     setIsLoading(true)
 
     try {
-      // Add your newsletter signup logic here
-      await new Promise(resolve => setTimeout(resolve, 1000)) // Simulated API call
+      await new Promise(resolve => setTimeout(resolve, 1000))
       toast.success("Thank you for subscribing!")
       setEmail("")
     } catch (error) {
@@ -37,10 +36,9 @@ export function Newsletter() {
   }
 
   return (
-    <section className="relative py-20 overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-slate-50/50 to-white" />
-      <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]" />
+    <section className="relative py-20 overflow-hidden bg-background">
+      {/* Update the background pattern with better dark mode visibility */}
+      <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] dark:bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)]" />
 
       <div className="container px-4 md:px-6">
         <motion.div 
@@ -57,14 +55,14 @@ export function Newsletter() {
             transition={{ delay: 0.2 }}
             className="space-y-4"
           >
-            <div className="inline-flex items-center gap-2 rounded-lg bg-muted px-3 py-1 text-sm">
+            <div className="inline-flex items-center gap-2 rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">
               <MailIcon className="h-4 w-4" />
               <span>Stay updated</span>
             </div>
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-foreground">
               Subscribe to Our Newsletter
             </h2>
-            <p className="text-gray-500 md:text-lg">
+            <p className="text-muted-foreground text-lg">
               Get the latest insights about relationships and psychological well-being delivered to your inbox.
             </p>
             <form onSubmit={handleSubmit} className="flex max-w-sm flex-col gap-2 sm:flex-row">
@@ -97,12 +95,12 @@ export function Newsletter() {
             transition={{ delay: 0.3 }}
             className="space-y-4 lg:pl-8"
           >
-            <div className="inline-flex items-center gap-2 rounded-lg bg-muted px-3 py-1 text-sm">
+            <div className="inline-flex items-center gap-2 rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">
               <Send className="h-4 w-4" />
               <span>Get in touch</span>
             </div>
-            <h2 className="text-3xl font-bold tracking-tighter">Contact Us</h2>
-            <p className="text-gray-500 md:text-lg">
+            <h2 className="text-3xl font-bold tracking-tighter text-foreground">Contact Us</h2>
+            <p className="text-muted-foreground text-lg">
               Have questions or feedback? We'd love to hear from you.
             </p>
             <div className="space-y-4 pt-4">
