@@ -59,7 +59,7 @@ export function Newsletter() {
               <span>Stay updated</span>
             </div>
             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-foreground">
-              Subscribe to Our Newsletter
+              Subscribeto Our Newsletter
             </h2>
             <p className="text-muted-foreground text-lg">
               Get the latest insights about relationships and psychological well-being delivered to your inbox.
