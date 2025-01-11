@@ -31,7 +31,7 @@ export default function Navbar() {
           href="/" 
           className="text-xl font-bold hover:opacity-80 transition-opacity"
         >
-          Relationship Matrix
+          Sociolytics
         </Link>
 
         <div className="flex items-center gap-6">

@@ -2,8 +2,8 @@ import Hero from "@/components/hero"
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Relationship Matrix - Data-Driven Relationship Assessment",
-  description: "Gain insights into your relationship through our scientifically designed assessment tools. Understand your relationship's strengths and areas for growth.",
+  title: "Sociolytics | Relationship Psychology Tests & Analysis",
+  description: "Discover insights about your relationships through scientifically-designed psychological tests. Get personalized analysis and improve your connections with others.",
 }
 
 export default function HomePage() {

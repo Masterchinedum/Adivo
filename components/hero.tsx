@@ -1,123 +1,94 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
+import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { ArrowRight, Brain, Heart, Sparkles } from "lucide-react"
 
-export default function Hero() {
+const Hero = () => {
   return (
     <section className="relative overflow-hidden">
-      {/* Background Animation */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-grid-white/[0.02] dark:bg-grid-white/[0.05]" />
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary-foreground/20 dark:from-primary/10 dark:to-primary-foreground/10"
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-        <div className="absolute inset-0 bg-background/80 backdrop-blur-3xl" />
-      </div>
+      {/* Background Pattern */}
+      <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)]" />
 
-      <div className="container mx-auto px-4">
-        <div className="min-h-[90vh] flex items-center justify-between gap-8 py-20">
-          {/* Content Column */}
-          <motion.div 
-            className="w-full lg:w-1/2 space-y-8"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+      <div className="container px-4 md:px-6 py-12 md:py-24 lg:py-32">
+        <div className="flex flex-col items-center space-y-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-3xl space-y-4"
           >
-            <div className="space-y-6">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.5 }}
-                className="inline-block"
-              >
-                <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
-                  Relationship Assessment Platform
-                </span>
-              </motion.div>
-
-              <motion.h1 
-                className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.5 }}
-              >
-                Discover Your 
-                <span className="text-primary"> Relationship</span>
-                <br />
-                Potential
-              </motion.h1>
-
-              <motion.p 
-                className="text-lg sm:text-xl text-muted-foreground max-w-xl"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.5 }}
-              >
-                Use our data-driven assessment tools to gain deep insights into your relationship dynamics. Understanding leads to growth.
-              </motion.p>
-            </div>
-
-            <motion.div 
-              className="flex flex-col sm:flex-row gap-4 pt-4"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-            >
-              <Button size="lg" className="text-base">
-                <Link href="/tests">Take Assessment</Link>
-              </Button>
-              <Button size="lg" variant="outline" className="text-base">
-                <Link href="/about">Learn More</Link>
-              </Button>
-            </motion.div>
-
-            <motion.div
-              className="pt-8 flex items-center gap-8"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.5 }}
-            >
-              <div className="flex flex-col">
-                <span className="text-3xl font-bold">7+</span>
-                <span className="text-muted-foreground">Assessment Types</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-3xl font-bold">5min</span>
-                <span className="text-muted-foreground">Average Time</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-3xl font-bold">98%</span>
-                <span className="text-muted-foreground">Accuracy Rate</span>
-              </div>
-            </motion.div>
+            <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl text-foreground">
+              Discover Your Relationship{" "}
+              <span className="text-primary">Dynamics</span>
+            </h1>
+            <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
+              Take our scientifically designed tests to gain insights into your relationships 
+              and understand yourself better.
+            </p>
           </motion.div>
 
-          {/* Visual Column */}
           <motion.div 
-            className="hidden lg:block w-1/2"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="flex flex-col sm:flex-row gap-4 w-full max-w-sm sm:max-w-none justify-center"
           >
-            <div className="relative h-[600px] w-full">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-primary-foreground/30 rounded-lg backdrop-blur-sm" />
-              <div className="absolute inset-4 bg-white/5 rounded-lg border border-white/10 backdrop-blur-md" />
-              <div className="absolute inset-8 bg-white/5 rounded-lg border border-white/10 backdrop-blur-md" />
-            </div>
+            <Button size="lg" asChild>
+              <Link href="/tests">
+                Take a Test
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button variant="outline" size="lg" asChild>
+              <Link href="/about">
+                Learn More
+              </Link>
+            </Button>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+            className="grid grid-cols-1 sm:grid-cols-3 gap-8 pt-8"
+          >
+            {features.map((feature, index) => (
+              <div 
+                key={index}
+                className="flex flex-col items-center space-y-2 p-4 rounded-lg border bg-card text-card-foreground shadow-sm transition-all hover:shadow-md"
+              >
+                {feature.icon}
+                <h3 className="text-xl font-semibold">{feature.title}</h3>
+                <p className="text-sm text-muted-foreground text-center">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
           </motion.div>
         </div>
       </div>
     </section>
   )
 }
+
+const features = [
+  {
+    title: "Scientific Approach",
+    description: "Based on established psychological research and relationship studies",
+    icon: <Brain className="h-6 w-6 text-primary" />,
+  },
+  {
+    title: "Deep Insights",
+    description: "Get detailed analysis of your relationship patterns and behaviors",
+    icon: <Sparkles className="h-6 w-6 text-primary" />,
+  },
+  {
+    title: "Improve Connections",
+    description: "Learn how to build stronger and healthier relationships",
+    icon: <Heart className="h-6 w-6 text-primary" />,
+  }
+]
+
+export default Hero

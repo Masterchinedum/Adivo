@@ -13,8 +13,8 @@ import { Inter } from "next/font/google"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
-  title: "Relationship Matrix",
-  description: "Interactive tests to explore relationships and self-reflection.",
+  title: "Sociolytics | Relationship Psychology Tests & Analysis",
+  description: "Discover insights about your relationships through scientifically-designed psychological tests. Get personalized analysis and improve your connections with others.",
 }
 
 export default function RootLayout({
