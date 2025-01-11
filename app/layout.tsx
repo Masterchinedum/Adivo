@@ -6,7 +6,7 @@ import { ProfileCompletionProvider } from '@/lib/contexts/ProfileCompletionConte
 import { ProfileCompletionDialog } from '@/components/profile/ProfileCompletionDialog'
 import { Toaster } from "@/components/ui/sonner"
 import Navbar from "@/components/navbar"
-import Footer from "@/components/footer"
+import { Footer } from "@/components/footer"
 import "./globals.css"
 import { Inter } from "next/font/google"
 
