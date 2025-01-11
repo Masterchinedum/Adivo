@@ -1,6 +1,7 @@
 import Hero from "@/components/hero"
 import { Metadata } from "next"
 import { FeaturesGrid } from "@/components/features-grid"
+import { HowItWorks } from "@/components/how-it-works"
 
 export const metadata: Metadata = {
   title: "Sociolytics | Relationship Psychology Tests & Analysis",
@@ -12,6 +13,7 @@ export default function HomePage() {
     <main>
       <Hero />
       <FeaturesGrid />
+      <HowItWorks />
       {/* Other sections will be added here */}
     </main>
   )
