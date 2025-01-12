@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { LayoutGrid, LayoutList } from "lucide-react";
-import { BlogListControlsProps, SortOption } from '@/app/types/blog';
+import { BlogListControlsProps, SortOption } from '@/types/blog';
 
 const sortOptions: Array<SortOption> = [
   { label: 'Newest First', value: 'newest' },

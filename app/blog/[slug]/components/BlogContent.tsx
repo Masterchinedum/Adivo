@@ -1,6 +1,6 @@
 import { PortableText } from "@portabletext/react";
 import { PortableTextReactComponents, PortableTextComponentProps } from "@portabletext/react";
-import { BlogContentProps, Post } from "@/app/types/blog";
+import { BlogContentProps, Post } from "@/types/blog";
 import { portableTextComponents } from "@/lib/portableText";
 import Image from "next/image";
 import { urlForImage } from "@/app/sanity/sanity.image";

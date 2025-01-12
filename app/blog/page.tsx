@@ -13,7 +13,7 @@ import {
   Post, 
   SortOption, 
   ViewMode 
-} from '@/app/types/blog';
+} from '@/types/blog';
 
 const postFields = `
   _id,

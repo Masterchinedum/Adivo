@@ -2,7 +2,7 @@
 // import { Badge } from "@/components/ui/badge";
 import { PostCard } from "./PostCard";
 import { SanityClient } from "@/app/sanity/client";
-import { Post} from "@/app/types/blog";
+import { Post} from "@/types/blog";
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 // import { Post, Category } from "@/app/types/blog";
@@ -55,7 +55,7 @@ export default async function RecentBlogPosts() {
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4">Recent Blog Posts</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Exploring the intersection of web development and biochemistry through detailed articles and tutorials
+            Exploring Relationship Intricacies
           </p>
           
           {/* Categories Filter */}

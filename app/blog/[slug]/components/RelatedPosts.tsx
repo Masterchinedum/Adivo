@@ -1,4 +1,4 @@
-import { Post } from '@/app/types/blog'
+import { Post } from '@/types/blog'
 import Image from 'next/image'
 import Link from 'next/link'
 import { urlForImage } from '@/app/sanity/sanity.image'

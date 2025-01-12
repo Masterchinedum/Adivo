@@ -3,7 +3,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Category } from "@/app/types/blog";
+import { Category } from "@/types/blog";
 
 interface CategoryFilterProps {
   categories: Category[];

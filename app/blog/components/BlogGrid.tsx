@@ -3,7 +3,7 @@
 import { PostCardGrid } from "@/app/blog/components/PostCardGrid";
 import { PostCardList } from "@/app/blog/components/PostCardList";
 import { cn } from "@/lib/utils";
-import { BlogGridProps } from '@/app/types/blog';
+import { BlogGridProps } from '@/types/blog';
 
 export function BlogGrid({ posts, viewMode }: BlogGridProps) {
   const gridCols = viewMode.type === 'grid'

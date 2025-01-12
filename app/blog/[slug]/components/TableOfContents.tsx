@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { TableOfContentsItem } from "@/app/types/blog";
+import { TableOfContentsItem } from "@/types/blog";
 import { extractTableOfContents } from "@/lib/utils";
 import { PortableTextBlock } from '@portabletext/types';
 

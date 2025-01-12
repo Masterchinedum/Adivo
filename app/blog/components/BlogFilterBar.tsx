@@ -19,7 +19,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { BlogFilterBarProps } from '@/app/types/blog';
+import { BlogFilterBarProps } from '@/types/blog';
 
 export function BlogFilterBar({
   categories,

@@ -40,7 +40,7 @@ export default function BlogHeader({ totalPosts, onSearchChange, searchValue }: 
         <div className="max-w-7xl mx-auto">
           <div className="text-center space-y-8">
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-              Exploring Web Development & Biochemistry
+              Exploring Relationships
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Dive into {totalPosts} articles where code meets science, featuring tutorials, insights, and discoveries.

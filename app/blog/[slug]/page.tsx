@@ -2,7 +2,7 @@
 
 import { SanityClient } from "@/app/sanity/client";
 import { notFound } from "next/navigation";
-import { PostDetails, Post, relatedPostsQuery, getExcerptText } from "@/app/types/blog";
+import { PostDetails, Post, relatedPostsQuery, getExcerptText } from "@/types/blog";
 import { singlePostQuery } from "@/app/sanity/sanity.queries";
 import BlogHeader from "./components/BlogHeader";
 import BlogContent from "./components/BlogContent";
@@ -94,7 +94,7 @@ export default async function BlogPost({ params }: Props) {
     : [];
 
   // Get the current URL for sharing
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://masterchinedum.vercel.app';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://sociolitica.vercel.app';
   const currentUrl = `${baseUrl}/blog/${slug}`;
 
   // Format publish date

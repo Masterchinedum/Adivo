@@ -54,7 +54,7 @@ const NewsletterSignup = () => {
     <div className="space-y-4">
       <h3 className="font-semibold">Stay Updated</h3>
       <p className="text-muted-foreground">
-        Subscribe to get updates on new articles and projects.
+        Subscribe to get updates on new articles.
       </p>
       <form className="space-y-2" onSubmit={subscribe}>
         <div className="space-y-2">

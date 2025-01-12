@@ -3,7 +3,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { CalendarDays, Clock } from "lucide-react"
-import { BlogHeaderProps } from "@/app/types/blog"
+import { BlogHeaderProps } from "@/types/blog"
 import Link from "next/link"
 
 export default function BlogHeader({

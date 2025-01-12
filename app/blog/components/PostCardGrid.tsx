@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { urlForImage } from "@/app/sanity/sanity.image";
-import { Post } from "@/app/types/blog";
+import { Post } from "@/types/blog";
 import { cn } from "@/lib/utils";
 
 interface PostCardGridProps {

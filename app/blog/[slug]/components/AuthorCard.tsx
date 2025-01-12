@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Github, Linkedin, Twitter } from "lucide-react"
-import { AuthorCardProps } from "@/app/types/blog"
+import { AuthorCardProps } from "@/types/blog"
 import { PortableText } from "@portabletext/react"
 
 export default function AuthorCard({ author, className }: AuthorCardProps) {
