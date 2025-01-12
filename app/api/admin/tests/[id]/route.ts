@@ -116,61 +116,17 @@ export async function PATCH(req: Request) {
             for (const category of categories) {
               if (category.id) {
                 // Update existing category
-                await tx.category.upsert({
+                await tx.category.update({
                   where: { id: category.id },
-                  update: {
+                  data: {
                     name: category.name,
                     description: category.description,
                     scale: category.scale
-                  },
-                  create: {
-                    id: category.id,
-                    name: category.name,
-                    description: category.description,
-                    scale: category.scale,
-                    testId: id
                   }
-                })
-
-                // Process questions
-                if (category.questions) {
-                  for (const question of category.questions) {
-                    // Update or create question
-                    const upsertedQuestion = await tx.question.upsert({
-                      where: { id: question.id || 'temp-id' },
-                      update: {
-                        title: question.title
-                      },
-                      create: {
-                        title: question.title,
-                        categoryId: category.id,
-                        testId: id
-                      }
-                    })
-
-                    // Process options
-                    if (question.options) {
-                      // Delete old options
-                      if (question.id) {
-                        await tx.option.deleteMany({
-                          where: { questionId: question.id }
-                        })
-                      }
-
-                      // Create new options
-                      await tx.option.createMany({
-                        data: question.options.map(opt => ({
-                          text: opt.text,
-                          point: opt.point,
-                          questionId: upsertedQuestion.id
-                        }))
-                      })
-                    }
-                  }
-                }
+                });
               } else {
-                // Create new category with questions and options
-                await tx.category.create({
+                // Create new category with all relations
+                const newCategory = await tx.category.create({
                   data: {
                     name: category.name,
                     description: category.description,
@@ -181,12 +137,52 @@ export async function PATCH(req: Request) {
                         title: question.title,
                         testId: id,
                         options: {
-                          create: question.options
+                          create: question.options?.map(opt => ({
+                            text: opt.text,
+                            point: opt.point
+                          })) || []
                         }
-                      }))
+                      })) || []
                     }
                   }
-                })
+                });
+              }
+
+              // Process questions
+              if (category.questions) {
+                for (const question of category.questions) {
+                  // Update or create question
+                  const upsertedQuestion = await tx.question.upsert({
+                    where: { id: question.id || 'temp-id' },
+                    update: {
+                      title: question.title
+                    },
+                    create: {
+                      title: question.title,
+                      categoryId: category.id,
+                      testId: id
+                    }
+                  })
+
+                  // Process options
+                  if (question.options) {
+                    // Delete old options
+                    if (question.id) {
+                      await tx.option.deleteMany({
+                        where: { questionId: question.id }
+                      })
+                    }
+
+                    // Create new options
+                    await tx.option.createMany({
+                      data: question.options.map(opt => ({
+                        text: opt.text,
+                        point: opt.point,
+                        questionId: upsertedQuestion.id
+                      }))
+                    })
+                  }
+                }
               }
             }
 
