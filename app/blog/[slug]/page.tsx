@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!post) return { title: "Not Found" };
 
   const excerptText = getExcerptText(post.excerpt);
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://masterchinedum.vercel.app';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_UR || 'https://sociolitica.vercel.app';
   const postUrl = `${baseUrl}/blog/${slug}`;
 
   return {
