@@ -31,7 +31,7 @@ export function CategoryList({ form }: CategoryListProps) {
   const handleAddCategory = () => {
     append({
       name: "",
-      description: "",
+      description: "", // Changed from null to empty string
       scale: 0,
       questions: []
     });
@@ -98,6 +98,7 @@ export function CategoryList({ form }: CategoryListProps) {
                     <FormControl>
                       <Textarea
                         {...field}
+                        value={field.value || ''} // Convert null/undefined to empty string
                         placeholder="Enter category description"
                         rows={2}
                       />

@@ -3,7 +3,7 @@ import { Question } from './question'
 export interface Category {
     id: string
     name: string
-    description?: string
+    description: string // Make this required but possibly empty
     scale: number
     testId: string
     createdAt: Date
@@ -16,14 +16,14 @@ export interface Category {
 
 export interface CreateCategoryPayload {
     name: string
-    description?: string
+    description: string // Changed from optional to required
     scale: number
     testId: string
 }
 
 export interface UpdateCategoryPayload {
     name?: string
-    description?: string
+    description?: string // Keep this optional for updates
     scale?: number
 }
 

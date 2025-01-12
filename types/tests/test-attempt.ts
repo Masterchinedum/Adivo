@@ -29,7 +29,15 @@ export interface CategoryScore {
   rawScore: number
   maxRawScore: number
   scaledScore: number
-  category: Category
+  category: {
+    id: string
+    name: string
+    description: string // Make this required but possibly empty
+    scale: number
+    testId: string
+    createdAt: Date
+    updatedAt: Date
+  }
   createdAt: Date
   updatedAt: Date
 }

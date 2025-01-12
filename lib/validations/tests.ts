@@ -13,10 +13,10 @@ const questionSchema = z.object({
   options: z.array(optionSchema).min(1, "At least one option is required")
 })
 
-const categorySchema = z.object({
+export const categorySchema = z.object({
   id: z.string().cuid().optional(),
   name: z.string().min(1, "Category name is required"),
-  description: z.string().nullable().optional(),
+  description: z.string().default(''), // Default to empty string instead of nullable
   scale: z.number().int().min(0),
   questions: z.array(questionSchema).default([])
 })

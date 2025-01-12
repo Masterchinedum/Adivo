@@ -99,10 +99,10 @@ export async function GET(req: Request): Promise<NextResponse<TestAttemptResult 
       percentageScore,
       categoryScores: attempt.categoryScores.map(cs => ({
         ...cs,
-        scaledScore: cs.actualScore, // Map actualScore to scaledScore
+        scaledScore: cs.actualScore,
         category: {
           ...cs.category,
-          description: cs.category.description || undefined // Ensure description is string | undefined
+          description: cs.category.description || '' // Convert null/undefined to empty string
         }
       })),
       responses: attempt.responses.map(response => ({
