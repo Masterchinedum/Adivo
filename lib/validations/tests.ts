@@ -1,42 +1,42 @@
-// lib/validations/tests.ts
+import { z } from "zod"
 
-import * as z from 'zod'
-
+// Base schemas for reuse
 const optionSchema = z.object({
-  text: z
-    .string()
-    .min(1, 'Option text is required')
-    .max(500, 'Option text must be less than 500 characters'),
-  point: z
-    .number()
-    .int("Point must be an integer")
-    .min(0, "Point must be a non-negative number")
+  id: z.string().cuid().optional(),
+  text: z.string().min(1, "Option text is required"),
+  point: z.number().int().min(0)
 })
 
 const questionSchema = z.object({
-  title: z
-      .string()
-      .min(1, 'Question title is required')
-      .max(1000, 'Question title must be less than 1000 characters'),
-  options: z.array(optionSchema).optional()
+  id: z.string().cuid().optional(),
+  title: z.string().min(1, "Question title is required"),
+  options: z.array(optionSchema).min(1, "At least one option is required")
 })
 
 const categorySchema = z.object({
-  name: z
-    .string()
-    .min(1, 'Category name is required')
-    .max(100, 'Category name must be less than 100 characters'),
-  description: z
-    .string()
-    .max(500, 'Description must be less than 500 characters')
-    .optional(),
-  scale: z
-    .number()
-    .int("Scale must be an integer")
-    .min(0, "Scale must be a non-negative number"),
+  id: z.string().cuid().optional(),
+  name: z.string().min(1, "Category name is required"),
+  description: z.string().nullable().optional(),
+  scale: z.number().int().min(0),
   questions: z.array(questionSchema).default([])
 })
 
+// Main update schema
+export const updateTestSchema = z.object({
+  id: z.string().uuid("Invalid test ID"),
+  title: z.string().min(1).max(100).optional(),
+  description: z.string().max(500).nullable().optional(),
+  isPublished: z.boolean().optional(),
+  categories: z.array(categorySchema).default([])
+})
+
+// Types generated from schemas
+export type UpdateTestInput = z.infer<typeof updateTestSchema>
+export type CategoryInput = z.infer<typeof categorySchema>
+export type QuestionInput = z.infer<typeof questionSchema>
+export type OptionInput = z.infer<typeof optionSchema>
+
+// Schema for creating a test
 export const testSchema = z.object({
   title: z
     .string()
@@ -48,44 +48,6 @@ export const testSchema = z.object({
     .optional(),
   isPublished: z.boolean().default(false),
   categories: z.array(categorySchema).default([])
-})
-
-// Schema for updating a test
-export const updateTestSchema = z.object({
-  id: z.string().uuid("Invalid test ID"), // Changed to uuid to match Prisma
-  title: z
-    .string()
-    .min(1, "Title is required")
-    .max(100, "Title must be less than 100 characters")
-    .optional(),
-  description: z
-    .string()
-    .max(500, "Description must be less than 500 characters")
-    .nullable() // Changed to nullable to match Prisma
-    .optional(),
-  isPublished: z.boolean().optional(),
-  categories: z.array(
-    z.object({
-      id: z.string().cuid("Invalid category ID").optional(),
-      name: z.string().min(1, "Category name is required"),
-      description: z.string().max(500).nullable().optional(),
-      scale: z.number().int().min(0),
-      questions: z.array(
-        z.object({
-          id: z.string().cuid("Invalid question ID").optional(),
-          title: z.string().min(1, "Question title is required"),
-          categoryId: z.string().cuid("Invalid category ID").optional(),
-          options: z.array(
-            z.object({
-              id: z.string().cuid("Invalid option ID").optional(),
-              text: z.string().min(1, "Option text is required"),
-              point: z.number().int().min(0)
-            })
-          ).optional()
-        })
-      ).default([])
-    })
-  ).default([])
 })
 
 // For query parameters

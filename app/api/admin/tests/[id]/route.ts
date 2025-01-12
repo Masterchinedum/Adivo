@@ -2,10 +2,11 @@
 
 import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
-// import { Prisma } from '@prisma/client'
 import prisma from '@/lib/prisma'
 import { updateTestSchema } from '@/lib/validations/tests'
-// import type { TestError } from '@/types/tests/test'
+import { TestService } from '@/lib/services/test-service'
+
+const testService = new TestService(prisma)
 
 export async function GET(req: Request) {
   try {
@@ -50,23 +51,17 @@ export async function GET(req: Request) {
 
 export async function PATCH(req: Request) {
   try {
-    console.log('[TEST_PATCH] Starting PATCH request')
-    const id = req.url.split('/tests/')[1].split('/')[0]
-    console.log('[TEST_PATCH] Extracted ID:', id)
-
+    // Auth check
     const { userId } = await auth()
     if (!userId) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
 
+    // Extract and validate input
+    const id = req.url.split('/tests/')[1].split('/')[0]
     const json = await req.json()
-    console.log('[TEST_PATCH] Request body:', json)
-
-    const validationResult = updateTestSchema.safeParse({
-      ...json,
-      id
-    })
-
+    
+    const validationResult = updateTestSchema.safeParse({ ...json, id })
     if (!validationResult.success) {
       return NextResponse.json({
         message: 'Invalid request data',
@@ -74,166 +69,19 @@ export async function PATCH(req: Request) {
       }, { status: 400 })
     }
 
-    const { categories, ...testData } = validationResult.data
-
-    // Add retries for transaction
+    // Process update with retries
     const maxRetries = 3
-    let retryCount = 0
-    let updatedTest = null
-
-    while (retryCount < maxRetries && !updatedTest) {
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
-        updatedTest = await prisma.$transaction(async (tx) => {
-          // 1. Verify test exists
-          const existingTest = await tx.test.findUnique({
-            where: { id },
-            include: {
-              categories: {
-                include: {
-                  questions: {
-                    include: {
-                      options: true
-                    }
-                  }
-                }
-              }
-            }
-          })
-
-          if (!existingTest) {
-            throw new Error('Test not found')
-          }
-
-          // 2. Update test basic info first
-          await tx.test.update({
-            where: { id },
-            data: testData
-          })
-
-          // 3. Process categories in smaller chunks
-          if (categories) {
-            // Update or create categories
-            for (const category of categories) {
-              if (category.id) {
-                // Update existing category
-                await tx.category.update({
-                  where: { id: category.id },
-                  data: {
-                    name: category.name,
-                    description: category.description,
-                    scale: category.scale
-                  }
-                });
-              } else {
-                // Create new category with all relations
-                const newCategory = await tx.category.create({
-                  data: {
-                    name: category.name,
-                    description: category.description,
-                    scale: category.scale,
-                    testId: id,
-                    questions: {
-                      create: category.questions?.map(question => ({
-                        title: question.title,
-                        testId: id,
-                        options: {
-                          create: question.options?.map(opt => ({
-                            text: opt.text,
-                            point: opt.point
-                          })) || []
-                        }
-                      })) || []
-                    }
-                  }
-                });
-              }
-
-              // Process questions
-              if (category.questions) {
-                for (const question of category.questions) {
-                  // Update or create question
-                  const upsertedQuestion = await tx.question.upsert({
-                    where: { id: question.id || 'temp-id' },
-                    update: {
-                      title: question.title
-                    },
-                    create: {
-                      title: question.title,
-                      categoryId: category.id,
-                      testId: id
-                    }
-                  })
-
-                  // Process options
-                  if (question.options) {
-                    // Delete old options
-                    if (question.id) {
-                      await tx.option.deleteMany({
-                        where: { questionId: question.id }
-                      })
-                    }
-
-                    // Create new options
-                    await tx.option.createMany({
-                      data: question.options.map(opt => ({
-                        text: opt.text,
-                        point: opt.point,
-                        questionId: upsertedQuestion.id
-                      }))
-                    })
-                  }
-                }
-              }
-            }
-
-            // Delete removed categories
-            const newCategoryIds = categories
-              .map(c => c.id)
-              .filter((id): id is string => id !== undefined)
-
-            await tx.category.deleteMany({
-              where: {
-                testId: id,
-                id: { notIn: newCategoryIds }
-              }
-            })
-          }
-
-          // 4. Return updated test
-          return await tx.test.findUnique({
-            where: { id },
-            include: {
-              categories: {
-                include: {
-                  questions: {
-                    include: {
-                      options: true
-                    }
-                  }
-                }
-              }
-            }
-          })
-        }, {
-          maxWait: 5000, // 5s maximum waiting time
-          timeout: 10000 // 10s timeout
-        })
-
-        break // Exit loop if successful
+        const updatedTest = await testService.updateTest(validationResult.data)
+        return NextResponse.json(updatedTest)
       } catch (err) {
-        retryCount++
-        console.error(`[TEST_PATCH] Transaction attempt ${retryCount} failed:`, err)
-        if (retryCount === maxRetries) throw err
-        await new Promise(resolve => setTimeout(resolve, 1000 * retryCount)) // Exponential backoff
+        if (attempt === maxRetries - 1) throw err
+        await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)))
       }
     }
 
-    if (!updatedTest) {
-      return NextResponse.json({ message: 'Failed to update test' }, { status: 500 })
-    }
-
-    return NextResponse.json(updatedTest)
-
+    return NextResponse.json({ message: 'Failed to update test' }, { status: 500 })
   } catch (error) {
     console.error('[TEST_PATCH] Error:', error)
     const message = error instanceof Error ? error.message : 'Internal Server Error'
