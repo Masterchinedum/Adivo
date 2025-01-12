@@ -11,8 +11,8 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // Add this section for fonts
-  optimizeFonts: true,
+  // // Add this section for fonts
+  // optimizeFonts: true,
 };
 
 export default nextConfig;
