@@ -27,39 +27,3 @@ export const singlePostQuery = `*[_type == "post" && slug.current == $slug][0]{
     description
   }
 }`;
-
-
-const webProjectFields = `
-  _id,
-  _createdAt,
-  name,
-  slug,
-  link,
-  description,
-  mainImage,
-  techStack
-`;
-
-const scientificProjectFields = `
-  _id,
-  _createdAt,
-  title,
-  slug,
-  link,
-  abstract,
-  projectType,
-  mainImage,
-  tags
-`;
-
-export const getWebProjectsQuery = `
-  *[_type == "webProject"] | order(_createdAt desc)[0...4] {
-    ${webProjectFields}
-  }
-`;
-
-export const getScientificProjectsQuery = `
-  *[_type == "scientificProject"] | order(_createdAt desc)[0...4] {
-    ${scientificProjectFields}
-  }
-`;
