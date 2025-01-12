@@ -52,7 +52,7 @@ export function BlogFilterBar({
               </PopoverTrigger>
               <PopoverContent className="w-[200px] p-0">
                 <Command>
-                  <CommandInput placeholder="Search categories..." />
+                 >
                   <CommandEmpty>No category found.</CommandEmpty>
                   <CommandGroup>
                     {categories.map((category) => (
