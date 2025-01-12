@@ -4,7 +4,7 @@ import { FeaturesGrid } from "@/components/features-grid"
 import { HowItWorks } from "@/components/how-it-works"
 import { CallToAction } from "@/components/call-to-action"
 import { Newsletter } from "@/components/newsletter"
-import RecentBlogPosts from "./components/RecentBlogPosts";
+import RecentBlogPosts from "@/components/RecentBlogPosts";
 
 export const metadata: Metadata = {
   title: "Sociolytics | Relationship Psychology Tests & Analysis",
