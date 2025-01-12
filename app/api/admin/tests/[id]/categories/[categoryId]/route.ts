@@ -2,7 +2,7 @@
 
 import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
+import prisma from '@/lib/prism'
 import { updateCategorySchema } from '@/lib/validations/category'
 import type { CategoryError } from '@/types/tests/category'
 
