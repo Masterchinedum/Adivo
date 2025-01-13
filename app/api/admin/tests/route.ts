@@ -1,5 +1,3 @@
-// app/api/admin/tests/route.ts
-
 import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import { Prisma } from '@prisma/client'
