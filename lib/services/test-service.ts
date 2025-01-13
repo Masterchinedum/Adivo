@@ -9,18 +9,24 @@ export class TestService {
   async updateTest(data: UpdateTestInput) {
     const { id, categories, ...testData } = data
 
-    return await this.prisma.$transaction(async (tx) => {
-      // 1. Verify and update test
-      await this.verifyAndUpdateTest(tx, id, testData)
-      
-      // 2. Process categories if they exist
-      if (categories?.length) {
-        await this.processCategories(tx, id, categories)
-      }
+    return await this.prisma.$transaction(
+      async (tx) => {
+        // 1. Verify and update test
+        await this.verifyAndUpdateTest(tx, id, testData)
+        
+        // 2. Process categories if they exist
+        if (categories?.length) {
+          await this.processCategories(tx, id, categories)
+        }
 
-      // 3. Return updated test
-      return await this.getTestWithRelations(tx, id)
-    })
+        // 3. Return updated test
+        return await this.getTestWithRelations(tx, id)
+      },
+      {
+        maxWait: 10000, // 10 seconds max waiting time
+        timeout: 15000  // 15 seconds transaction timeout
+      }
+    )
   }
 
   private async verifyAndUpdateTest(
