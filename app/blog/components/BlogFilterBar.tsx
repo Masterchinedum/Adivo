@@ -58,10 +58,11 @@ export function BlogFilterBar({
                     {categories.map((category) => (
                       <CommandItem
                         key={category._id}
-                        onSelect={() => {
+                        onClick={() => {
                           onCategoryChange(category._id);
                           setOpenCategories(false);
                         }}
+                        selected={selectedCategories.includes(category._id)}
                       >
                         <Check
                           className={cn(
