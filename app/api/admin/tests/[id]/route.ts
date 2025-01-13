@@ -81,7 +81,17 @@ export async function PATCH(req: Request) {
       }
     }
 
-    return NextResponse.json({ message: 'Failed to update test' }, { status: 500 })
+    try {
+      const result = await testService.updateTest(validationResult.data);
+      return NextResponse.json(result);
+    } catch (error) {
+      return NextResponse.json(
+        { error: error instanceof Error ? error.message : 'An unexpected error occurred' },
+        { status: 400 }
+      );
+    }
+
+    // return NextResponse.json({ message: 'Failed to update test' }, { status: 500 })
   } catch (error) {
     console.error('[TEST_PATCH] Error:', error)
     const message = error instanceof Error ? error.message : 'Internal Server Error'
