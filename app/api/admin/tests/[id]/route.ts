@@ -51,13 +51,13 @@ export async function GET(req: Request) {
 
 export async function PATCH(req: Request) {
   try {
-    // Auth check
+    // Auth check remains the same
     const { userId } = await auth()
     if (!userId) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
 
-    // Extract and validate input
+    // Extract and validate input remains the same
     const id = req.url.split('/tests/')[1].split('/')[0]
     const json = await req.json()
     
@@ -71,31 +71,30 @@ export async function PATCH(req: Request) {
 
     // Process update with retries
     const maxRetries = 3
+    let lastError: Error | null = null;
+
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
         const updatedTest = await testService.updateTest(validationResult.data)
         return NextResponse.json(updatedTest)
       } catch (err) {
-        if (attempt === maxRetries - 1) throw err
+        lastError = err instanceof Error ? err : new Error('Unknown error');
+        if (attempt === maxRetries - 1) break;
         await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)))
       }
     }
 
-    try {
-      const result = await testService.updateTest(validationResult.data);
-      return NextResponse.json(result);
-    } catch (error) {
-      return NextResponse.json(
-        { error: error instanceof Error ? error.message : 'An unexpected error occurred' },
-        { status: 400 }
-      );
-    }
+    // If we get here, all retries failed
+    console.error('[TEST_PATCH] All retries failed:', lastError)
+    return NextResponse.json({ 
+      message: lastError?.message || 'Failed to update test'
+    }, { status: 500 })
 
-    // return NextResponse.json({ message: 'Failed to update test' }, { status: 500 })
   } catch (error) {
     console.error('[TEST_PATCH] Error:', error)
-    const message = error instanceof Error ? error.message : 'Internal Server Error'
-    return NextResponse.json({ message }, { status: 500 })
+    return NextResponse.json({ 
+      message: error instanceof Error ? error.message : 'Internal Server Error'
+    }, { status: 500 })
   }
 }
 
