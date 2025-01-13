@@ -1,3 +1,5 @@
+//lib/services/test-service.ts
+
 import { PrismaClient, Prisma } from '@prisma/client'
 import { CategoryInput, UpdateTestInput } from '../validations/tests'
 
@@ -58,14 +60,14 @@ export class TestService {
       }
     })
 
-    // Update or create categories
-    for (const category of categories) {
-      if (category.id) {
-        await this.updateExistingCategory(tx, category)
-      } else {
-        await this.createNewCategory(tx, testId, category)
-      }
-    }
+    // Process all categories concurrently
+    await Promise.all(
+      categories.map(category => 
+        category.id 
+          ? this.updateExistingCategory(tx, category)
+          : this.createNewCategory(tx, testId, category)
+      )
+    )
   }
 
   private async updateExistingCategory(
