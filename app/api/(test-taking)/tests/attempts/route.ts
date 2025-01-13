@@ -1,5 +1,3 @@
-// app/api/(test-taking)/tests/attempts/route.ts
-
 import { auth } from "@clerk/nextjs/server"
 import { NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
@@ -20,29 +18,33 @@ export async function GET() {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    const attempts = await prisma.testAttempt.findMany({
-      where: {
-        userId: user.id
-      },
-      include: {
-        test: {
-          select: {
-            id: true,
-            title: true
+    const attempts = await prisma.$transaction(async (tx) => {
+      const attempts = await tx.testAttempt.findMany({
+        where: {
+          userId: user.id
+        },
+        include: {
+          test: {
+            select: {
+              id: true,
+              title: true
+            }
           }
+        },
+        orderBy: {
+          startedAt: 'desc'
         }
-      },
-      orderBy: {
-        startedAt: 'desc'
-      }
+      })
+
+      const inProgress = attempts.filter(a => a.status === "IN_PROGRESS")
+      const completed = attempts
+        .filter(a => a.status === "COMPLETED")
+        .slice(0, 5)
+
+      return { inProgress, completed }
     })
 
-    const inProgress = attempts.filter(a => a.status === "IN_PROGRESS")
-    const completed = attempts
-      .filter(a => a.status === "COMPLETED")
-      .slice(0, 5)
-
-    return NextResponse.json({ inProgress, completed })
+    return NextResponse.json(attempts)
 
   } catch (error) {
     console.error("[TEST_ATTEMPTS_GET]", error)
